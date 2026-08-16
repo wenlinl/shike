@@ -33,7 +33,7 @@
 
 - 主控：T5-E1（SPARKLEIOT T5AI DEV）单板（ST7789 触控屏 + GC2145 摄像头 + 板载音频）
 - 固件：TuyaOpen 工程 `copy`（app_xzd.c：放入 / 取出 → 3 秒倒计时 → 拍照 → 上传 /api/scan）
-- 完整后端（含数据库 v3 与部署说明）位于 https://github.com/wenlinl/reporting-review-agent
+- 后端接口与数据库参考代码见 `backend/`；已部署 https://tuvmkt.com（完整可部署工程保留在本机与服务器）
 
 ## 说明
 
