@@ -8,7 +8,7 @@
 |---|---|---|
 | H5 手机端 | https://tuvmkt.com/shike-h5.html | 手机（iPhone 16 适配） |
 | 大屏版 | https://tuvmkt.com/shike-web.html | 电脑 / 投屏 |
-| 代码仓库 | https://github.com/wenlinl/reporting-review-agent | — |
+| 代码仓库 | https://github.com/wenlinl/shike | — |
 
 ## 2. 环境依赖（重要）
 
