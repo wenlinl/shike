@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>食刻 · H5 手机端</title>
+<style>
+:root{
+  --bg:#f8f1e9;
+  --cream:#fdf9f3;
+  --card:#fffdf9;
+  --ink:#50382b;
+  --ink-2:#a08c7c;
+  --line:#efe3d5;
+  --red:#e23c2b;
+  --red-deep:#c93122;
+  --green:#4d9a62;
+  --green-2:#3d7f50;
+  --green-soft:#e8f1e9;
+  --amber:#e8913c;
+  --amber-soft:#fdf0cd;
+  --blue:#5b8fc9;
+  --blue-soft:#deeefc;
+  --pink:#fce2d7;
+  --olive:#ecf3d8;
+  --yellow:#fdf0cd;
+  --shadow:0 10px 30px rgba(126,86,57,.10);
+  --shadow-sm:0 4px 14px rgba(126,86,57,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink);
+  padding-top:calc(env(safe-area-inset-top) + 106px);
+  padding-bottom:calc(env(safe-area-inset-bottom) + 104px);
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer}
+a{cursor:pointer}
+.phone{max-width:480px;margin:0 auto}
+
+/* ---------- 状态栏 ---------- */
+.statusbar{position:fixed;top:0;left:0;right:0;z-index:40;background:var(--bg);padding-top:env(safe-area-inset-top)}
+.statusbar .in{max-width:480px;margin:0 auto;height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.sb-time{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink);width:52px}
+.sb-island{width:104px;height:26px;border-radius:999px;background:#201511;position:relative}
+.sb-island::after{content:"";position:absolute;right:7px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:#2f2620;border:1px solid #40342c}
+.sb-icons{display:flex;align-items:center;gap:5px;width:80px;justify-content:flex-end;color:#3f2f26}
+
+/* ---------- 品牌栏 ---------- */
+.brandbar{
+  position:fixed;top:calc(env(safe-area-inset-top) + 40px);left:0;right:0;z-index:40;
+  background:rgba(248,241,233,.94);backdrop-filter:blur(12px);
+}
+.brandbar .in{max-width:480px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 18px}
+.brand{line-height:1.15}
+.brand .logo{font-size:23px;font-weight:800;color:var(--red);letter-spacing:1.5px}
+.brand .slogan{font-size:10.5px;color:var(--ink-2);margin-top:3px;letter-spacing:.2px}
+.brand-actions{display:flex;align-items:center;gap:10px}
+.icon-btn{position:relative;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid rgba(239,227,213,.9);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:#7a6857}
+.icon-btn .dot{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
+.icon-btn .dot.hidden{display:none}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f6c8a8,#e8a37f);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow-sm)}
+
+/* ---------- 布局 ---------- */
+main{padding:8px 16px 0}
+.page{display:none}
+.page.active{display:block;animation:fadeUp .28s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin:4px 2px 12px}
+.page-head .t{font-size:24px;font-weight:800;color:var(--red);letter-spacing:.5px}
+.page-head .s{font-size:12px;color:var(--ink-2);margin-top:4px;letter-spacing:.2px}
+.page-head .acts{display:flex;align-items:center;gap:8px}
+.page-head .icon-btn{width:38px;height:38px;border-radius:13px}
+.greet{font-size:24px;font-weight:800;color:var(--ink);margin:6px 2px 12px;letter-spacing:.5px}
+
+/* ---------- 首页：冰箱总览 ---------- */
+.fridge{position:relative;overflow:hidden;background:linear-gradient(135deg,#ef5a41,#d42f1f);border-radius:26px;padding:18px;color:#fff;display:flex;justify-content:space-between;gap:12px;box-shadow:0 14px 28px rgba(212,47,31,.26);margin-bottom:12px}
+.fridge::before,.fridge::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.09)}
+.fridge::before{width:150px;height:150px;top:-70px;right:-38px}
+.fridge::after{width:90px;height:90px;bottom:-46px;left:22%}
+.fridge-left{position:relative;z-index:1;flex:1;min-width:0}
+.fridge-head{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700}
+.fridge-head .upd{margin-left:auto;font-size:10.5px;font-weight:400;opacity:.85;white-space:nowrap}
+.fridge-stats{display:flex;gap:30px;margin:16px 0 14px}
+.fs b{font-size:34px;font-weight:800;line-height:1}
+.fs b small{font-size:13px;font-weight:600;opacity:.92}
+.fs em{display:block;font-style:normal;font-size:11.5px;opacity:.92;margin-top:5px}
+.fridge-link{display:inline-block;background:#fff;color:var(--red);font-size:12.5px;font-weight:700;padding:9px 18px;border-radius:999px;box-shadow:0 6px 14px rgba(150,30,15,.18);border:0}
+.fridge-illus{position:relative;z-index:1;flex:none;width:100px;align-self:center}
+.fridge-draw{background:#fffdf9;border-radius:16px;padding:10px 6px 12px;position:relative;box-shadow:inset 0 0 0 2px #f6ebdd}
+.fridge-draw .split{position:absolute;left:50%;top:10px;bottom:12px;width:2px;background:#efe0cf;transform:translateX(-1px)}
+.fridge-draw .handle{position:absolute;width:15px;height:3px;border-radius:2px;background:#d9c8b6}
+.fridge-draw .h1{left:7px;top:22px}
+.fridge-draw .h2{right:7px;top:22px}
+.fridge-draw .rows{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:14px;line-height:1}
+.fridge-draw .foot{position:absolute;left:8px;right:8px;bottom:4px;height:2px;border-radius:2px;background:#e3d2bf}
+
+/* ---------- 首页：双栏卡片 ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.half{border-radius:22px;padding:14px;display:flex;flex-direction:column;min-height:148px}
+.half h3{font-size:13.5px;font-weight:700;color:var(--ink)}
+.pink{background:var(--pink)}
+.olive{background:var(--olive)}
+.yellow{background:var(--yellow)}
+.blue{background:var(--blue-soft)}
+.f-name{font-size:17px;font-weight:800;color:var(--ink);margin-top:12px}
+.f-badge{align-self:flex-start;background:#fff;color:var(--red);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:999px;margin-top:8px}
+.f-desc{font-size:11px;color:#8a7461;margin-top:5px;line-height:1.4}
+.f-link{margin-top:auto;padding-top:10px;font-size:11px;color:var(--ink-2);display:flex;align-items:center;gap:2px}
+.f-meta{font-size:11px;color:var(--ink-2);margin-top:9px}
+.shop-row{display:flex;justify-content:space-between;font-size:12.5px;margin-top:9px}
+.shop-row b{color:var(--ink);font-weight:600}
+.shop-row span{color:var(--ink-2)}
+.fam-stat{font-size:15px;font-weight:800;color:var(--ink);margin-top:12px}
+
+/* ---------- 首页：快捷宫格 ---------- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 6px;background:var(--cream);border-radius:24px;padding:16px 8px 14px;border:1px solid rgba(239,227,213,.7);margin-bottom:4px}
+.qcell{display:flex;flex-direction:column;align-items:center;gap:7px;border:0;background:none;padding:0}
+.qic{width:44px;height:44px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:21px;position:relative}
+.qc1{background:#fde3dc}.qc2{background:#dcefdc}.qc3{background:#fdf0cd}.qc4{background:#ddebfa}
+.ql{font-size:10.5px;color:var(--ink);font-weight:600;text-align:center;line-height:1.3}
+.ql small{display:block;font-size:9px;color:var(--ink-2);font-weight:400;margin-top:1px}
+.ai-badge{position:absolute;top:-5px;right:-6px;background:#2f241c;color:#fff;font-size:7.5px;font-weight:700;padding:1.5px 4px;border-radius:5px;letter-spacing:.3px}
+
+/* ---------- 扫描页 ---------- */
+.viewfinder{position:relative;border-radius:26px;overflow:hidden;height:clamp(360px,46vh,460px);background:linear-gradient(165deg,#e3ecd0 0%,#b8c99a 55%,#93a977 100%);box-shadow:inset 0 0 60px rgba(70,95,45,.25)}
+.viewfinder.lit{filter:brightness(1.18) saturate(1.05)}
+.viewfinder video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.viewfinder.live video{display:block}
+.viewfinder.live .vf-scene{display:none}
+.vf-scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:.9;filter:drop-shadow(0 18px 22px rgba(60,80,40,.35))}
+.vf-scene::before,.vf-scene::after{content:"🥦";position:absolute;font-size:42px;opacity:.55;filter:blur(1px)}
+.vf-scene::before{left:9%;bottom:12%;transform:rotate(-18deg)}
+.vf-scene::after{right:8%;bottom:20%;transform:rotate(12deg) scale(.8)}
+.corner{position:absolute;width:30px;height:30px;border:3px solid rgba(127,176,105,.95)}
+.corner.tl{top:22px;left:22px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.corner.tr{top:22px;right:22px;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.corner.bl{bottom:22px;left:22px;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.corner.br{bottom:22px;right:22px;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.scanline{position:absolute;left:12%;right:12%;top:24%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(143,208,111,.95),transparent);box-shadow:0 0 12px 2px rgba(143,208,111,.6);animation:scan 2.8s ease-in-out infinite;z-index:2}
+@keyframes scan{0%,100%{top:24%}50%{top:74%}}
+.cam-status{position:absolute;top:16px;left:16px;z-index:3;font-size:11px;font-weight:700;padding:7px 12px;border-radius:999px;display:flex;gap:5px;align-items:center;backdrop-filter:blur(6px)}
+.cam-status.live{background:rgba(63,127,80,.88);color:#fff}
+.cam-status.demo{background:rgba(255,255,255,.86);color:#8a7461}
+.cam-status.err{background:rgba(212,47,31,.9);color:#fff}
+.cam-status .pulse{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.8;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.torch{position:absolute;top:16px;right:16px;z-index:3;background:rgba(255,255,255,.84);border:0;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:600;color:#4a443d;backdrop-filter:blur(6px);display:flex;gap:5px;align-items:center}
+.hint{position:absolute;left:50%;transform:translateX(-50%);bottom:18px;z-index:3;background:rgba(58,42,32,.58);color:#fff;font-size:11px;padding:8px 15px;border-radius:999px;backdrop-filter:blur(6px);display:flex;gap:6px;align-items:center;white-space:nowrap}
+.result{margin-top:12px;background:#eaf3e2;border-radius:22px;padding:14px;display:flex;align-items:center;gap:12px;transition:.25s}
+.result.hide{opacity:0;transform:translateY(6px);pointer-events:none;position:absolute;visibility:hidden}
+.res-thumb{width:64px;height:64px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:0 4px 12px rgba(80,56,43,.08);flex:none}
+.res-info{flex:1;min-width:0}
+.res-ok{display:flex;align-items:center;gap:5px;color:var(--green-2);font-size:12px;font-weight:700}
+.res-ok i{width:15px;height:15px;border-radius:50%;background:var(--green);color:#fff;font-style:normal;font-size:10px;display:inline-flex;align-items:center;justify-content:center}
+.res-info b{display:block;font-size:20px;color:var(--ink);margin:4px 0 2px}
+.res-keep{font-size:12px;color:var(--ink-2)}
+.res-keep i{font-style:normal;color:var(--red);font-weight:800}
+.res-conf{font-size:10.5px;color:var(--green-2);margin-top:3px}
+.res-sync{flex:none;width:76px;text-align:center;background:#fff;border-radius:16px;padding:9px 6px;font-size:10px;color:var(--ink-2);line-height:1.45}
+.res-sync .si{font-size:17px;display:block;margin-bottom:3px}
+.result.low{border:1px solid #f0d49c;background:#fffaf0}
+.result.low .res-thumb{font-size:30px}
+.btn-primary{margin-top:14px;width:100%;background:linear-gradient(135deg,#ef5a41,#d42f1f);color:#fff;border:0;border-radius:999px;padding:15px;font-size:16px;font-weight:700;box-shadow:0 12px 22px rgba(212,47,31,.28)}
+.btn-primary:disabled{opacity:.55}
+.btn-ghost{margin-top:10px;width:100%;background:#fff;color:var(--red);border:1px solid var(--red);border-radius:999px;padding:14px;font-size:15px;display:flex;align-items:center;justify-content:center;gap:7px}
+.elderly{margin-top:12px;background:var(--pink);border-radius:20px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.el-ic{font-size:24px}
+.el-t{font-size:13px;font-weight:700;color:var(--ink)}
+.el-d{font-size:11px;color:var(--ink-2);margin-top:2px}
+.el-heart{margin-left:auto;font-size:15px}
+
+/* ---------- 库存页 ---------- */
+.stats3{background:var(--cream);border-radius:22px;padding:16px 6px;display:flex;margin-bottom:12px;border:1px solid rgba(239,227,213,.7)}
+.col{flex:1;text-align:center;position:relative;padding:0 2px}
+.col+.col::before{content:"";position:absolute;left:0;top:14%;height:72%;width:1px;background:var(--line)}
+.s-icn{width:34px;height:34px;border-radius:12px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.s-red{background:#fde3dc}.s-amber{background:#fdf0cd}.s-green{background:#dcefdc}
+.col .n{font-size:23px;font-weight:800;line-height:1.1}
+.n-red{color:var(--red)}.n-amber{color:#c67a1e}.n-green{color:var(--green-2)}
+.col .l1{font-size:12px;color:var(--ink);font-weight:600;margin-top:4px}
+.col .l2{font-size:10px;color:var(--ink-2);margin-top:2px}
+.inv-search{display:none;margin:0 0 10px;position:relative}
+.inv-search.open{display:block}
+.inv-search input{width:100%;border:1px solid var(--line);border-radius:999px;padding:11px 38px 11px 16px;font-size:14px;background:#fff;color:var(--ink);font-family:inherit;outline:none}
+.inv-search .clear-x{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--ink-2);font-size:17px}
+.chips-wrap{display:flex;align-items:center;gap:8px;padding:2px 0 12px}
+.chips-row{display:flex;gap:8px;overflow-x:auto;flex:1;scrollbar-width:none;align-items:center}
+.chips-row::-webkit-scrollbar{display:none}
+.chip{flex:none;border-radius:999px;padding:9px 14px;font-size:13px;background:var(--cream);border:1px solid var(--line);color:var(--ink-2);transition:.2s}
+.chip.active{background:var(--red);border-color:var(--red);color:#fff;font-weight:600}
+.chip .cnt{opacity:.72;margin-left:3px;font-size:11px}
+.filter-btn{flex:none;width:38px;height:38px;border-radius:13px;background:var(--cream);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:#8a7461;position:relative}
+.filter-btn .dot{position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--red)}
+.inv-item{background:var(--cream);border-radius:20px;padding:12px;display:flex;gap:10px;margin-bottom:10px;border:1px solid rgba(239,227,213,.65);cursor:pointer}
+.inv-thumb{width:52px;height:52px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none;box-shadow:var(--shadow-sm)}
+.inv-body{flex:1;min-width:0}
+.inv-r1{display:flex;align-items:center;gap:6px}
+.inv-r1 b{font-size:15px;color:var(--ink)}
+.inv-cat{font-size:10px;padding:2px 8px;border-radius:999px;background:#fff;color:var(--ink-2);border:1px solid var(--line)}
+.inv-r2{display:flex;align-items:center;gap:8px;margin-top:5px}
+.inv-days{font-size:14px;font-weight:800}
+.d-red{color:var(--red)}.d-amber{color:#c67a1e}.d-green{color:var(--green-2)}
+.inv-st{font-size:10px;padding:2.5px 9px;border-radius:999px;font-weight:600}
+.st-red{background:#fde3dc;color:var(--red)}
+.st-amber{background:#fdf0cd;color:#c67a1e}
+.st-green{background:#dcefdc;color:var(--green-2)}
+.inv-bar{height:5px;border-radius:3px;background:#ece1d3;margin-top:8px;overflow:hidden}
+.inv-bar i{display:block;height:100%;border-radius:3px}
+.inv-r3{font-size:10px;color:var(--ink-2);margin-top:5px}
+.inv-right{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:54px}
+.who-av{width:26px;height:26px;border-radius:50%;background:#f2e6d8;display:flex;align-items:center;justify-content:center;font-size:13px}
+.who-name{font-size:10px;color:var(--ink);font-weight:600}
+.who-when{font-size:9px;color:var(--ink-2);text-align:center;line-height:1.3}
+.soon-banner{background:#fdf3dd;border-radius:20px;padding:13px 14px;display:flex;align-items:center;gap:10px;margin-top:14px;width:100%;border:0;text-align:left}
+.b-ic{width:36px;height:36px;border-radius:12px;background:#fbe3b8;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.b-t b{font-size:14px;color:var(--ink)}
+.b-t span{font-size:11px;color:var(--ink-2);display:block;margin-top:2px}
+.b-thumbs{display:flex;align-items:center;gap:5px;margin-left:auto}
+.b-thumb{width:27px;height:27px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:var(--shadow-sm)}
+.b-arrow{color:var(--red);font-size:17px;font-weight:700;margin-left:3px}
+.empty-box{text-align:center;color:var(--ink-2);font-size:13px;padding:44px 0;line-height:1.9}
+
+/* ---------- 菜谱页 ---------- */
+.fav-pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);color:var(--ink);font-size:12px;font-weight:600;padding:9px 15px;border-radius:999px;box-shadow:var(--shadow-sm)}
+.fav-pill b{color:var(--red)}
+.cream-panel{background:var(--cream);border-radius:22px;padding:14px;margin-bottom:12px;border:1px solid rgba(239,227,213,.65)}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.panel-head b{font-size:14px;color:var(--ink)}
+.panel-head a{font-size:12px;color:var(--red);text-decoration:none}
+.food-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.food-chips::-webkit-scrollbar{display:none}
+.fchip{flex:none;display:flex;align-items:center;gap:5px;background:#fff;border-radius:999px;padding:8px 13px;font-size:12px;color:var(--ink);box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.today-card{background:linear-gradient(150deg,#eef5df,#e2efcb);border-radius:26px;padding:16px;display:flex;gap:12px;margin-bottom:16px;position:relative}
+.tc-left{flex:1.15;min-width:0}
+.today-tag{display:inline-block;font-size:11px;color:var(--green-2);font-weight:700;background:#fff;padding:4px 10px;border-radius:999px}
+.tc-left h3{font-size:20px;color:var(--ink);margin:10px 0 4px;font-weight:800;line-height:1.25}
+.tc-meta{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink-2)}
+.tc-pill{background:#fff;color:var(--green-2);padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600}
+.tc-desc{font-size:11.5px;color:#6b5848;margin-top:9px;line-height:1.55}
+.tc-sub{font-size:10px;color:#9c8a78;margin-top:4px;letter-spacing:.2px}
+.green-btn{margin-top:12px;background:linear-gradient(135deg,#5eae74,#3f8f58);color:#fff;border:0;border-radius:999px;padding:10px 18px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:5px;box-shadow:0 8px 16px rgba(79,154,98,.28)}
+.tc-right{flex:1;position:relative}
+.food-img{width:100%;aspect-ratio:1/1.12;border-radius:18px;background:radial-gradient(circle at 34% 28%,#fffdf7,#d9e6bf 75%);display:flex;align-items:center;justify-content:center;font-size:52px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.75)}
+.heart-btn{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:#fff;border:0;color:#8fbf93;font-size:15px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
+.heart-btn.on{color:var(--red)}
+.sec-head{display:flex;justify-content:space-between;align-items:center;margin:2px 2px 10px}
+.sec-head b{font-size:15px;color:var(--ink)}
+.sec-head a{font-size:12px;color:var(--red);text-decoration:none}
+.rec-card{background:#fff;border-radius:20px;padding:12px;display:flex;gap:12px;margin-bottom:10px;border:1px solid rgba(239,227,213,.7);box-shadow:var(--shadow-sm);cursor:pointer}
+.rec-img{width:92px;height:92px;border-radius:16px;flex:none;display:flex;align-items:center;justify-content:center;font-size:40px}
+.rec-body{flex:1;min-width:0;display:flex;flex-direction:column}
+.rec-name{font-size:15px;font-weight:800;color:var(--ink)}
+.rec-meta{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:10.5px;color:var(--ink-2)}
+.rec-tag{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600}
+.tag-orange{background:#fdeeda;color:#c67a1e}
+.tag-blue{background:#e1eefb;color:#3f76ad}
+.tag-green{background:#e2f0e5;color:#3f7d50}
+.rec-desc{font-size:11px;color:#6b5848;margin-top:7px;line-height:1.5}
+.rec-sub{font-size:9.5px;color:#a08c7c;margin-top:3px}
+.rec-heart{align-self:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:#b8a99b;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.2s;flex:none}
+.rec-heart.on{color:var(--red);border-color:#f4c4bb;background:#fdebe7}
+.pref-row{display:flex;gap:10px}
+.pref{flex:1;border-radius:999px;padding:10px 6px;font-size:13px;background:#fff;border:1.5px solid;display:flex;align-items:center;justify-content:center;gap:5px;font-weight:600}
+.pref.green{color:var(--green-2);border-color:#8fc39b}
+.pref.orange{color:#c67a1e;border-color:#e8b26b}
+.pref.red{color:var(--red);border-color:#f0a08f}
+.pref.active::after{content:"✓";width:16px;height:16px;border-radius:50%;background:var(--green);color:#fff;font-size:10px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.pref-caption{font-size:11px;color:var(--ink-2);margin-top:11px}
+
+/* ---------- 我的页 ---------- */
+.profile{background:var(--cream);border-radius:24px;padding:18px;display:flex;align-items:center;gap:14px;border:1px solid rgba(239,227,213,.65);width:100%;border-top:0;border-left:0;border-right:0;text-align:left}
+.avatar-lg{width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#f6c8a8,#e8a37f);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none;box-shadow:var(--shadow-sm)}
+.pf-name{font-size:18px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+.pf-badge{display:inline-block;background:#fde7e2;color:var(--red);font-size:10px;padding:2px 8px;border-radius:999px;font-weight:600}
+.pf-sub{font-size:12px;color:var(--ink-2);margin-top:5px}
+.pf-arrow{margin-left:auto;color:#cbb9a8;font-size:18px;font-weight:700}
+.me-stats{margin-top:12px}
+.menu-card{background:#fff;border-radius:22px;margin-top:12px;border:1px solid rgba(239,227,213,.7);overflow:hidden;padding:6px 0;box-shadow:var(--shadow-sm)}
+.menu-item{display:flex;align-items:center;gap:12px;padding:14px 18px;font-size:14px;color:var(--ink);width:100%;background:none;border:0;text-align:left;position:relative;transition:background .15s}
+.menu-item:active{background:#faf3ea}
+.menu-item + .menu-item::before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:var(--line)}
+.mi-ic{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+.mi-arrow{margin-left:auto;color:#cbb9a8;font-size:15px}
+.app-footer{text-align:center;font-size:10.5px;color:#c0ad9a;margin-top:22px;letter-spacing:.5px}
+
+/* ---------- 底部悬浮 Tab 栏 ---------- */
+.tabbar{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 10px);padding:0 14px;z-index:30}
+.tabbar .in{max-width:452px;margin:0 auto;background:var(--card);border-radius:26px;box-shadow:0 12px 32px rgba(126,86,57,.18);border:1px solid rgba(239,227,213,.85);display:flex;height:66px;padding:7px 4px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:none;color:var(--ink-2);font-size:10px;border-radius:18px;transition:.2s}
+.tab .ic{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:11px;color:#a79787}
+.tab.active{color:var(--red);font-weight:700}
+.tab.active .ic{background:#fde7e2;color:var(--red)}
+
+/* ---------- 子页面（弹层） ---------- */
+.subview{position:fixed;inset:0;z-index:45;background:var(--bg);display:none;margin:0 auto;max-width:480px}
+.subview.open{display:block;animation:slideIn .26s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+.sv-head{position:sticky;top:0;z-index:2;background:rgba(248,241,233,.96);backdrop-filter:blur(10px);padding:calc(env(safe-area-inset-top) + 14px) 16px 10px;display:flex;align-items:center;gap:10px}
+.back-btn{width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--line);color:var(--ink);font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);flex:none;line-height:1}
+.sv-title{font-size:19px;font-weight:800;color:var(--ink);flex:1}
+.sv-right{flex:none}
+.sv-right-btn{background:var(--red);color:#fff;border:0;border-radius:999px;padding:8px 15px;font-size:12px;font-weight:600}
+.sv-body{padding:8px 16px calc(env(safe-area-inset-bottom) + 30px)}
+.sv-card{background:#fff;border-radius:20px;padding:14px;margin-bottom:12px;border:1px solid rgba(239,227,213,.7);box-shadow:var(--shadow-sm)}
+.sv-sec{font-size:15px;font-weight:800;color:var(--ink);margin:16px 0 8px;display:flex;align-items:center;justify-content:space-between}
+.sv-sec small{font-size:11px;color:var(--ink-2);font-weight:400}
+
+/* 购物清单 */
+.shop-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.shop-item:last-child{border-bottom:0}
+.shop-check{width:24px;height:24px;border-radius:50%;border:2px solid #d9c8b6;background:#fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex:none;cursor:pointer;transition:.2s}
+.shop-check.on{background:var(--green);border-color:var(--green)}
+.shop-name{flex:1;font-size:14px;color:var(--ink)}
+.shop-name.done{color:#c2b1a0;text-decoration:line-through}
+.shop-qty{display:flex;align-items:center;gap:7px;color:var(--ink-2);font-size:13px}
+.qty-btn{width:25px;height:25px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:14px}
+.shop-add{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sug-chip{display:inline-flex;align-items:center;gap:4px;background:var(--amber-soft);color:#b06f1d;font-size:11px;padding:6px 12px;border-radius:999px;border:0}
+
+/* 保鲜提醒 / 通知 */
+.remind-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.remind-item:last-child{border-bottom:0}
+.remind-ic{width:40px;height:40px;border-radius:12px;background:#f6ecdf;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.remind-body{flex:1;min-width:0}
+.remind-name{font-size:14px;font-weight:700;color:var(--ink)}
+.remind-meta{font-size:11px;color:var(--ink-2);margin-top:2px}
+.remind-actions{display:flex;gap:6px;flex:none}
+.mini-btn{font-size:11px;padding:6px 11px;border-radius:999px;border:0;font-weight:600}
+.mini-btn.red{background:var(--red);color:#fff}
+.mini-btn.ghost{background:#fff;color:var(--red);border:1px solid #f0b5aa}
+.notif-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px dashed var(--line);width:100%;background:none;border-top:0;border-left:0;border-right:0;text-align:left;align-items:flex-start}
+.notif-item:last-child{border-bottom:0}
+.notif-ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.notif-t{font-size:13.5px;color:var(--ink);font-weight:600}
+.notif-d{font-size:11px;color:var(--ink-2);margin-top:3px;line-height:1.45}
+.notif-item.unread .notif-t::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:6px}
+
+/* 成员 */
+.member-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--cream);border-radius:18px;margin-bottom:10px;border:1px solid rgba(239,227,213,.65)}
+.member-av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.member-name{font-size:15px;font-weight:700;color:var(--ink)}
+.member-role{font-size:10px;color:var(--red);background:#fde7e2;padding:2px 8px;border-radius:999px;margin-left:6px;font-weight:600}
+.member-meta{font-size:11px;color:var(--ink-2);margin-top:4px}
+.add-member{width:100%;padding:13px;border-radius:999px;border:1.5px dashed #e0c9b4;background:#fff;color:#a58d77;font-size:14px;font-weight:600}
+
+/* 菜谱详情 */
+.detail-hero{border-radius:24px;height:180px;display:flex;align-items:center;justify-content:center;font-size:76px;margin-bottom:12px;position:relative}
+.detail-banner{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);color:var(--red);font-size:11px;font-weight:700;padding:6px 12px;border-radius:999px}
+.detail-name{font-size:21px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+.detail-meta{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12px;color:var(--ink-2)}
+.ing-row{display:flex;justify-content:space-between;font-size:13px;padding:9px 0;border-bottom:1px dashed var(--line);color:var(--ink)}
+.ing-row:last-child{border-bottom:0}
+.ing-row .have{color:var(--green-2)}
+.ing-row .missing{color:var(--red)}
+.ing-row .missing a{color:var(--red);font-weight:700}
+.step-row{display:flex;gap:10px;font-size:13px;color:#6b5848;padding:9px 0;border-bottom:1px dashed var(--line);line-height:1.55}
+.step-row:last-child{border-bottom:0}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none;font-weight:700;margin-top:1px}
+.detail-actions{display:flex;gap:10px;margin-top:18px}
+.detail-actions .btn-primary{margin-top:0}
+.btn-outline{flex:1;background:#fff;color:var(--red);border:1px solid var(--red);border-radius:999px;padding:13px;font-size:14px;font-weight:600}
+
+/* 偏好 / 营养 / 流水 / 溯源 / 录入 */
+.pref-grid{display:flex;flex-wrap:wrap;gap:10px}
+.pref-chip{padding:9px 16px;border-radius:999px;border:1.5px solid var(--line);background:#fff;color:var(--ink-2);font-size:13px;font-weight:600}
+.pref-chip.on{border-color:var(--green);color:var(--green-2);background:#eef7ef}
+.pref-chip.on::after{content:"✓";margin-left:5px;color:var(--green);font-weight:800}
+.pref-sec{font-size:13px;font-weight:700;color:var(--ink);margin:14px 0 8px}
+.nutr-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.nutr-k{width:62px;font-size:12px;color:var(--ink-2)}
+.nutr-track{flex:1;height:12px;border-radius:6px;background:#f0e5d8;overflow:hidden}
+.nutr-track i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#5eae74,#8fca7f)}
+.nutr-v{width:40px;text-align:right;font-size:12px;font-weight:700;color:var(--ink)}
+.log-row{display:flex;gap:10px;padding:11px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.log-row:last-child{border-bottom:0}
+.log-dot{width:8px;height:8px;border-radius:50%;flex:none;margin-top:5px}
+.log-act{font-size:13px;font-weight:700;color:var(--ink)}
+.log-t{font-size:11px;color:var(--ink-2);margin-top:2px}
+.trace-row{display:flex;justify-content:space-between;font-size:13px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.trace-row:last-child{border-bottom:0}
+.trace-row b{color:var(--ink)}
+.trace-row span{color:var(--ink-2)}
+.trace-ok{display:flex;align-items:center;gap:6px;color:var(--green-2);font-weight:700;font-size:13px}
+.form-field{margin-bottom:12px}
+.form-label{font-size:12px;color:var(--ink-2);margin-bottom:6px;display:block}
+.form-input{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:14px;background:#fff;color:var(--ink);font-family:inherit;outline:none}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed;left:50%;bottom:100px;transform:translate(-50%,16px);background:rgba(52,36,26,.93);color:#fff;font-size:13px;padding:11px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:.28s;z-index:60;white-space:nowrap;box-shadow:0 8px 22px rgba(0,0,0,.22)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- 状态栏 -->
+  <div class="statusbar">
+    <div class="in">
+      <div class="sb-time" id="sbTime">9:41</div>
+      <div class="sb-island"></div>
+      <div class="sb-icons">
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx=".8"/><rect x="4.5" y="4.5" width="3" height="6.5" rx=".8"/><rect x="9" y="2" width="3" height="9" rx=".8"/><rect x="13.5" y="0" width="1.5" height="11" rx=".8" opacity=".35"/></svg>
+        <svg width="15" height="11" viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1.8 3.8a10.2 10.2 0 0112.4 0"/><path d="M4.4 6.2a6.6 6.6 0 017.2 0"/><path d="M7 8.5a3.2 3.2 0 012 0"/><path d="M8 10.3h.01"/></svg>
+        <svg width="23" height="11" viewBox="0 0 23 11" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><rect x=".8" y=".8" width="18" height="9.4" rx="2.5"/><path d="M21 3.5v4" stroke-width="1.6"/><rect x="2.8" y="2.8" width="11" height="5.4" rx="1.2" fill="currentColor" stroke="none" opacity=".85"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 品牌栏 -->
+  <div class="brandbar">
+    <div class="in">
+      <div class="brand">
+        <div class="logo">食刻</div>
+        <div class="slogan">让每一餐都新鲜安心</div>
+      </div>
+      <div class="brand-actions">
+        <button class="icon-btn" id="bellBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+          <span class="dot" id="bellDot"></span>
+        </button>
+        <div class="avatar">👩</div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- ============ 首页 ============ -->
+    <section class="page active" id="page-home">
+      <div class="greet">你好，今天的冰箱状态</div>
+
+      <div class="fridge">
+        <div class="fridge-left">
+          <div class="fridge-head">冰箱总览 <span class="upd">更新于 08:30</span></div>
+          <div class="fridge-stats">
+            <div class="fs"><b><span id="kpiTotal">12</span><small> 种</small></b><em>今日库存食材</em></div>
+            <div class="fs"><b><span id="kpiSoon">3</span><small> 种</small></b><em>即将过期</em></div>
+          </div>
+          <button class="fridge-link" data-goto="inv">查看全部库存</button>
+        </div>
+        <div class="fridge-illus">
+          <div class="fridge-draw">
+            <div class="split"></div>
+            <div class="handle h1"></div>
+            <div class="handle h2"></div>
+            <div class="rows"><span>🥦</span><span>🥛</span><span>🥚</span></div>
+            <div class="foot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="duo">
+        <div class="half pink">
+          <h3>保鲜提醒</h3>
+          <div class="f-name" id="remindName">西兰花</div>
+          <span class="f-badge" id="remindDays">剩余 1 天</span>
+          <div class="f-desc" id="remindDesc">建议今日食用</div>
+          <span class="f-link" data-view="remind">查看全部提醒 ›</span>
+        </div>
+        <div class="half olive">
+          <h3>今日推荐</h3>
+          <div class="f-name" id="todayDish">西兰花炒蛋</div>
+          <div class="f-meta" id="todayTime">⏱ 15 分钟</div>
+          <span class="f-link" data-view="recipe:0">查看详情 ›</span>
+        </div>
+      </div>
+
+      <div class="duo">
+        <div class="half yellow">
+          <h3>购物清单</h3>
+          <div class="shop-row"><b>牛奶</b><span>1 瓶</span></div>
+          <div class="shop-row"><b>鸡蛋</b><span>6 个</span></div>
+          <div class="shop-row"><b>生菜</b><span>1 颗</span></div>
+          <span class="f-link" data-view="shop">查看清单 ›</span>
+        </div>
+        <div class="half blue">
+          <h3>家庭共享</h3>
+          <div class="fam-stat">已同步 4 位成员</div>
+          <div class="f-desc">一起管理，一起安心</div>
+          <span class="f-link" data-view="members">查看成员 ›</span>
+        </div>
+      </div>
+
+      <div class="grid" id="quickGrid"></div>
+    </section>
+
+    <!-- ============ 扫描 ============ -->
+    <section class="page" id="page-scan">
+      <div class="page-head">
+        <div><div class="t">扫描食材</div><div class="s">轻松一扫，智能识别，快速录入</div></div>
+      </div>
+
+      <div class="viewfinder" id="viewfinder">
+        <video id="camVideo" autoplay playsinline muted></video>
+        <div class="vf-scene">🥦</div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="scanline"></div>
+        <div class="cam-status demo" id="camStatus"><span class="pulse"></span><span id="camStatusText">未连接摄像头</span></div>
+        <button class="torch" id="torchBtn">⚡ 开灯</button>
+        <div class="hint">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 9V7a4 4 0 014-4h2"/><path d="M21 9V7a4 4 0 00-4-4h-2"/><path d="M3 15v2a4 4 0 004 4h2"/><path d="M21 15v2a4 4 0 01-4 4h-2"/></svg>
+          将食材置于取景框内自动识别
+        </div>
+      </div>
+
+      <div class="result hide" id="scanResult">
+        <div class="res-thumb" id="resThumb">🥦</div>
+        <div class="res-info">
+          <span class="res-ok" id="resOk"><i>✓</i>识别成功</span>
+          <b id="resName">西兰花</b>
+          <span class="res-keep" id="resKeep">建议保鲜 <i>3</i> 天</span>
+          <div class="res-conf" id="resConf">置信度 96% · 建议放入冰箱</div>
+        </div>
+        <div class="res-sync"><span class="si">👥</span>录入后将同步至<br>家庭成员</div>
+      </div>
+
+      <button class="btn-primary" id="confirmBtn">确认录入</button>
+      <button class="btn-ghost" id="rescanBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+        重新扫描
+      </button>
+
+      <div class="elderly">
+        <span class="el-ic">👴👵</span>
+        <div>
+          <div class="el-t">老人儿童也能轻松录入</div>
+          <div class="el-d">对准食材，自动识别，省心又简单</div>
+        </div>
+        <span class="el-heart">❤️</span>
+      </div>
+    </section>
+
+    <!-- ============ 库存 ============ -->
+    <section class="page" id="page-inv">
+      <div class="page-head">
+        <div><div class="t">我的库存</div><div class="s">食材心中有数，饮食安排更轻松</div></div>
+        <div class="acts">
+          <button class="icon-btn" id="searchBtn">🔍</button>
+          <button class="icon-btn filter-btn" id="sortBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          </button>
+          <div class="avatar" style="width:38px;height:38px;font-size:17px">👩</div>
+        </div>
+      </div>
+
+      <div class="inv-search" id="invSearch">
+        <input id="invSearchInput" type="text" placeholder="搜索食材名称或分类…">
+        <button class="clear-x" id="invSearchClear">×</button>
+      </div>
+
+      <div class="stats3">
+        <div class="col">
+          <div class="s-icn s-red">🛍️</div>
+          <div class="n n-red" id="invTotal">12</div>
+          <div class="l1">种食材</div>
+          <div class="l2">库存充足</div>
+        </div>
+        <div class="col">
+          <div class="s-icn s-amber">🔔</div>
+          <div class="n n-amber" id="invSoon">3</div>
+          <div class="l1">种即将过期</div>
+          <div class="l2">需尽快食用</div>
+        </div>
+        <div class="col">
+          <div class="s-icn s-green">👨‍👩‍👧</div>
+          <div class="n n-green">4</div>
+          <div class="l1">位成员</div>
+          <div class="l2">已同步更新</div>
+        </div>
+      </div>
+
+      <div class="chips-wrap">
+        <div class="chips-row" id="invChips"></div>
+        <button class="filter-btn" id="sortBtn2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        </button>
+      </div>
+      <div id="invList"></div>
+
+      <button class="soon-banner" data-view="remind">
+        <div class="b-ic">📅</div>
+        <div class="b-t"><b>3 种食材即将过期</b><span>查看详情，合理安排菜谱</span></div>
+        <div class="b-thumbs">
+          <span class="b-thumb">🥦</span>
+          <span class="b-thumb">🥩</span>
+          <span class="b-thumb">🍅</span>
+          <span class="b-arrow">›</span>
+        </div>
+      </button>
+    </section>
+
+    <!-- ============ 菜谱 ============ -->
+    <section class="page" id="page-recipe">
+      <div class="page-head">
+        <div><div class="t">智能菜谱</div><div class="s">根据库存智能推荐，减少浪费</div></div>
+        <button class="fav-pill" data-view="favorites"><b>♥</b>我的收藏</button>
+      </div>
+
+      <div class="cream-panel">
+        <div class="panel-head"><b>当前可用食材</b><a data-goto="inv">查看全部 ›</a></div>
+        <div class="food-chips">
+          <span class="fchip">🥦 西兰花</span>
+          <span class="fchip">🥚 鸡蛋</span>
+          <span class="fchip">🥩 牛肉</span>
+          <span class="fchip">🥛 牛奶</span>
+        </div>
+      </div>
+
+      <div class="today-card" id="todayCard"></div>
+
+      <div class="sec-head"><b>更多推荐</b><a id="shuffleBtn">换一批 ↻</a></div>
+      <div id="moreList"></div>
+
+      <div class="cream-panel prefs">
+        <div class="panel-head"><b>口味偏好</b><a data-view="prefs">编辑偏好 ›</a></div>
+        <div class="pref-row" id="prefRow">
+          <button class="pref green active">清淡</button>
+          <button class="pref orange">家常</button>
+          <button class="pref red">微辣</button>
+        </div>
+        <div class="pref-caption">调整口味偏好，获得更精准的菜谱推荐</div>
+      </div>
+    </section>
+
+    <!-- ============ 我的 ============ -->
+    <section class="page" id="page-me">
+      <div class="page-head">
+        <div><div class="t">我的</div><div class="s">家庭食材，一起管理</div></div>
+      </div>
+
+      <button class="profile" data-view="members">
+        <div class="avatar-lg">👩</div>
+        <div>
+          <div class="pf-name">妈妈<span class="pf-badge">家庭管理员</span></div>
+          <div class="pf-sub">已绑定 4 位成员 · 冰箱 / 零食柜 / 药盒</div>
+        </div>
+        <span class="pf-arrow">›</span>
+      </button>
+
+      <div class="stats3 me-stats">
+        <div class="col">
+          <div class="s-icn s-red">🥗</div>
+          <div class="n n-red">12</div>
+          <div class="l1">在库食材</div>
+        </div>
+        <div class="col">
+          <div class="s-icn s-amber">⏰</div>
+          <div class="n n-amber">3</div>
+          <div class="l1">即将过期</div>
+        </div>
+        <div class="col">
+          <div class="s-icn s-green">💰</div>
+          <div class="n n-green">¥42</div>
+          <div class="l1">本月省下</div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <button class="menu-item" data-view="members"><span class="mi-ic" style="background:#fde3dc">👨‍👩‍👧</span>家庭共享管理<span class="mi-arrow">›</span></button>
+        <button class="menu-item" data-view="shop"><span class="mi-ic" style="background:#fdf0cd">🛒</span>购物清单<span class="mi-arrow">›</span></button>
+        <button class="menu-item" data-view="favorites"><span class="mi-ic" style="background:#fde3dc">❤️</span>我的收藏<span class="mi-arrow">›</span></button>
+        <button class="menu-item" data-view="notif"><span class="mi-ic" style="background:#dcefdc">🔔</span>通知设置<span class="mi-arrow">›</span></button>
+        <button class="menu-item" data-view="nutrition"><span class="mi-ic" style="background:#ddebfa">🥗</span>营养档案<span class="mi-arrow">›</span></button>
+        <button class="menu-item" id="helpItem"><span class="mi-ic" style="background:#f2e6d8">💬</span>帮助与反馈<span class="mi-arrow">›</span></button>
+        <button class="menu-item" id="aboutItem"><span class="mi-ic" style="background:#f2e6d8">ℹ️</span>关于食刻<span class="mi-arrow">›</span></button>
+      </div>
+
+      <div class="app-footer">食刻 · 让每一餐都新鲜安心</div>
+    </section>
+  </main>
+
+  <!-- 子页面弹层 -->
+  <div class="subview" id="subview">
+    <div class="sv-head">
+      <button class="back-btn" id="svBack">‹</button>
+      <div class="sv-title" id="svTitle">标题</div>
+      <div class="sv-right" id="svRight"></div>
+    </div>
+    <div class="sv-body" id="svBody"></div>
+  </div>
+
+  <!-- 底部 Tab 栏 -->
+  <nav class="tabbar">
+    <div class="in">
+      <button class="tab active" data-page="home">
+        <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5L12 3.8l8.5 6.7"/><path d="M5.5 9.6V20h13V9.6"/><path d="M9.5 20v-5.6h5V20"/></svg></span>首页
+      </button>
+      <button class="tab" data-page="scan">
+        <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 012-2h2"/><path d="M16 4h2a2 2 0 012 2v2"/><path d="M20 16v2a2 2 0 01-2 2h-2"/><path d="M8 20H6a2 2 0 01-2-2v-2"/><path d="M12 9v6M9 12h6"/></svg></span>扫描
+      </button>
+      <button class="tab" data-page="inv">
+        <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M12 3.5v17"/><path d="M7.5 7h2M7.5 10.5h2"/><path d="M14.5 15.5h2M14.5 19h2"/></svg></span>库存
+      </button>
+      <button class="tab" data-page="recipe">
+        <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 11a4.5 4.5 0 013.2-7.6A4.6 4.6 0 0117 4.4a4.5 4.5 0 011.5 6.6"/><path d="M5 11h14l1.2 5.5H3.8z"/><path d="M7 16.5h10V21H7z"/></svg></span>菜谱
+      </button>
+      <button class="tab" data-page="me">
+        <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.7 14.8a4.3 4.3 0 006.6 0"/><path d="M9.2 10h.01M14.8 10h.01"/></svg></span>我的
+      </button>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ================= 数据 ================= */
+const NOW = new Date("2026-08-16T08:30:00");
+
+let INV = [
+  { name:"西兰花", cat:"蔬菜", emoji:"🥦", by:"妈妈", av:"👩", when:"今天 08:30", exp:"2026-08-17", storage:"保鲜中" },
+  { name:"牛奶",   cat:"乳品", emoji:"🥛", by:"爷爷", av:"👴", when:"昨天 21:10", exp:"2026-08-23", storage:"保鲜中", label:"建议尽快喝" },
+  { name:"鸡蛋",   cat:"蛋类", emoji:"🥚", by:"姐姐", av:"👧", when:"昨天 18:45", exp:"2026-08-26", storage:"新鲜" },
+  { name:"生菜",   cat:"蔬菜", emoji:"🥬", by:"妈妈", av:"👩", when:"昨天 12:20", exp:"2026-08-19", storage:"保鲜中" },
+  { name:"牛肉",   cat:"肉类", emoji:"🥩", by:"爸爸", av:"👨", when:"前天 19:35", exp:"2026-08-17", storage:"冷藏中" },
+  { name:"番茄",   cat:"蔬菜", emoji:"🍅", by:"妈妈", av:"👩", when:"前天 08:10", exp:"2026-08-17", storage:"保鲜中" },
+  { name:"黄瓜",   cat:"蔬菜", emoji:"🥒", by:"爸爸", av:"👨", when:"08-14 17:20", exp:"2026-08-21", storage:"保鲜中" },
+  { name:"酸奶",   cat:"乳品", emoji:"🥣", by:"姐姐", av:"👧", when:"08-13 20:45", exp:"2026-08-21", storage:"保鲜中" },
+  { name:"鸡胸肉", cat:"肉类", emoji:"🍗", by:"爸爸", av:"👨", when:"08-13 19:00", exp:"2026-08-19", storage:"冷冻中" },
+  { name:"苹果",   cat:"水果", emoji:"🍎", by:"妈妈", av:"👩", when:"08-12 09:30", exp:"2026-08-23", storage:"常温" },
+  { name:"面包",   cat:"零食", emoji:"🍞", by:"姐姐", av:"👧", when:"08-11 15:20", exp:"2026-08-19", storage:"常温" },
+  { name:"大米",   cat:"主食", emoji:"🍚", by:"爸爸", av:"👨", when:"08-10 10:00", exp:"2026-09-05", storage:"主食柜" }
+];
+
+const RECIPES = [
+  { name:"西兰花炒蛋", time:"15 分钟", tag:"清淡", tcls:"tag-green", desc:"西兰花脆嫩，鸡蛋滑嫩，营养丰富", nutr:"蛋白质高·维生素丰富·低脂健康", emoji:"🥦🍳", grad:"radial-gradient(circle at 34% 28%,#fffdf7,#d9e6bf 75%)",
+    ing:[["西兰花","1 朵","有"],["鸡蛋","2 个","有"],["小葱","1 把","缺"]],
+    steps:["西兰花切小朵，淡盐水焯 30 秒捞出","鸡蛋加少许盐打散，热油炒至凝固盛出","蒜末爆香，下西兰花大火翻炒 1 分钟","倒入鸡蛋，加盐调味翻匀即可"] },
+  { name:"牛肉蔬菜汤", time:"30 分钟", tag:"家常", tcls:"tag-orange", desc:"牛肉鲜美，蔬菜清甜，暖胃又营养", nutr:"高蛋白·铁质丰富·增强免疫力", emoji:"🍲", grad:"radial-gradient(circle at 34% 28%,#fff8ec,#f0dcc0 78%)",
+    ing:[["牛肉","200g","有"],["番茄","1 个","有"],["胡萝卜","1 根","缺"]],
+    steps:["牛肉切块冷水下锅焯去浮沫","番茄切块与牛肉同煮 20 分钟","加入胡萝卜块再煮 10 分钟","盐和胡椒调味即可"] },
+  { name:"奶香蔬菜浓汤", time:"20 分钟", tag:"清淡", tcls:"tag-blue", desc:"奶香浓郁，口感顺滑，适合全家", nutr:"钙质丰富·易消化·增强骨骼健康", emoji:"🥣", grad:"radial-gradient(circle at 34% 28%,#fbf7ff,#e2dcf0 78%)",
+    ing:[["牛奶","300ml","有"],["西兰花","半朵","有"],["土豆","1 个","缺"]],
+    steps:["土豆蒸熟压成泥","西兰花焯水后切碎","牛奶小火加热，拌入土豆泥","加入西兰花碎，搅匀调味"] },
+  { name:"番茄炒蛋", time:"10 分钟", tag:"家常", tcls:"tag-orange", desc:"酸甜开胃，色泽诱人，下饭首选", nutr:"维生素C·蛋白质·低脂健康", emoji:"🍅🍳", grad:"radial-gradient(circle at 34% 28%,#fff6ee,#f6d8c8 78%)",
+    ing:[["番茄","2 个","有"],["鸡蛋","2 个","有"],["小葱","1 把","缺"]],
+    steps:["番茄切块，鸡蛋打散","鸡蛋炒至凝固盛出","番茄炒出汁后回锅鸡蛋","加糖盐调味，撒葱花"] },
+  { name:"牛奶燕麦粥", time:"15 分钟", tag:"清淡", tcls:"tag-green", desc:"奶香丝滑，暖胃又饱腹", nutr:"钙质丰富·膳食纤维·易消化", emoji:"🥛🌾", grad:"radial-gradient(circle at 34% 28%,#fffdf5,#e9e0c8 78%)",
+    ing:[["牛奶","250ml","有"],["燕麦片","50g","缺"]],
+    steps:["牛奶小火加热至微沸","加入燕麦片搅拌 5 分钟","关火焖 3 分钟","依口味加蜂蜜"] },
+  { name:"蒜蓉西兰花", time:"12 分钟", tag:"家常", tcls:"tag-orange", desc:"清爽脆嫩，蒜香扑鼻", nutr:"维生素丰富·低脂·抗氧化", emoji:"🥦", grad:"radial-gradient(circle at 34% 28%,#f7fff2,#cfe3b8 78%)",
+    ing:[["西兰花","1 朵","有"],["大蒜","3 瓣","缺"]],
+    steps:["西兰花掰小朵焯水","蒜末爆香","下西兰花大火快炒","盐调味出锅"] }
+];
+
+const SHOP = [
+  { name:"牛奶", qty:1, unit:"瓶", done:false },
+  { name:"鸡蛋", qty:6, unit:"个", done:false },
+  { name:"生菜", qty:1, unit:"颗", done:false },
+  { name:"小葱", qty:1, unit:"把", done:true }
+];
+const SHOP_SUGGEST = ["小葱","香菜","燕麦片","香菇"];
+
+const MEMBERS = [
+  { av:"👩", name:"妈妈", role:"管理员", meta:"本月录入 24 次 · 负责蔬菜", bg:"linear-gradient(135deg,#f6c8a8,#e8a37f)" },
+  { av:"👨", name:"爸爸", role:"成员", meta:"本月录入 16 次 · 负责肉类", bg:"linear-gradient(135deg,#bcd4f0,#8fb0d8)" },
+  { av:"👴", name:"爷爷", role:"成员", meta:"本月录入 9 次 · 负责乳品", bg:"linear-gradient(135deg,#e4d9c6,#cbb9a0)" },
+  { av:"👧", name:"姐姐", role:"成员", meta:"本月录入 12 次 · 负责零食", bg:"linear-gradient(135deg,#f6c9d4,#eba9bb)" }
+];
+
+const NOTIFS = [
+  { ic:"🔔", bg:"#fde3dc", t:"2 种食材今天到期", d:"西兰花、牛肉建议今日食用", unread:true, view:"remind" },
+  { ic:"🍳", bg:"#e2f0e5", t:"今日推荐 · 西兰花炒蛋", d:"使用库存食材即可完成", unread:true, view:"recipe:0" },
+  { ic:"👩", bg:"#fdf0cd", t:"妈妈录入了 2 种食材", d:"番茄、黄瓜已同步到家庭库存", unread:false, view:"inv" },
+  { ic:"🛒", bg:"#ddebfa", t:"购物清单有 1 项待买", d:"小葱 · 已加入清单", unread:false, view:"shop" }
+];
+
+const LOG = [
+  { act:"补给", cls:"in", d:"西兰花 · 妈妈摄像头扫描录入", t:"今天 08:30" },
+  { act:"补给", cls:"in", d:"牛奶 · 爷爷手动录入", t:"昨天 21:10" },
+  { act:"取出", cls:"out", d:"番茄 · 爸爸做晚餐", t:"昨天 19:00" },
+  { act:"提醒", cls:"sys", d:"系统推送：4 样临期食材", t:"昨天 08:00" },
+  { act:"过期", cls:"exp", d:"豆腐 · 已清理并记录", t:"前天 20:15" }
+];
+const NUTR = [["蛋白质",78],["维生素C",62],["膳食纤维",45],["钙",58]];
+const TRACE = {
+  name:"西兰花", source:"盒马鲜生 · 云南基地直采", batch:"YN20260812-A3",
+  inTime:"2026-08-14 16:20", cold:"全程 4°C 冷链运输", report:"农残检测 ✓ 合格"
+};
+
+const QUICK = [
+  { t:"扫描食材", i:"📷", c:"qc1", v:"tab:scan" },
+  { t:"智能推荐", i:"✨", c:"qc2", ai:true, v:"recipe:0:AI 为你推荐" },
+  { t:"营养分析", i:"🥗", c:"qc3", sub:"均衡膳食", v:"view:nutrition" },
+  { t:"食材履历", i:"📋", c:"qc4", sub:"来源可查", v:"view:log" },
+  { t:"快速录入", i:"⚡", c:"qc1", v:"view:quickAdd" },
+  { t:"菜谱灵感", i:"🍳", c:"qc2", v:"tab:recipe" },
+  { t:"吃得更健康", i:"🌱", c:"qc3", v:"recipe:2:健康清淡推荐" },
+  { t:"追溯记录", i:"🧾", c:"qc4", v:"view:trace" }
+];
+const CAT_EMOJI = { 蔬菜:"🥬", 乳品:"🥛", 肉类:"🥩", 蛋类:"🥚", 水果:"🍎", 零食:"🍞", 主食:"🍚", 其他:"🥫" };
+const AV_MAP = { 妈妈:"👩", 爸爸:"👨", 爷爷:"👴", 姐姐:"👧" };
+const EMOJI_MAP = { 西兰花:"🥦", 牛奶:"🥛", "光明鲜牛奶":"🥛", 鸡蛋:"🥚", 生菜:"🥬", 牛肉:"🥩", 番茄:"🍅", 黄瓜:"🥒", 酸奶:"🥣", 鸡胸肉:"🍗", 苹果:"🍎", 面包:"🍞", 大米:"🍚", "农夫山泉饮用水":"💧", "饮用天然水":"💧", "瓶装饮用水":"💧", "深层天然水":"💧", 榴莲:"🍈" };
+const RECIPE_FOR = { 西兰花:0, 牛肉:1, 番茄:3, 牛奶:4, 生菜:0, 鸡胸肉:0 };
+
+/* ================= 状态 ================= */
+let activeCat = "全部", query = "", sortMode = "days";
+let moreIdx = 0;
+const FAVS = new Set();
+const PREF_SEL = new Set(["清淡"]);
+const HANDLED = new Set();
+let currentView = null;
+
+/* ================= 工具 ================= */
+function daysLeft(exp){
+  const a = new Date(exp), b = new Date(NOW);
+  a.setHours(0,0,0,0); b.setHours(0,0,0,0);
+  return Math.round((a - b) / 86400000);
+}
+function stateOf(it){
+  const d = daysLeft(it.exp);
+  if (d <= 2) return d === 1 ? ["今天到期","d-red","st-red"] : ["即将过期","d-red","st-red"];
+  if (d <= 7) return [it.label || "尽快食用","d-amber","st-amber"];
+  return ["新鲜","d-green","st-green"];
+}
+function barPct(it){
+  const d = daysLeft(it.exp);
+  return Math.max(12, Math.min(100, 100 - (d - 1) * 7));
+}
+function barColor(dcls){
+  return dcls === "d-red" ? "var(--red)" : dcls === "d-amber" ? "#e8913c" : "var(--green)";
+}
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), 1800);
+}
+function go(page){
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.page === page));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + page).classList.add("active");
+  window.scrollTo(0, 0);
+  if (page !== "scan") pauseAutoScan(); else resumeAutoScan();
+  try { history.replaceState(null, "", "#" + page); } catch(e){}
+}
+
+/* ================= 渲染：首页 ================= */
+function renderHome(){
+  const soon = INV.filter(i => daysLeft(i.exp) <= 2 && !HANDLED.has(i.name));
+  document.getElementById("kpiTotal").textContent = INV.length;
+  document.getElementById("kpiSoon").textContent = soon.length;
+  const first = soon[0];
+  if (first){
+    const d = daysLeft(first.exp);
+    document.getElementById("remindName").textContent = first.name;
+    document.getElementById("remindDays").textContent = `剩余 ${d} 天`;
+    document.getElementById("remindDesc").textContent = d <= 1 ? "建议今日食用" : "建议尽快食用";
+  } else {
+    document.getElementById("remindName").textContent = "暂无临期";
+    document.getElementById("remindDays").textContent = "库存健康";
+    document.getElementById("remindDesc").textContent = "继续好好吃饭吧";
+  }
+  const r0 = RECIPES[0];
+  document.getElementById("todayDish").textContent = r0.name;
+  document.getElementById("todayTime").textContent = `⏱ ${r0.time}`;
+  document.getElementById("quickGrid").innerHTML = QUICK.map(q => `
+    <button class="qcell" data-view="${q.v}">
+      <span class="qic ${q.c}">${q.i}${q.ai ? '<span class="ai-badge">AI</span>' : ""}</span>
+      <span class="ql">${q.t}${q.sub ? `<small>${q.sub}</small>` : ""}</span>
+    </button>`).join("");
+}
+
+/* ================= 渲染：库存 ================= */
+function renderChips(){
+  const cats = ["全部", ...new Set(INV.map(i => i.cat))];
+  document.getElementById("invChips").innerHTML = cats.map(c => {
+    const cnt = c === "全部" ? INV.length : INV.filter(i => i.cat === c).length;
+    return `<button class="chip ${activeCat === c ? "active" : ""}" data-cat="${c}">${c}<span class="cnt">${cnt}</span></button>`;
+  }).join("");
+}
+function renderInv(){
+  let list = INV.filter(i => activeCat === "全部" || i.cat === activeCat);
+  if (query) list = list.filter(i => i.name.includes(query) || i.cat.includes(query));
+  if (sortMode === "days") list = [...list].sort((a,b) => daysLeft(a.exp) - daysLeft(b.exp));
+  else if (sortMode === "cat") list = [...list].sort((a,b) => a.cat.localeCompare(b.cat));
+  document.getElementById("invTotal").textContent = INV.length;
+  document.getElementById("invSoon").textContent = INV.filter(i => daysLeft(i.exp) <= 2 && !HANDLED.has(i.name)).length;
+  document.getElementById("invList").innerHTML = list.length ? list.map(it => {
+    const d = daysLeft(it.exp);
+    const [label, dcls, stcls] = stateOf(it);
+    return `<div class="inv-item" data-view="item:${it.name}">
+      <div class="inv-thumb">${it.emoji}</div>
+      <div class="inv-body">
+        <div class="inv-r1"><b>${it.name}</b><span class="inv-cat">${it.cat}</span></div>
+        <div class="inv-r2"><span class="inv-days ${dcls}">剩余 ${d} 天</span><span class="inv-st ${stcls}">${label}</span></div>
+        <div class="inv-bar"><i style="width:${barPct(it)}%;background:${barColor(dcls)}"></i></div>
+        <div class="inv-r3">${it.storage} · 点击查看详情</div>
+      </div>
+      <div class="inv-right">
+        <span class="who-av">${it.av}</span>
+        <span class="who-name">${it.by}</span>
+        <span class="who-when">${it.when}<br>录入</span>
+      </div>
+    </div>`;
+  }).join("") : `<div class="empty-box">没有找到相关食材<br><span style="font-size:11px">换个关键词试试</span></div>`;
+}
+
+/* ================= 渲染：菜谱 ================= */
+function recipeCard(r, fav){
+  return `<div class="rec-card" data-view="recipe:${RECIPES.indexOf(r)}">
+    <div class="rec-img" style="background:${r.grad}">${r.emoji}</div>
+    <div class="rec-body">
+      <div class="rec-name">${r.name}</div>
+      <div class="rec-meta">⏱ ${r.time}<span class="rec-tag ${r.tcls}">${r.tag}</span></div>
+      <div class="rec-desc">${r.desc}</div>
+      <div class="rec-sub">${r.nutr}</div>
+    </div>
+    <button class="rec-heart ${fav ? "on" : ""}" data-stop data-name="${r.name}">${fav ? "♥" : "♡"}</button>
+  </div>`;
+}
+function renderRecipe(){
+  const t = RECIPES[0];
+  document.getElementById("todayCard").innerHTML = `
+    <div class="tc-left">
+      <span class="today-tag">今日推荐</span>
+      <h3>${t.name}</h3>
+      <div class="tc-meta">⏱ ${t.time}<span class="tc-pill">${t.tag}</span></div>
+      <div class="tc-desc">${t.desc}</div>
+      <div class="tc-sub">${t.nutr}</div>
+      <button class="green-btn" data-stop data-view="recipe:0">查看菜谱 ›</button>
+    </div>
+    <div class="tc-right">
+      <div class="food-img">${t.emoji}</div>
+      <button class="heart-btn ${FAVS.has(t.name) ? "on" : ""}" data-stop data-name="${t.name}">${FAVS.has(t.name) ? "♥" : "♡"}</button>
+    </div>`;
+  const pool = RECIPES.slice(1);
+  const show = [pool[moreIdx % pool.length], pool[(moreIdx + 1) % pool.length]];
+  document.getElementById("moreList").innerHTML = show.map(r => recipeCard(r, FAVS.has(r.name))).join("");
+}
+
+/* ================= 子页面 ================= */
+const VIEW_CFG = {
+  shop:     { title:"购物清单", right:"清空完成" },
+  remind:   { title:"保鲜提醒", right:"" },
+  members:  { title:"家庭成员", right:"邀请" },
+  nutrition:{ title:"营养分析", right:"" },
+  log:      { title:"食材履历", right:"" },
+  trace:    { title:"追溯记录", right:"" },
+  prefs:    { title:"口味偏好", right:"保存" },
+  notif:    { title:"通知中心", right:"全部已读" },
+  favorites:{ title:"我的收藏", right:"" },
+  quickAdd: { title:"快速录入", right:"保存" },
+  item:     { title:"食材详情", right:"" },
+  recipe:   { title:"菜谱详情", right:"" }
+};
+
+function openView(name, payload){
+  currentView = { name, payload };
+  document.getElementById("svTitle").textContent = VIEW_CFG[name].title;
+  const right = VIEW_CFG[name].right;
+  document.getElementById("svRight").innerHTML = right
+    ? `<button class="sv-right-btn" data-act="right:${name}">${right}</button>` : "";
+  document.getElementById("svBody").innerHTML = renderView(name, payload);
+  document.getElementById("subview").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeView(){
+  document.getElementById("subview").classList.remove("open");
+  document.body.style.overflow = "";
+  currentView = null;
+}
+function refreshView(){
+  if (!currentView) return;
+  document.getElementById("svBody").innerHTML = renderView(currentView.name, currentView.payload);
+}
+function renderView(name, p){
+  if (name === "shop") return viewShop();
+  if (name === "remind") return viewRemind();
+  if (name === "members") return viewMembers();
+  if (name === "nutrition") return viewNutrition();
+  if (name === "log") return viewLog();
+  if (name === "trace") return viewTrace();
+  if (name === "prefs") return viewPrefs();
+  if (name === "notif") return viewNotif();
+  if (name === "favorites") return viewFavorites();
+  if (name === "quickAdd") return viewQuickAdd();
+  if (name === "item") return viewItem(p.name);
+  if (name === "recipe") return viewRecipe(p.idx, p.banner);
+  return "";
+}
+
+function viewShop(){
+  const undone = SHOP.filter(s => !s.done).length;
+  return `
+  <div class="sv-card">
+    <div class="sv-sec">待采购 <small>${undone} 项</small></div>
+    ${SHOP.map((s,i) => `
+      <div class="shop-item">
+        <button class="shop-check ${s.done ? "on" : ""}" data-act="shop-toggle" data-i="${i}">${s.done ? "✓" : ""}</button>
+        <span class="shop-name ${s.done ? "done" : ""}">${s.name}</span>
+        <div class="shop-qty">
+          <button class="qty-btn" data-act="shop-qty" data-i="${i}" data-d="-1">−</button>
+          ${s.qty} ${s.unit}
+          <button class="qty-btn" data-act="shop-qty" data-i="${i}" data-d="1">＋</button>
+        </div>
+      </div>`).join("")}
+  </div>
+  <div class="sv-card">
+    <div class="sv-sec">一键加购 <small>根据菜谱缺料自动建议</small></div>
+    <div class="shop-add">${SHOP_SUGGEST.filter(n => !SHOP.some(s => s.name === n)).map(n =>
+      `<button class="sug-chip" data-act="shop-add" data-name="${n}">＋ ${n}</button>`).join("")}</div>
+    <div class="pref-caption">扫描或菜谱缺料会自动补充到这里</div>
+  </div>`;
+}
+
+function viewRemind(){
+  const list = INV.filter(i => daysLeft(i.exp) <= 2 && !HANDLED.has(i.name))
+    .sort((a,b) => daysLeft(a.exp) - daysLeft(b.exp));
+  return list.length ? `<div class="sv-card">${list.map(it => {
+    const d = daysLeft(it.exp);
+    return `<div class="remind-item">
+      <div class="remind-ic">${it.emoji}</div>
+      <div class="remind-body">
+        <div class="remind-name">${it.name}</div>
+        <div class="remind-meta">${d <= 1 ? "今天到期" : `剩余 ${d} 天`} · ${it.storage} · ${it.by}录入</div>
+      </div>
+      <div class="remind-actions">
+        <button class="mini-btn red" data-act="remind-cook" data-name="${it.name}">做菜谱</button>
+        <button class="mini-btn ghost" data-act="remind-done" data-name="${it.name}">已处理</button>
+      </div>
+    </div>`;}).join("")}</div>` :
+    `<div class="empty-box">🎉 暂无临期食材<br><span style="font-size:11px">库存很健康，继续保持</span></div>`;
+}
+
+function viewMembers(){
+  return `
+  <div class="sv-card">
+    <div class="sv-sec">家庭共 4 位成员 <small>已全部同步</small></div>
+    ${MEMBERS.map(m => `
+      <div class="member-card">
+        <div class="member-av" style="background:${m.bg}">${m.av}</div>
+        <div>
+          <div class="member-name">${m.name}<span class="member-role">${m.role}</span></div>
+          <div class="member-meta">${m.meta}</div>
+        </div>
+      </div>`).join("")}
+  </div>
+  <button class="add-member" data-act="member-invite">＋ 邀请新成员</button>`;
+}
+
+function viewNutrition(){
+  const max = Math.max(...NUTR.map(n => n[1]));
+  return `
+  <div class="sv-card">
+    <div class="sv-sec">今日营养概览 <small>基于 12 种库存食材估算</small></div>
+    ${NUTR.map(([k,v]) => `
+      <div class="nutr-bar-row"><span class="nutr-k">${k}</span>
+        <div class="nutr-track"><i style="width:${v}%"></i></div>
+        <span class="nutr-v">${v}%</span>
+      </div>`).join("")}
+  </div>
+  <div class="sv-card">
+    <div class="sv-sec">饮食建议</div>
+    <div class="remind-item"><div class="remind-ic">🍳</div><div class="remind-body"><div class="remind-name">早餐补钙</div><div class="remind-meta">牛奶、酸奶库存充足，建议早餐搭配</div></div></div>
+    <div class="remind-item"><div class="remind-ic">🥦</div><div class="remind-body"><div class="remind-name">午餐补膳食纤维</div><div class="remind-meta">西兰花、生菜建议今天食用</div></div></div>
+  </div>`;
+}
+
+function viewLog(){
+  const color = { in:"#4d9a62", out:"#5b8fc9", sys:"#e8913c", exp:"#e23c2b" };
+  return `<div class="sv-card">${LOG.map(l => `
+    <div class="log-row"><span class="log-dot" style="background:${color[l.cls]}"></span>
+      <div><div class="log-act">${l.act} · ${l.d}</div><div class="log-t">${l.t}</div></div>
+    </div>`).join("")}</div>`;
+}
+
+function viewTrace(){
+  return `
+  <div class="sv-card">
+    <div class="sv-sec">${TRACE.name} · 批次信息</div>
+    <div class="trace-row"><b>来源</b><span>${TRACE.source}</span></div>
+    <div class="trace-row"><b>批次号</b><span>${TRACE.batch}</span></div>
+    <div class="trace-row"><b>入库时间</b><span>${TRACE.inTime}</span></div>
+    <div class="trace-row"><b>冷链记录</b><span>${TRACE.cold}</span></div>
+  </div>
+  <div class="sv-card">
+    <div class="sv-sec">流转时间线</div>
+    ${["云南基地采收","分拣预冷 2°C","冷链运输 8 小时","家庭冰箱入库"].map((s,i) => `
+      <div class="step-row"><span class="step-num">${i+1}</span><span>${s}</span></div>`).join("")}
+  </div>
+  <div class="sv-card"><div class="trace-ok">✓ 农残检测报告 · 合格</div></div>`;
+}
+
+function viewPrefs(){
+  const groups = [["口味", ["清淡","家常","微辣"]], ["健康偏好", ["少油","少盐","无糖"]], ["忌口", ["香菜","海鲜","坚果"]]];
+  return `<div class="sv-card">${groups.map(([g, items]) => `
+    <div class="pref-sec">${g}</div>
+    <div class="pref-grid">${items.map(i =>
+      `<button class="pref-chip ${PREF_SEL.has(i) ? "on" : ""}" data-act="pref-toggle" data-name="${i}">${i}</button>`).join("")}
+    </div>`).join("")}
+    <div class="pref-caption">保存后菜谱推荐会按你的口味调整</div>
+  </div>`;
+}
+
+function viewNotif(){
+  return `<div class="sv-card">${NOTIFS.map((n,i) => `
+    <button class="notif-item ${n.unread ? "unread" : ""}" data-view="${n.view}">
+      <span class="notif-ic" style="background:${n.bg}">${n.ic}</span>
+      <span><span class="notif-t">${n.t}</span><div class="notif-d">${n.d}</div></span>
+    </button>`).join("")}</div>`;
+}
+
+function viewFavorites(){
+  const favs = RECIPES.filter(r => FAVS.has(r.name));
+  return favs.length ? favs.map(r => recipeCard(r, true)).join("") :
+    `<div class="empty-box">还没有收藏的菜谱<br><span style="font-size:11px">去「智能菜谱」里点 ♡ 收藏吧</span></div>`;
+}
+
+function viewQuickAdd(){
+  const cats = [...new Set(INV.map(i => i.cat))];
+  return `
+  <div class="sv-card">
+    <div class="form-field"><label class="form-label">食材名称</label><input class="form-input" id="qaName" placeholder="如：苹果"></div>
+    <div class="form-field"><label class="form-label">分类</label><select class="form-input" id="qaCat">${cats.map(c => `<option>${c}</option>`).join("")}</select></div>
+    <div class="form-field"><label class="form-label">建议保鲜天数</label><select class="form-input" id="qaDays"><option>3</option><option>5</option><option>7</option><option>15</option><option>30</option></select></div>
+    <div class="form-field"><label class="form-label">录入人</label><select class="form-input" id="qaBy"><option>妈妈</option><option>爸爸</option><option>爷爷</option><option>姐姐</option></select></div>
+    <div class="pref-caption">保存后会自动同步给 4 位家庭成员</div>
+  </div>`;
+}
+
+function viewItem(name){
+  const it = INV.find(x => x.name === name);
+  if (!it) return `<div class="empty-box">该食材已不在库存中</div>`;
+  const d = daysLeft(it.exp);
+  const [label, dcls, stcls] = stateOf(it);
+  return `
+  <div class="detail-hero" style="background:radial-gradient(circle at 34% 28%,#fffdf7,#e5ddca 78%)">${it.emoji}</div>
+  <div class="sv-card">
+    <div class="detail-name">${it.name} <span class="inv-cat">${it.cat}</span></div>
+    <div class="detail-meta">${it.by} ${it.when} 录入</div>
+    <div class="inv-bar" style="margin-top:12px"><i style="width:${barPct(it)}%;background:${barColor(dcls)}"></i></div>
+    <div class="sv-sec">状态</div>
+    <div class="ing-row"><span>剩余天数</span><span class="${dcls}">${d <= 1 ? "今天到期" : `${d} 天`}</span></div>
+    <div class="ing-row"><span>状态标签</span><span class="${stcls}">${label}</span></div>
+    <div class="ing-row"><span>存放位置</span><span>${it.storage}</span></div>
+    <div class="ing-row"><span>建议</span><span>${d <= 1 ? "尽快食用或放入菜谱" : "冷藏保鲜，注意密封"}</span></div>
+  </div>
+  <div class="detail-actions">
+    <button class="btn-outline" data-act="item-use" data-name="${it.name}">已用完</button>
+    <button class="btn-primary" data-act="item-note">记一笔</button>
+  </div>`;
+}
+
+function viewRecipe(idx, banner){
+  const r = RECIPES[idx];
+  const fav = FAVS.has(r.name);
+  const have = r.ing.filter(i => i[2] === "有").length;
+  return `
+  <div class="detail-hero" style="background:${r.grad}">${r.emoji}
+    ${banner ? `<span class="detail-banner">✨ ${banner}</span>` : ""}
+  </div>
+  <div class="sv-card">
+    <div class="detail-name">${r.name} <span class="rec-tag ${r.tcls}">${r.tag}</span></div>
+    <div class="detail-meta">⏱ ${r.time}<span>·</span>${r.nutr}</div>
+    <div class="sv-sec">所需食材 <small>库存 ${have}/${r.ing.length}</small></div>
+    ${r.ing.map(i => `
+      <div class="ing-row"><span>${i[0]} ${i[1]}</span>
+        <span class="${i[2] === "有" ? "have" : "missing"}">${i[2] === "有" ? "库存有 ✓" : `缺 · <a data-act="ing-buy" data-name="${i[0]}">加入清单</a>`}</span>
+      </div>`).join("")}
+    <div class="sv-sec">做法步骤</div>
+    ${r.steps.map((s,i) => `<div class="step-row"><span class="step-num">${i+1}</span><span>${s}</span></div>`).join("")}
+  </div>
+  <div class="detail-actions">
+    <button class="btn-outline" data-act="detail-fav" data-name="${r.name}">${fav ? "♥ 已收藏" : "♡ 收藏"}</button>
+    <button class="btn-primary" data-act="detail-cook" data-name="${r.name}">开始烹饪</button>
+  </div>`;
+}
+
+/* ================= 子页面动作 ================= */
+function act(action, el){
+  const [a, ...rest] = action.split(":");
+  if (a === "shop-toggle"){
+    const i = +el.dataset.i; SHOP[i].done = !SHOP[i].done; refreshView();
+  } else if (a === "shop-qty"){
+    const i = +el.dataset.i, d = +el.dataset.d;
+    SHOP[i].qty = Math.max(1, SHOP[i].qty + d); refreshView();
+  } else if (a === "shop-add"){
+    if (!SHOP.some(s => s.name === el.dataset.name)) { SHOP.push({ name:el.dataset.name, qty:1, unit:"份", done:false }); }
+    toast(`${el.dataset.name} 已加入购物清单`); refreshView();
+  } else if (a === "right"){
+    const v = rest[0];
+    if (v === "shop"){ SHOP.forEach(s => s.done = true); toast("已完成项已清空"); refreshView(); }
+    else if (v === "prefs"){ toast("偏好已保存 · 推荐将更精准"); closeView(); }
+    else if (v === "notif"){ NOTIFS.forEach(n => n.unread = false); document.getElementById("bellDot").classList.add("hidden"); toast("通知已全部标记为已读"); refreshView(); }
+    else if (v === "quickAdd"){ quickSave(); }
+    else if (v === "members"){ toast("邀请链接已生成 · 有效期 24 小时"); }
+  } else if (a === "remind-cook"){
+    const idx = RECIPE_FOR[el.dataset.name] ?? 0;
+    openView("recipe", { idx, banner:`为「${el.dataset.name}」推荐` });
+  } else if (a === "remind-done"){
+    HANDLED.add(el.dataset.name); toast(`已标记「${el.dataset.name}」为已处理`); refreshView(); renderHome();
+  } else if (a === "member-invite"){
+    toast("邀请链接已生成 · 有效期 24 小时");
+  } else if (a === "pref-toggle"){
+    const n = el.dataset.name;
+    PREF_SEL.has(n) ? PREF_SEL.delete(n) : PREF_SEL.add(n); refreshView();
+  } else if (a === "ing-buy"){
+    if (!SHOP.some(s => s.name === el.dataset.name)) SHOP.push({ name:el.dataset.name, qty:1, unit:"份", done:false });
+    toast(`「${el.dataset.name}」已加入购物清单`);
+  } else if (a === "detail-fav"){
+    const n = el.dataset.name;
+    FAVS.has(n) ? FAVS.delete(n) : FAVS.add(n);
+    el.innerHTML = FAVS.has(n) ? "♥ 已收藏" : "♡ 收藏";
+    el.classList.toggle("on", FAVS.has(n));
+    toast(FAVS.has(n) ? "已加入收藏" : "已取消收藏");
+  } else if (a === "detail-cook"){
+    toast(`开做「${el.dataset.name}」· 完成后记得在库存扣减`);
+  } else if (a === "item-use"){
+    const it = INV.find(x => x.name === el.dataset.name);
+    if (it){
+      if (it._db){
+        fetch(`${API_BASE}/api/consume`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: it.name, reason: "consumed", quantity: 1 })
+        }).catch(() => {});
+      }
+      const i = INV.indexOf(it);
+      if (i >= 0) INV.splice(i, 1);
+      toast(`「${it.name}」已从库存移除`);
+      closeView(); renderHome(); renderChips(); renderInv();
+    }
+  } else if (a === "item-note"){
+    toast("已记录 · 同步到家庭动态");
+  }
+}
+
+function quickSave(){
+  const name = document.getElementById("qaName").value.trim();
+  if (!name){ toast("请先输入食材名称"); return; }
+  const cat = document.getElementById("qaCat").value;
+  const days = +document.getElementById("qaDays").value;
+  const by = document.getElementById("qaBy").value;
+  const exp = new Date(NOW); exp.setDate(exp.getDate() + days);
+  const now = new Date();
+  INV.unshift({
+    name, cat, emoji: CAT_EMOJI[cat] || "🥫", by, av: AV_MAP[by] || "👤",
+    when:`今天 ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`,
+    exp: exp.toISOString().slice(0,10), storage:"保鲜中"
+  });
+  toast(`「${name}」已录入并同步给家庭成员`);
+  closeView(); renderHome(); renderChips(); renderInv(); renderRecipe();
+}
+
+function fmtWhen(iso){
+  const d = new Date(iso), now = new Date();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const same = a => a.getFullYear() === d.getFullYear() && a.getMonth() === d.getMonth() && a.getDate() === d.getDate();
+  if (same(now)) return `今天 ${hh}:${mm}`;
+  const yest = new Date(now); yest.setDate(now.getDate() - 1);
+  if (same(yest)) return `昨天 ${hh}:${mm}`;
+  return `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${hh}:${mm}`;
+}
+function calcExp(keepDays){
+  const d = new Date();
+  d.setDate(d.getDate() + keepDays);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+async function syncInventory(){
+  try {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 8000);
+    const res = await fetch(`${API_BASE}/api/items`, { signal: ctl.signal });
+    clearTimeout(timer);
+    const j = await res.json();
+    if (!(j && j.code === 0 && Array.isArray(j.items))) return;
+    const rows = j.items.filter(it => it.name);
+    if (!rows.length) return;
+    const CAT_MAP = { 乳制品:"乳品", 饮料:"饮料", 调味品:"调味品", 药品:"药品" };
+    const next = rows.map(it => ({
+      id: it.id,
+      name: it.name,
+      cat: CAT_MAP[it.category] || it.category || "其他",
+      emoji: it.emoji || EMOJI_MAP[it.name] || "🥫",
+      by: it.recordedBy || "家人",
+      av: it.recordedByAvatar || AV_MAP[it.recordedBy] || "👤",
+      when: fmtWhen(it.scannedAt),
+      exp: it.expiryDate || calcExp(it.keepDays || 3),
+      storage: it.storage || "保鲜中",
+      qty: it.quantity || 1,
+      _db: true
+    }));
+    INV.length = 0;
+    next.forEach(x => INV.push(x));
+    renderHome(); renderChips(); renderInv();
+    const now = new Date();
+    const upd = document.querySelector(".fridge-head .upd");
+    if (upd) upd.textContent = `已同步 ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  } catch (e) { /* 离线/失败时保留本地演示数据 */ }
+}
+
+/* ================= 全局跳转 ================= */
+function handleView(spec){
+  const [kind, ...args] = spec.split(":");
+  if (kind === "tab") go(args[0]);
+  else if (kind === "view") openView(args[0]);
+  else if (kind === "recipe") openView("recipe", { idx:+args[0], banner: args.slice(1).join(":") });
+  else if (kind === "item") openView("item", { name: args.join(":") });
+  else if (VIEW_CFG[kind]) openView(kind);
+  else if (["home","scan","inv","recipe","me"].includes(kind)) go(kind);
+}
+document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => go(tab.dataset.page)));
+document.addEventListener("click", e => {
+  const stop = e.target.closest("[data-stop]");
+  if (stop) return;
+  const g = e.target.closest("[data-goto]");
+  if (g){ e.preventDefault(); go(g.dataset.goto); return; }
+  const v = e.target.closest("[data-view]");
+  if (v){ e.preventDefault(); handleView(v.dataset.view); return; }
+  const heart = e.target.closest(".rec-heart, .heart-btn");
+  if (heart && !heart.dataset.stop){
+    const n = heart.dataset.name;
+    FAVS.has(n) ? FAVS.delete(n) : FAVS.add(n);
+    heart.classList.toggle("on", FAVS.has(n));
+    heart.innerHTML = FAVS.has(n) ? "♥" : "♡";
+    toast(FAVS.has(n) ? "已加入收藏" : "已取消收藏");
+    return;
+  }
+});
+document.getElementById("svBack").addEventListener("click", closeView);
+document.getElementById("svRight").addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (b) act(b.dataset.act, b);
+});
+document.getElementById("svBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (b) act(b.dataset.act, b);
+});
+
+/* ================= 库存：搜索 / 排序 ================= */
+const sortLabels = { days:"按剩余天数", cat:"按品类", time:"按录入时间" };
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const box = document.getElementById("invSearch");
+  box.classList.toggle("open");
+  if (box.classList.contains("open")) document.getElementById("invSearchInput").focus();
+});
+document.getElementById("invSearchInput").addEventListener("input", e => {
+  query = e.target.value.trim(); renderInv();
+});
+document.getElementById("invSearchClear").addEventListener("click", () => {
+  document.getElementById("invSearchInput").value = ""; query = ""; renderInv();
+});
+document.getElementById("sortBtn").addEventListener("click", cycleSort);
+document.getElementById("sortBtn2").addEventListener("click", cycleSort);
+function cycleSort(){
+  sortMode = sortMode === "days" ? "cat" : sortMode === "cat" ? "time" : "days";
+  toast(`已按${sortLabels[sortMode]}排序`); renderInv();
+}
+document.getElementById("invChips").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  activeCat = chip.dataset.cat; renderChips(); renderInv();
+});
+
+/* ================= 菜谱页交互 ================= */
+document.getElementById("shuffleBtn").addEventListener("click", () => { moreIdx++; renderRecipe(); toast("为你换了一批新菜谱"); });
+document.getElementById("prefRow").addEventListener("click", e => {
+  const p = e.target.closest(".pref"); if (!p) return;
+  document.querySelectorAll("#prefRow .pref").forEach(x => x.classList.remove("active"));
+  p.classList.add("active"); toast("偏好已更新，菜谱将更懂你");
+});
+document.getElementById("helpItem").addEventListener("click", () => toast("意见已收到，感谢反馈 ❤️"));
+document.getElementById("aboutItem").addEventListener("click", () => toast("食刻 v1.1.0 · 让每一餐都新鲜安心"));
+document.getElementById("bellBtn").addEventListener("click", () => openView("notif"));
+
+/* ================= 扫描：摄像头 + 识别 ================= */
+const SCAN_URL = "https://tuvmkt.com/api/scan";
+const API_BASE = SCAN_URL.replace(/\/api\/scan$/, "");
+const DEVICE_ID = "h5-demo-001";
+let stream = null, camMode = "demo", camLive = false;
+let scanLoopOn = false, busy = false, torchOn = false, lastResult = null, useDemo = false, scanSeq = 0;
+
+const vf = document.getElementById("viewfinder");
+const camVideo = document.getElementById("camVideo");
+const camStatus = document.getElementById("camStatus");
+const camStatusText = document.getElementById("camStatusText");
+const scanResult = document.getElementById("scanResult");
+const confirmBtn = document.getElementById("confirmBtn");
+
+function setCamStatus(text, mode){
+  camStatusText.textContent = text;
+  camStatus.className = "cam-status " + mode;
+}
+function showResult(r){
+  lastResult = r;
+  const keepDays = (r.daysLeft && r.daysLeft > 0) ? r.daysLeft : 3;
+  lastResult._keepDays = keepDays;
+  scanResult.classList.remove("hide", "low");
+  document.getElementById("resThumb").textContent = r.emoji || "🥦";
+  document.getElementById("resOk").innerHTML = "<i>✓</i>识别成功";
+  document.getElementById("resName").textContent = r.name;
+  document.getElementById("resKeep").innerHTML = `建议保鲜 <i>${keepDays}</i> 天`;
+  document.getElementById("resConf").textContent =
+    `置信度 ${Math.round(r.confidence * 100)}% · 建议放入${r.suggestedContainer || "冰箱"}`;
+  confirmBtn.disabled = false;
+  fetchShelfLife(r.name);
+  if (camMode === "demo") toast("演示模式：未识别到摄像头，展示演示数据");
+}
+async function fetchShelfLife(name){
+  const seq = ++scanSeq;
+  try {
+    const base = SCAN_URL.replace(/\/api\/scan$/, "");
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 8000);
+    const res = await fetch(`${base}/api/shelf-life?name=${encodeURIComponent(name)}`, { signal: ctl.signal });
+    clearTimeout(timer);
+    const j = await res.json();
+    if (seq !== scanSeq || !lastResult || lastResult.name !== name) return;
+    if (j && j.code === 0 && j.daysLeft > 0){
+      lastResult._keepDays = j.daysLeft;
+      document.getElementById("resKeep").innerHTML = `建议保鲜 <i>${j.daysLeft}</i> 天`;
+      const conf = document.getElementById("resConf");
+      conf.textContent = conf.textContent.split(" · 保质期 AI 实时生成")[0] + " · 保质期 AI 实时生成";
+    }
+  } catch (e) { /* 失败则保留默认保质期 */ }
+}
+function showLowConf(){
+  scanResult.classList.remove("hide");
+  scanResult.classList.add("low");
+  document.getElementById("resThumb").textContent = "❓";
+  document.getElementById("resOk").innerHTML = "<i>✓</i>识别结果";
+  document.getElementById("resName").textContent = "没看清，再试一次";
+  document.getElementById("resKeep").innerHTML = "请将食材置于取景框内重新对准";
+  document.getElementById("resConf").textContent = "";
+  confirmBtn.disabled = true;
+}
+
+async function startCamera(){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    camMode = "demo";
+    setCamStatus("当前环境不支持摄像头 · 演示模式", "demo");
+    toast("未检测到摄像头权限，已切换到演示画面");
+    demoScan();
+    return;
+  }
+  try {
+    const p = navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:{ ideal:"environment" }, width:{ ideal:1280 }, height:{ ideal:720 } },
+      audio:false
+    });
+    const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("camera-timeout")), 6000));
+    stream = await Promise.race([p, timeout]);
+    camVideo.srcObject = stream;
+    await camVideo.play().catch(() => {});
+    camMode = "live"; camLive = true;
+    useDemo = false;
+    vf.classList.add("live");
+    setCamStatus("摄像头已连接 · 自动识别中", "live");
+    resumeAutoScan();
+  } catch (err){
+    camMode = "demo"; camLive = false;
+    vf.classList.remove("live");
+    const msg = err && err.name === "NotAllowedError"
+      ? "未授权摄像头 · 点击浏览器地址栏允许后重试"
+      : err && err.name === "NotFoundError" ? "未检测到摄像头 · 演示模式"
+      : "摄像头启动失败 · 演示模式";
+    setCamStatus(msg, "demo");
+    toast("摄像头不可用，已切换到演示模式");
+    demoScan();
+  }
+}
+function stopCamera(){
+  if (stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
+  camLive = false;
+  vf.classList.remove("live");
+}
+async function captureFrame(){
+  const canvas = document.createElement("canvas");
+  canvas.width = 640; canvas.height = 480;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(camVideo, 0, 0, 640, 480);
+  return new Promise(res => canvas.toBlob(b => res(b), "image/jpeg", 0.72));
+}
+async function recognize(){
+  if (busy) return;
+  busy = true;
+  setCamStatus("识别中…", "live");
+  try {
+    const img = await captureFrame();
+    const fd = new FormData();
+    fd.append("image", img, "scan.jpg");
+    fd.append("deviceId", DEVICE_ID);
+    fd.append("action", "in");
+    fd.append("container", "冰箱");
+    fd.append("timestamp", new Date().toISOString());
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 12000);
+    const res = await fetch(SCAN_URL, { method:"POST", body:fd, signal:ctl.signal });
+    clearTimeout(timer);
+    const j = await res.json();
+    if (j && j.code === 0 && j.name && j.confidence >= 0.5){
+      const emojiMap = { "西兰花":"🥦", "牛奶":"🥛", "光明鲜牛奶":"🥛", "鸡蛋":"🥚", "牛肉":"🥩", "番茄":"🍅", "苹果":"🍎", "面包":"🍞", "黄瓜":"🥒", "生菜":"🥬" };
+      showResult({ name:j.name, daysLeft:j.daysLeft || 3, confidence:j.confidence,
+        suggestedContainer:j.suggestedContainer, emoji: emojiMap[j.name] || "🥫" });
+      setCamStatus("识别成功", "live");
+    } else {
+      showLowConf();
+      setCamStatus("没看清，请重新对准", "live");
+    }
+  } catch (e){
+    if (camMode === "live"){
+      setCamStatus("识别服务连接失败", "err");
+      toast("识别服务暂时不可用，已切换到演示数据");
+      demoScan();
+    }
+  } finally {
+    busy = false;
+  }
+}
+function demoScan(){
+  useDemo = true;
+  pauseAutoScan();
+  showResult({ name:"西兰花", daysLeft:3, confidence:0.96, suggestedContainer:"冰箱", emoji:"🥦" });
+  setCamStatus("演示模式 · 自动识别中", "demo");
+}
+function pauseAutoScan(){ scanLoopOn = false; }
+function resumeAutoScan(){
+  if (camLive && !scanLoopOn && !busy){
+    scanLoopOn = true;
+    setTimeout(scanTick, 2600);
+  }
+}
+function scanTick(){
+  if (!scanLoopOn) return;
+  if (!document.getElementById("page-scan").classList.contains("active")) return;
+  if (!busy && camLive && !useDemo) recognize();
+  setTimeout(scanTick, 2600);
+}
+document.getElementById("rescanBtn").addEventListener("click", () => {
+  scanResult.classList.add("hide");
+  if (camMode === "live" && camLive){
+    setCamStatus("正在重新识别…", "live");
+    setTimeout(() => { if (camLive) recognize(); }, 500);
+  } else {
+    toast("正在重新识别…");
+    useDemo = false;
+    setTimeout(demoScan, 1400);
+  }
+});
+confirmBtn.addEventListener("click", () => {
+  if (!lastResult){ toast("还没有识别结果"); return; }
+  const r = lastResult;
+  const exp = new Date(NOW); exp.setDate(exp.getDate() + (r._keepDays || 3));
+  const existing = INV.find(i => i.name === r.name);
+  const now = new Date();
+  const when = `今天 ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  if (existing){
+    existing.when = when; existing.exp = exp.toISOString().slice(0,10);
+  } else {
+    const cat = r.suggestedContainer === "冰箱" ? "蔬菜" : "其他";
+    INV.unshift({ name:r.name, cat, emoji:r.emoji || "🥫", by:"妈妈", av:"👩",
+      when, exp: exp.toISOString().slice(0,10), storage:"保鲜中" });
+  }
+  HANDLED.delete(r.name);
+  toast(`已录入「${r.name}」 · 同步至 4 位家庭成员`);
+  renderHome(); renderChips(); renderInv(); renderRecipe();
+  go("inv");
+});
+document.getElementById("torchBtn").addEventListener("click", async () => {
+  torchOn = !torchOn;
+  const track = stream && stream.getVideoTracks()[0];
+  if (track && track.applyConstraints){
+    try { await track.applyConstraints({ advanced:[{ torch:torchOn }] }); } catch(e){}
+  }
+  vf.classList.toggle("lit", torchOn);
+  document.getElementById("torchBtn").innerHTML = torchOn ? "💡 关灯" : "⚡ 开灯";
+});
+
+/* ================= 时钟 / 启动 ================= */
+function tick(){
+  const t = new Date();
+  document.getElementById("sbTime").textContent =
+    `${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}`;
+}
+tick(); setInterval(tick, 10000);
+renderHome(); renderChips(); renderInv(); renderRecipe();
+syncInventory();
+startCamera();
+const hash = location.hash.slice(1);
+if (["home","scan","inv","recipe","me"].includes(hash)) go(hash);
+
+/* ================= 云端实时库存（tuvmkt.com/api/items） ================= */
+function xzdPad(n){ return String(n).padStart(2, "0"); }
+function xzdWhen(iso){
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "—";
+  const now = new Date();
+  const hm = `${xzdPad(d.getHours())}:${xzdPad(d.getMinutes())}`;
+  if (d.toDateString() === now.toDateString()) return `今天 ${hm}`;
+  return `${xzdPad(d.getMonth() + 1)}-${xzdPad(d.getDate())} ${hm}`;
+}
+async function loadServerData(){
+  try {
+    const res = await fetch("https://tuvmkt.com/api/items", {
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || data.code !== 0 || !Array.isArray(data.items)) return;
+    // 服务器为准：硬件扫描出入库后这里自动更新（含清空库存）
+    const list = data.items.map(it => ({
+      id: it.id,
+      name: it.name,
+      cat: it.category || "其他",
+      emoji: it.emoji || "🥫",
+      by: it.recordedBy || "妈妈",
+      av: it.recordedByAvatar || "👩",
+      when: xzdWhen(it.scannedAt),
+      exp: it.expiryDate || "2099-01-01",
+      storage: it.storage || "保鲜中",
+      qty: it.quantity ?? 1,
+      label: it.label || "",
+    }));
+    INV.splice(0, INV.length, ...list);
+    renderHome(); renderChips(); renderInv(); renderRecipe();
+  } catch (e) {
+    // 服务器不可达时保留本地演示数据
+  }
+}
+loadServerData();
+setInterval(loadServerData, 5000);   // 硬件出入库 → 云端 → 本页自动刷新
+</script>
+</body>
+</html>
