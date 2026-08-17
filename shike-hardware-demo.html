@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>食刻 · 硬件交互 Demo</title>
+<style>
+:root{
+  --bg:#f2f5f9; --panel:#ffffff; --ink:#1c2733; --muted:#6b7a8c;
+  --line:#dfe6ee; --brand:#1d7a5f; --brand2:#0f5c47;
+  --soon:#d97706; --expired:#dc2626; --ok:#16a34a;
+  --chip-bg:#eef4f1; --shadow:0 10px 28px rgba(23,43,62,.10);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:0 0 2rem}
+.topbar{display:flex;align-items:baseline;gap:.8rem;flex-wrap:wrap;padding:.9rem 1.2rem;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff}
+.topbar h1{font-size:1.25rem;margin:0}
+.topbar span{font-size:.8rem;opacity:.85}
+.stage{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:1.1rem;padding:1.1rem 1.2rem;max-width:1280px;margin:0 auto}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem;box-shadow:var(--shadow)}
+.panel h2{font-size:.95rem;margin:0 0 .7rem;color:var(--brand2)}
+
+/* ---- 设备模拟 ---- */
+.device-wrap{display:flex;flex-direction:column;align-items:center;gap:.8rem}
+.device{width:272px;height:363px;border-radius:26px;background:#0b0f14;padding:14px;box-shadow:inset 0 0 0 2px #222a33, 0 16px 34px rgba(10,20,30,.35)}
+.screen{position:relative;width:100%;height:100%;border-radius:12px;overflow:hidden;background:#101820}
+.dev-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.65rem;padding:1rem;text-align:center;color:#eaf2ee}
+.hidden{display:none !important}
+.dev-logo{font-size:1.05rem;font-weight:600;letter-spacing:.35em;color:#7fd6b3;margin-top:.5rem}
+.dev-sub{font-size:.68rem;color:#8fa3b4}
+.dev-btns{display:flex;gap:.7rem;margin-top:.6rem}
+.dev-btn{border:0;border-radius:12px;padding:.85rem 1.25rem;font-size:1.05rem;font-weight:600;color:#fff;cursor:pointer;min-width:96px}
+.dev-btn.in{background:linear-gradient(180deg,#27a076,#157a58)}
+.dev-btn.out{background:linear-gradient(180deg,#3b82c4,#1f5f96)}
+.dev-btn:active{transform:scale(.97)}
+.dev-mini{margin-top:.5rem;font-size:.68rem;color:#ffd9a0;background:rgba(217,119,6,.16);padding:.25rem .6rem;border-radius:999px}
+.dev-remind{font-size:.66rem;color:#9fb4c3;max-width:210px}
+canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cam-tip{position:absolute;top:.65rem;left:50%;transform:translateX(-50%);font-size:.66rem;color:#dff2e8;background:rgba(0,0,0,.42);padding:.25rem .6rem;border-radius:999px;white-space:nowrap}
+.count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:200px;font-weight:700;color:#fff;opacity:.36;text-shadow:0 4px 18px rgba(0,0,0,.5);pointer-events:none}
+.cam-actions{position:absolute;bottom:.7rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem}
+.ghost-btn{border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;border-radius:10px;padding:.45rem .8rem;font-size:.72rem;cursor:pointer}
+.upload-box{display:flex;flex-direction:column;align-items:center;gap:.8rem}
+.ring{width:52px;height:52px;border-radius:50%;border:5px solid rgba(127,214,179,.25);border-top-color:#7fd6b3;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.res-card{width:100%;background:#15222b;border:1px solid #2a3a47;border-radius:12px;padding:.8rem .9rem;text-align:left}
+.res-name{font-size:1rem;font-weight:600;color:#fff;margin-bottom:.35rem}
+.res-row{font-size:.72rem;color:#b8c9d4;line-height:1.7}
+.res-row b{color:#7fd6b3;font-weight:600}
+.res-exp{font-size:.78rem;color:#ffd9a0;margin-top:.3rem}
+.res-actions{display:flex;gap:.5rem;margin-top:.7rem}
+.dev-btn.ok{background:linear-gradient(180deg,#27a076,#157a58);min-width:96px}
+.status-line{font-size:.68rem;color:#9fb4c3;text-align:center;min-height:1em}
+.device-log{width:100%;max-height:120px;overflow:auto;font-size:.68rem;color:#5c6b7a;line-height:1.6;border-top:1px dashed var(--line);padding-top:.5rem}
+
+/* ---- 网页大屏 ---- */
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:.85rem}
+@media (max-width:520px){.chips{grid-template-columns:repeat(2,1fr)}}
+.chip{background:var(--chip-bg);border-radius:10px;padding:.55rem .7rem}
+.chip .k{font-size:.68rem;color:var(--muted)}
+.chip .v{font-size:1.15rem;font-weight:600;color:var(--brand2)}
+.chip .v.soon{color:var(--soon)} .chip .v.bad{color:var(--expired)}
+.tabs{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.7rem}
+.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:.32rem .8rem;font-size:.76rem;cursor:pointer;color:var(--muted)}
+.tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+.inv-row{display:grid;grid-template-columns:1fr auto auto;gap:.6rem;align-items:center;padding:.5rem .65rem;border-bottom:1px solid var(--line)}
+.inv-row:last-child{border-bottom:0}
+.inv-name{font-size:.82rem;font-weight:500}
+.inv-meta{font-size:.68rem;color:var(--muted)}
+.badge{font-size:.66rem;border-radius:999px;padding:.12rem .5rem;font-weight:600}
+.badge.normal{background:#e7f6ec;color:#15803d}
+.badge.soon{background:#fdf0dc;color:#b45309}
+.badge.expired{background:#fde8e8;color:#b91c1c}
+.inv-qty{display:flex;align-items:center;gap:.35rem}
+.qty-btn{border:1px solid var(--line);background:#fff;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:.8rem;line-height:1}
+.inv-sel{border:1px solid var(--line);border-radius:8px;font-size:.7rem;padding:.22rem .3rem;color:var(--ink);background:#fff}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+@media (max-width:700px){.two-col{grid-template-columns:1fr}}
+.sec-title{font-size:.8rem;font-weight:600;color:var(--brand2);margin:.2rem 0 .5rem}
+.recipe-ok{color:#15803d;font-size:.8rem;line-height:1.8}
+.recipe-miss{color:var(--muted);font-size:.78rem;line-height:1.8}
+.recipe-miss b{color:#b45309}
+.bar-row{display:flex;align-items:center;gap:.5rem;margin:.32rem 0;font-size:.72rem;color:var(--muted)}
+.bar-track{flex:1;background:#eef2f6;border-radius:6px;height:14px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#39b98a,#1d7a5f)}
+.bar-val{width:2.4rem;text-align:right;font-variant-numeric:tabular-nums}
+.log-list{font-size:.72rem;color:#5c6b7a;line-height:1.8;max-height:190px;overflow:auto}
+.log-list .in{color:#15803d}.log-list .out{color:#1f5f96}.log-list .push{color:#b45309}
+
+/* ---- 推送弹窗 ---- */
+.push-toast{position:fixed;top:1rem;right:1rem;width:300px;background:#fff;border:1px solid var(--line);border-left:5px solid var(--soon);border-radius:12px;box-shadow:var(--shadow);padding:.8rem .95rem;z-index:50;animation:slideIn .35s ease}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+.push-toast h3{font-size:.82rem;margin:0 0 .3rem;color:var(--ink)}
+.push-toast p{font-size:.74rem;margin:.15rem 0;color:#5c6b7a}
+.push-close{position:absolute;top:.45rem;right:.6rem;border:0;background:none;font-size:1rem;cursor:pointer;color:var(--muted)}
+.foot-note{max-width:1280px;margin:.4rem auto 0;padding:0 1.2rem;font-size:.72rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="topbar"><h1>食刻</h1><span>食刻在场 · 不浪费每一份食材 ｜ 硬件交互 Demo · 放入 / 取出 · 3 秒倒计时拍照 · 云端 AI 识别 → 网页大屏联动</span></header>
+
+<main class="stage">
+  <!-- 硬件设备模拟 -->
+  <section class="panel">
+    <h2>硬件屏幕（T5-E1 模拟）</h2>
+    <div class="device-wrap">
+      <div class="device">
+        <div class="screen" id="deviceScreen">
+          <div id="devIdle" class="dev-state">
+            <div class="dev-logo">食刻</div>
+            <div class="dev-sub">冰箱 · 零食柜 · 药盒 · 调料柜 · 主食柜</div>
+            <div class="dev-btns">
+              <button class="dev-btn in" id="btnIn" type="button">放入</button>
+              <button class="dev-btn out" id="btnOut" type="button">取出</button>
+            </div>
+            <div class="dev-mini" id="devMini"></div>
+            <div class="dev-remind" id="devRemind">待机：常显临期 / 过期提醒</div>
+          </div>
+
+          <div id="devCam" class="dev-state hidden">
+            <canvas id="camCanvas" width="240" height="320"></canvas>
+            <div class="cam-tip" id="camTip">请把食品放到镜头前</div>
+            <div class="count" id="countNum"></div>
+            <div class="cam-actions hidden" id="camActions">
+              <button class="ghost-btn" id="btnCancel" type="button">取消</button>
+            </div>
+          </div>
+
+          <div id="devUpload" class="dev-state hidden">
+            <div class="upload-box">
+              <div class="ring"></div>
+              <div class="status-line" id="uploadText">上传中…</div>
+            </div>
+          </div>
+
+          <div id="devResult" class="dev-state hidden">
+            <div class="res-card">
+              <div class="res-name" id="resName"></div>
+              <div class="res-row" id="resMeta"></div>
+              <div class="res-exp" id="resExp"></div>
+            </div>
+            <div class="res-actions">
+              <button class="dev-btn ok" id="btnConfirm" type="button">确认</button>
+              <button class="ghost-btn" id="btnReshoot" type="button">重拍</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="device-log" id="deviceLog"></div>
+    </div>
+  </section>
+
+  <!-- 网页端大屏 -->
+  <section class="panel">
+    <h2>网页端大屏（软件端）</h2>
+    <div class="chips">
+      <div class="chip"><div class="k">库存件数</div><div class="v" id="statTotal">0</div></div>
+      <div class="chip"><div class="k">临期 ≤3 天</div><div class="v soon" id="statSoon">0</div></div>
+      <div class="chip"><div class="k">已过期</div><div class="v bad" id="statExpired">0</div></div>
+      <div class="chip"><div class="k">本月少浪费</div><div class="v" id="statSaved">0 件</div></div>
+    </div>
+
+    <div class="sec-title">库存 · 按容器分类（自动分类 + 可手动修改）</div>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-c="全部" type="button">全部</button>
+      <button class="tab" data-c="冰箱" type="button">冰箱</button>
+      <button class="tab" data-c="零食柜" type="button">零食柜</button>
+      <button class="tab" data-c="药盒" type="button">药盒</button>
+      <button class="tab" data-c="调料柜" type="button">调料柜</button>
+      <button class="tab" data-c="主食柜" type="button">主食柜</button>
+    </div>
+    <div id="invList"></div>
+
+    <div class="two-col">
+      <div>
+        <div class="sec-title">周度菜谱 · 能做的菜 / 还缺的菜</div>
+        <div class="recipe-ok" id="recipeOk"></div>
+        <div class="recipe-miss" id="recipeMiss"></div>
+      </div>
+      <div>
+        <div class="sec-title">月度统计 · 各容器件数</div>
+        <div id="monthChart"></div>
+        <div style="margin-top:.7rem">
+          <button class="tab" id="btnPush" type="button">模拟下班前推送</button>
+        </div>
+        <div class="sec-title" style="margin-top:.8rem">操作记录</div>
+        <div class="log-list" id="logList"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="pushToast" class="push-toast hidden">
+  <button class="push-close" id="pushClose" type="button" aria-label="关闭">×</button>
+  <h3>下班前提醒</h3>
+  <p id="pushBody"></p>
+</div>
+
+<div class="foot-note">说明：设备画面为演示模拟（浏览器允许时可调用真实摄像头）；倒计时数字为半透明、约占屏幕一半，背景为实时取景。识别结果由演示数据生成。</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- 数据 ---------- */
+  var CONTAINERS = ["冰箱", "零食柜", "药盒", "调料柜", "主食柜"];
+  var nextId = 100;
+  var log = [];
+  var currentTab = "全部";
+  var action = "in";            // in | out
+  var scanCount = 0;
+  var timers = [];
+  var camRunning = false;
+  var videoEl = null;
+
+  function daysFromNow(n) {
+    var d = new Date();
+    d.setDate(d.getDate() + n);
+    return d;
+  }
+  function fmtDate(d) {
+    var p = function (x) { return (x < 10 ? "0" : "") + x; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  function fmtDateTime(d) {
+    var p = function (x) { return (x < 10 ? "0" : "") + x; };
+    return fmtDate(d) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  function daysLeft(item) {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var exp = new Date(item.expiry); exp.setHours(0, 0, 0, 0);
+    return Math.round((exp - today) / 86400000);
+  }
+  function status(item) {
+    var dl = daysLeft(item);
+    return dl < 0 ? "expired" : (dl <= 3 ? "soon" : "normal");
+  }
+
+  var items = [
+    { id: 1, name: "光明鲜牛奶", cat: "乳制品", container: "冰箱", qty: 1, expiry: daysFromNow(2), suggested: "冰箱" },
+    { id: 2, name: "老酸奶", cat: "乳制品", container: "冰箱", qty: 2, expiry: daysFromNow(4), suggested: "冰箱" },
+    { id: 3, name: "内酯豆腐", cat: "豆制品", container: "冰箱", qty: 1, expiry: daysFromNow(1), suggested: "冰箱" },
+    { id: 4, name: "剩菜（青椒肉丝）", cat: "熟食", container: "冰箱", qty: 1, expiry: daysFromNow(-1), suggested: "冰箱" },
+    { id: 5, name: "鸡蛋", cat: "蛋类", container: "冰箱", qty: 6, expiry: daysFromNow(6), suggested: "冰箱" },
+    { id: 6, name: "薯片", cat: "零食", container: "零食柜", qty: 1, expiry: daysFromNow(18), suggested: "零食柜" },
+    { id: 7, name: "坚果混合装", cat: "零食", container: "零食柜", qty: 1, expiry: daysFromNow(45), suggested: "零食柜" },
+    { id: 8, name: "感冒灵颗粒", cat: "药品", container: "药盒", qty: 1, expiry: daysFromNow(120), suggested: "药盒" },
+    { id: 9, name: "酱油", cat: "调味品", container: "调料柜", qty: 1, expiry: daysFromNow(90), suggested: "调料柜" },
+    { id: 10, name: "大米", cat: "主食", container: "主食柜", qty: 1, expiry: daysFromNow(200), suggested: "主食柜" },
+    { id: 11, name: "苹果", cat: "水果", container: "冰箱", qty: 3, expiry: daysFromNow(5), suggested: "冰箱" }
+  ];
+
+  var recipes = [
+    { name: "牛奶燕麦粥", need: ["牛奶", "大米"] },
+    { name: "香煎豆腐", need: ["豆腐", "酱油"] },
+    { name: "番茄炒蛋", need: ["鸡蛋", "番茄"] },
+    { name: "苹果沙拉", need: ["苹果", "酸奶"] },
+    { name: "薯片拌酸奶杯", need: ["薯片", "酸奶"] }
+  ];
+
+  var templates = [
+    { name: "光明鲜牛奶", cat: "乳制品", shelf: 5, container: "冰箱" },
+    { name: "老酸奶", cat: "乳制品", shelf: 7, container: "冰箱" },
+    { name: "内酯豆腐", cat: "豆制品", shelf: 2, container: "冰箱" },
+    { name: "苹果", cat: "水果", shelf: 7, container: "冰箱" },
+    { name: "薯片", cat: "零食", shelf: 30, container: "零食柜" },
+    { name: "感冒灵颗粒", cat: "药品", shelf: 120, container: "药盒" },
+    { name: "酱油", cat: "调味品", shelf: 90, container: "调料柜" },
+    { name: "大米", cat: "主食", shelf: 180, container: "主食柜" }
+  ];
+
+  /* ---------- DOM ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  var el = {
+    devIdle: $("devIdle"), devCam: $("devCam"), devUpload: $("devUpload"), devResult: $("devResult"),
+    camCanvas: $("camCanvas"), camTip: $("camTip"), countNum: $("countNum"), camActions: $("camActions"),
+    uploadText: $("uploadText"), resName: $("resName"), resMeta: $("resMeta"), resExp: $("resExp"),
+    btnConfirm: $("btnConfirm"), btnReshoot: $("btnReshoot"), btnCancel: $("btnCancel"),
+    btnIn: $("btnIn"), btnOut: $("btnOut"),
+    devMini: $("devMini"), devRemind: $("devRemind"), deviceLog: $("deviceLog"),
+    invList: $("invList"), tabs: $("tabs"),
+    statTotal: $("statTotal"), statSoon: $("statSoon"), statExpired: $("statExpired"), statSaved: $("statSaved"),
+    recipeOk: $("recipeOk"), recipeMiss: $("recipeMiss"), monthChart: $("monthChart"),
+    logList: $("logList"), btnPush: $("btnPush"),
+    pushToast: $("pushToast"), pushBody: $("pushBody"), pushClose: $("pushClose")
+  };
+
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  function showState(name) {
+    ["devIdle", "devCam", "devUpload", "devResult"].forEach(function (k) {
+      el[k].classList.toggle("hidden", k !== name);
+    });
+  }
+
+  /* ---------- 模拟摄像头 ---------- */
+  function startCam() {
+    showState("devCam");
+    el.camActions.classList.add("hidden");
+    el.countNum.textContent = "";
+    camRunning = true;
+    if (videoEl === null) {
+      videoEl = document.createElement("video");
+      videoEl.muted = true;
+      videoEl.playsInline = true;
+    }
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: { width: 240, height: 320 } })
+        .then(function (stream) {
+          videoEl.srcObject = stream;
+          videoEl.play().catch(function () {});
+          requestAnimationFrame(drawFrame);
+        })
+        .catch(function () { requestAnimationFrame(drawSim); });
+    } else {
+      requestAnimationFrame(drawSim);
+    }
+  }
+
+  function drawFrame() {
+    if (!camRunning) return;
+    var ctx = el.camCanvas.getContext("2d");
+    if (videoEl && videoEl.videoWidth > 0) {
+      ctx.drawImage(videoEl, 0, 0, 240, 320);
+    }
+    requestAnimationFrame(drawFrame);
+  }
+
+  function drawSim() {
+    if (!camRunning) return;
+    var ctx = el.camCanvas.getContext("2d");
+    var g = ctx.createLinearGradient(0, 0, 240, 320);
+    g.addColorStop(0, "#dcecf5"); g.addColorStop(1, "#a9c6d8");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 240, 320);
+    ctx.fillStyle = "rgba(255,255,255,.55)";
+    ctx.fillRect(0, 96, 240, 6); ctx.fillRect(0, 210, 240, 6);
+    ctx.font = "46px serif"; ctx.textAlign = "center";
+    var t = Date.now() / 900;
+    ctx.fillText("🥛", 60 + Math.sin(t) * 5, 170);
+    ctx.fillText("🧃", 150 + Math.cos(t * 0.8) * 5, 155);
+    ctx.fillText("🍎", 110 + Math.sin(t * 1.3) * 4, 280);
+    ctx.fillText("🧄", 40, 60); ctx.fillText("🥚", 200, 70);
+    ctx.font = "12px sans-serif"; ctx.fillStyle = "#567";
+    ctx.fillText("演示取景：冰箱冷藏层", 120, 315);
+    requestAnimationFrame(drawSim);
+  }
+
+  function stopCam() {
+    camRunning = false;
+    if (videoEl && videoEl.srcObject) {
+      videoEl.srcObject.getTracks().forEach(function (tr) { tr.stop(); });
+      videoEl.srcObject = null;
+    }
+  }
+
+  /* ---------- 声音：咔嚓 ---------- */
+  function shutterSound() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      var ctx = new AC();
+      var dur = 0.09;
+      var buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+      }
+      var src = ctx.createBufferSource();
+      src.buffer = buf;
+      var gain = ctx.createGain(); gain.gain.value = 0.35;
+      src.connect(gain); gain.connect(ctx.destination);
+      src.start();
+      setTimeout(function () { ctx.close(); }, 300);
+    } catch (e) { /* 无音频环境忽略 */ }
+  }
+
+  /* ---------- 扫描流程 ---------- */
+  function startScan(act) {
+    clearTimers();
+    action = act;
+    el.camTip.textContent = act === "in" ? "放入 · 请把食品放到镜头前" : "取出 · 请把食品放到镜头前";
+    startCam();
+    el.camActions.classList.remove("hidden");
+    var n = 3;
+    el.countNum.textContent = String(n);
+    var tick = function () {
+      if (n > 1) {
+        n--;
+        el.countNum.textContent = String(n);
+        later(tick, 1000);
+      } else {
+        el.countNum.textContent = "";
+        shutterSound();
+        captureAndUpload();
+      }
+    };
+    later(tick, 1000);
+  }
+
+  function captureAndUpload() {
+    stopCam();
+    showState("devUpload");
+    el.uploadText.textContent = "上传中…";
+    later(function () {
+      el.uploadText.textContent = "AI 解析中…";
+      later(function () {
+        var tpl = templates[Math.floor(Math.random() * templates.length)];
+        showResult(tpl);
+      }, 900);
+    }, 900);
+  }
+
+  function showResult(tpl) {
+    var now = new Date();
+    var exp = new Date(now); exp.setDate(exp.getDate() + tpl.shelf);
+    var result = {
+      name: tpl.name, cat: tpl.cat, expiry: exp, suggested: tpl.container, scannedAt: now
+    };
+    el.resName.textContent = result.name;
+    el.resMeta.innerHTML = "扫描时间 <b>" + fmtDateTime(result.scannedAt) + "</b><br>建议容器 <b>" + result.suggested + "</b> · 分类 <b>" + result.cat + "</b>";
+    el.resExp.textContent = "保质期至 " + fmtDate(result.expiry) + "（剩 " + Math.max(0, tpl.shelf) + " 天）";
+    el.btnConfirm.textContent = action === "in" ? "确认入库" : "确认取出";
+    showState("devResult");
+  }
+
+  el.btnIn.addEventListener("click", function () { startScan("in"); });
+  el.btnOut.addEventListener("click", function () { startScan("out"); });
+  el.btnCancel.addEventListener("click", function () { cancelScan(); });
+  el.btnReshoot.addEventListener("click", function () { clearTimers(); startScan(action); });
+
+  function cancelScan() {
+    clearTimers(); stopCam(); showState("devIdle"); updateDeviceIdle();
+  }
+
+  el.btnConfirm.addEventListener("click", function () {
+    var tpl = lastResult();
+    if (!tpl) return;
+    if (action === "in") addItem(tpl); else removeItem(tpl);
+    showState("devIdle");
+    updateDeviceIdle();
+    scanCount++;
+    if (scanCount === 1) later(showPush, 600); // 首次扫描后模拟下班前推送
+  });
+
+  var last = null;
+  function lastResult() { return last; }
+  // showResult 时记录模板
+  var _origShow = showResult;
+  showResult = function (tpl) { last = tpl; _origShow(tpl); };
+
+  function addItem(tpl) {
+    var found = null;
+    items.forEach(function (it) {
+      if (it.name === tpl.name && it.container === tpl.container && status(it) !== "expired") found = it;
+    });
+    if (found) {
+      found.qty++;
+      found.expiry = tpl.expiry;
+    } else {
+      items.push({ id: nextId++, name: tpl.name, cat: tpl.cat, container: tpl.suggested, qty: 1, expiry: tpl.expiry, suggested: tpl.suggested });
+    }
+    pushLog("in", "放入 " + tpl.name + "（建议容器：" + tpl.suggested + "）");
+    renderAll();
+  }
+
+  function removeItem(tpl) {
+    var found = null;
+    items.forEach(function (it) {
+      if (it.name === tpl.name && it.qty > 0) found = it;
+    });
+    if (found) {
+      found.qty--;
+      if (found.qty <= 0) items = items.filter(function (it) { return it !== found; });
+      pushLog("out", "取出 " + tpl.name);
+    } else {
+      pushLog("out", "取出失败：库存中没有 " + tpl.name);
+    }
+    renderAll();
+  }
+
+  function pushLog(type, text) {
+    var t = new Date();
+    log.unshift({ type: type, text: text, time: fmtDateTime(t) });
+    if (log.length > 60) log.pop();
+  }
+
+  /* ---------- 设备待机 ---------- */
+  function updateDeviceIdle() {
+    var soon = items.filter(function (it) { return status(it) === "soon"; });
+    var exp = items.filter(function (it) { return status(it) === "expired"; });
+    var mini = soon[0] ? soon[0].name + " · 还剩 " + daysLeft(soon[0]) + " 天" : "暂无临期";
+    el.devMini.textContent = mini;
+    var parts = [];
+    if (exp.length) parts.push(exp.length + " 件已过期");
+    if (soon.length) parts.push(soon.length + " 件临期");
+    el.devRemind.textContent = parts.length ? "待机提醒：" + parts.join("，") : "待机：无临期 / 过期物品";
+  }
+
+  /* ---------- 渲染：库存 ---------- */
+  function renderStats() {
+    el.statTotal.textContent = items.reduce(function (s, it) { return s + it.qty; }, 0);
+    el.statSoon.textContent = items.filter(function (it) { return status(it) === "soon"; }).length;
+    el.statExpired.textContent = items.filter(function (it) { return status(it) === "expired"; }).length;
+    el.statSaved.textContent = (3 + log.filter(function (l) { return l.type === "out"; }).length) + " 件";
+  }
+
+  function renderInventory() {
+    var list = items.slice().sort(function (a, b) { return daysLeft(a) - daysLeft(b); });
+    if (currentTab !== "全部") list = list.filter(function (it) { return it.container === currentTab; });
+    if (!list.length) {
+      el.invList.innerHTML = '<div style="font-size:.76rem;color:var(--muted);padding:.6rem">该容器暂无库存</div>';
+      return;
+    }
+    var html = "";
+    list.forEach(function (it) {
+      var st = status(it);
+      var badge = st === "expired" ? "expired" : (st === "soon" ? "soon" : "normal");
+      var label = st === "expired" ? "已过期 " + (-daysLeft(it)) + " 天" : (st === "soon" ? "剩 " + daysLeft(it) + " 天" : "剩 " + daysLeft(it) + " 天");
+      html += '<div class="inv-row">' +
+        '<div><div class="inv-name">' + it.name + '</div>' +
+        '<div class="inv-meta">' + it.cat + " · " + fmtDate(it.expiry) + '</div></div>' +
+        '<div style="display:flex;align-items:center;gap:.5rem">' +
+        '<span class="badge ' + badge + '">' + label + '</span>' +
+        '<select class="inv-sel" data-id="' + it.id + '" aria-label="修改容器">' +
+        CONTAINERS.map(function (c) {
+          return '<option value="' + c + '"' + (c === it.container ? " selected" : "") + ">" + c + "</option>";
+        }).join("") +
+        '</select></div>' +
+        '<div class="inv-qty">' +
+        '<button class="qty-btn" data-id="' + it.id + '" data-d="-1" type="button">−</button>' +
+        '<span style="min-width:1.2rem;text-align:center;font-size:.8rem">' + it.qty + '</span>' +
+        '<button class="qty-btn" data-id="' + it.id + '" data-d="1" type="button">+</button>' +
+        '</div></div>';
+    });
+    el.invList.innerHTML = html;
+  }
+
+  el.invList.addEventListener("change", function (e) {
+    var sel = e.target;
+    if (sel.classList.contains("inv-sel")) {
+      var it = items.find(function (x) { return x.id === Number(sel.dataset.id); });
+      if (it) {
+        it.container = sel.value;
+        pushLog("in", "手动修改容器：" + it.name + " → " + sel.value);
+        renderAll();
+      }
+    }
+  });
+  el.invList.addEventListener("click", function (e) {
+    var btn = e.target.closest(".qty-btn");
+    if (!btn) return;
+    var it = items.find(function (x) { return x.id === Number(btn.dataset.id); });
+    if (!it) return;
+    it.qty += Number(btn.dataset.d);
+    if (it.qty <= 0) items = items.filter(function (x) { return x !== it; });
+    pushLog(Number(btn.dataset.d) > 0 ? "in" : "out", (Number(btn.dataset.d) > 0 ? "手动 +1：" : "手动 -1：") + it.name);
+    renderAll();
+  });
+
+  /* ---------- 容器 Tabs ---------- */
+  el.tabs.addEventListener("click", function (e) {
+    var btn = e.target.closest(".tab");
+    if (!btn) return;
+    currentTab = btn.dataset.c;
+    el.tabs.querySelectorAll(".tab").forEach(function (b) { b.classList.toggle("active", b === btn); });
+    renderInventory();
+  });
+
+  /* ---------- 菜谱 ---------- */
+  function hasStock(name) {
+    return items.some(function (it) {
+      return it.name.indexOf(name) >= 0 && it.qty > 0 && status(it) !== "expired";
+    });
+  }
+  function renderRecipes() {
+    var ok = [], miss = [];
+    recipes.forEach(function (r) {
+      var missing = r.need.filter(function (ing) { return !hasStock(ing); });
+      if (missing.length === 0) ok.push(r.name);
+      else miss.push(r.name + "（缺：" + missing.join("、") + "）");
+    });
+    el.recipeOk.innerHTML = ok.length ? ok.map(function (n) { return "✔ " + n; }).join("<br>") : '<span style="color:var(--muted)">暂无完全可做的菜</span>';
+    el.recipeMiss.innerHTML = miss.length ? miss.map(function (n) { return "○ " + n; }).join("<br>") : "";
+  }
+
+  /* ---------- 月度统计 ---------- */
+  function renderMonth() {
+    var counts = CONTAINERS.map(function (c) {
+      return { c: c, n: items.filter(function (it) { return it.container === c; }).reduce(function (s, it) { return s + it.qty; }, 0) };
+    });
+    var max = Math.max(1, Math.max.apply(null, counts.map(function (x) { return x.n; })));
+    el.monthChart.innerHTML = counts.map(function (x) {
+      return '<div class="bar-row"><span style="width:3.2rem">' + x.c + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + Math.round(x.n / max * 100) + '%"></div></div>' +
+        '<span class="bar-val">' + x.n + '</span></div>';
+    }).join("");
+  }
+
+  /* ---------- 操作记录 ---------- */
+  function renderLog() {
+    el.logList.innerHTML = log.slice(0, 20).map(function (l) {
+      return '<div class="' + l.type + '">' + l.time + " · " + l.text + "</div>";
+    }).join("") || '<span style="color:var(--muted)">暂无操作记录</span>';
+    el.deviceLog.innerHTML = log.slice(0, 6).map(function (l) {
+      return (l.type === "in" ? "▲ " : l.type === "out" ? "▼ " : "◎ ") + l.time + " " + l.text;
+    }).join("<br>");
+  }
+
+  /* ---------- 下班前推送 ---------- */
+  function showPush() {
+    var soon = items.filter(function (it) { return status(it) === "soon"; }).slice(0, 3);
+    var exp = items.filter(function (it) { return status(it) === "expired"; });
+    var lines = [];
+    if (exp.length) lines.push("已过期：" + exp.map(function (x) { return x.name; }).join("、") + "，建议尽快处理");
+    if (soon.length) lines.push("今日临期：" + soon.map(function (x) { return x.name; }).join("、"));
+    lines.push("建议补货：酸奶、鸡蛋、番茄");
+    el.pushBody.innerHTML = lines.map(function (l) { return "· " + l; }).join("<br>");
+    el.pushToast.classList.remove("hidden");
+    pushLog("push", "下班前推送：剩余食材 + 补货清单");
+    renderLog();
+  }
+  el.btnPush.addEventListener("click", showPush);
+  el.pushClose.addEventListener("click", function () { el.pushToast.classList.add("hidden"); });
+
+  /* ---------- 汇总 ---------- */
+  function renderAll() {
+    renderStats();
+    renderInventory();
+    renderRecipes();
+    renderMonth();
+    renderLog();
+    updateDeviceIdle();
+  }
+
+  pushLog("in", "演示数据初始化（11 件库存）");
+  renderAll();
+})();
+</script>
+</body>
+</html>
