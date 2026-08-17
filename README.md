@@ -126,7 +126,7 @@
 ├── shike-web.html                # 大屏版 Web Demo
 ├── shike-hardware-demo.html      # 硬件交互模拟 Demo（本地可开）
 ├── Demo操作说明.md                # 3 分钟演示步骤与依赖说明
-├── docs/                         # 产品 / 后端 / 固件 / 商业 / 出海 / 结构文档
+├── docs/                         # 产品 / 后端 / 固件 / 结构文档
 ├── hardware/case-3d/             # 3D 打印外壳（STL + 预览图 + 建模脚本）
 ├── firmware/                     # 硬件烧录源码（T5-E1 TuyaOpen，WiFi 凭据已打码）
 └── backend/                      # 后端接口参考代码（Prisma + Next.js，已部署）
@@ -140,10 +140,7 @@
 | [docs/后端对接说明.md](docs/后端对接说明.md) | 11 个 API 契约、数据库 15 张表、部署方式 |
 | [docs/固件烧录需求.md](docs/固件烧录需求.md) | 硬件 / 开发环境 / 烧录 SOP |
 | [docs/硬件描述.md](docs/硬件描述.md) | 硬件原型描述与 BOM |
-| [docs/商业化分析报告.md](docs/商业化分析报告.md) | 市场、竞品、商业模型、风险与 30 天计划 |
-| [docs/出海战略分析.md](docs/出海战略分析.md) | 日本首发路径、渠道、合规与定价 |
 | [docs/磁吸门版硬件设计方案.md](docs/磁吸门版硬件设计方案.md) | 门内连续扫描形态、低延时管线、BOM 成本 |
-| [docs/物料清单.md](docs/物料清单.md) | 采购物料清单 |
 
 ---
 
