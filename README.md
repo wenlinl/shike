@@ -26,6 +26,7 @@
 ├── shike-web.html         # 大屏版 Web Demo
 ├── Demo操作说明.md         # 现场演示步骤与依赖说明
 ├── docs/                  # 产品文档 / 后端对接说明 / 硬件描述 / 固件需求
+├── firmware/              # 硬件烧录源码（T5-E1 TuyaOpen 固件，WiFi 凭据已打码）
 └── backend/               # 后端接口参考代码（Prisma + Next.js API，已部署 tuvmkt.com）
 ```
 
