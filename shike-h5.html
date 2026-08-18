@@ -32,7 +32,7 @@ html{-webkit-text-size-adjust:100%}
 body{
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
   background:var(--bg); color:var(--ink);
-  padding-top:calc(env(safe-area-inset-top) + 128px);
+  padding-top:calc(env(safe-area-inset-top) + 40px);
   padding-bottom:calc(env(safe-area-inset-bottom) + 104px);
   -webkit-font-smoothing:antialiased;
 }
@@ -50,8 +50,8 @@ a{cursor:pointer}
 
 /* ---------- 品牌栏 ---------- */
 .brandbar{
-  position:fixed;top:calc(env(safe-area-inset-top) + 40px);left:50%;transform:translateX(-50%);
-  width:100%;max-width:480px;z-index:40;
+  position:sticky;top:calc(env(safe-area-inset-top) + 40px);
+  z-index:60;max-width:480px;margin:0 auto;
   background:linear-gradient(135deg,rgba(239,90,65,.16),rgba(212,47,31,.10));
   backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,47,31,.18);
   border-radius:0 0 18px 18px;box-shadow:0 6px 18px rgba(212,47,31,.10);
@@ -309,7 +309,7 @@ main{padding:8px 16px 0}
 .subview{position:fixed;inset:0;z-index:45;background:var(--bg);display:none;margin:0 auto;max-width:480px}
 .subview.open{display:block;animation:slideIn .26s ease}
 @keyframes slideIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
-.sv-head{position:sticky;top:0;z-index:2;background:rgba(248,241,233,.96);backdrop-filter:blur(10px);padding:calc(env(safe-area-inset-top) + 14px) 16px 10px;display:flex;align-items:center;gap:10px}
+.sv-head{position:sticky;top:calc(env(safe-area-inset-top) + 86px);z-index:2;background:rgba(248,241,233,.96);backdrop-filter:blur(10px);padding:14px 16px 10px;display:flex;align-items:center;gap:10px}
 .back-btn{width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--line);color:var(--ink);font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);flex:none;line-height:1}
 .sv-title{font-size:19px;font-weight:800;color:var(--ink);flex:1}
 .sv-right{flex:none}
