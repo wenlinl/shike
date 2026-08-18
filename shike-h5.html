@@ -32,7 +32,7 @@ html{-webkit-text-size-adjust:100%}
 body{
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
   background:var(--bg); color:var(--ink);
-  padding-top:calc(env(safe-area-inset-top) + 106px);
+  padding-top:calc(env(safe-area-inset-top) + 128px);
   padding-bottom:calc(env(safe-area-inset-bottom) + 104px);
   -webkit-font-smoothing:antialiased;
 }
@@ -50,14 +50,16 @@ a{cursor:pointer}
 
 /* ---------- 品牌栏 ---------- */
 .brandbar{
-  position:fixed;top:calc(env(safe-area-inset-top) + 40px);left:0;right:0;z-index:40;
-  background:linear-gradient(135deg,#2f9e63,#5dbf8b);backdrop-filter:blur(12px);
-  box-shadow:0 4px 16px rgba(47,158,99,.18);
+  position:fixed;top:calc(env(safe-area-inset-top) + 40px);left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;z-index:40;
+  background:linear-gradient(135deg,rgba(239,90,65,.16),rgba(212,47,31,.10));
+  backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,47,31,.18);
+  border-radius:0 0 18px 18px;box-shadow:0 6px 18px rgba(212,47,31,.10);
 }
 .brandbar .in{max-width:480px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 18px}
 .brand{line-height:1.15}
-.brand .logo{font-size:23px;font-weight:800;color:#fff;letter-spacing:1.5px}
-.brand .slogan{font-size:10.5px;color:rgba(255,255,255,.92);margin-top:3px;letter-spacing:.2px}
+.brand .logo{font-size:23px;font-weight:800;color:var(--red);letter-spacing:1.5px}
+.brand .slogan{font-size:10.5px;color:var(--ink-2);margin-top:3px;letter-spacing:.2px}
 .brand-actions{display:flex;align-items:center;gap:10px}
 .icon-btn{position:relative;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid rgba(239,227,213,.9);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:#7a6857}
 .icon-btn .dot{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
@@ -327,12 +329,15 @@ main{padding:8px 16px 0}
 .shop-qty{display:flex;align-items:center;gap:7px;color:var(--ink-2);font-size:13px}
 .qty-btn{width:25px;height:25px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:14px}
 .shop-add{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.shop-add-row{display:flex;gap:8px;margin-bottom:12px}
-.shop-add-row input{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px;background:#fff;color:var(--ink)}
+.shop-add-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.shop-add-row input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font-size:14px;background:#fff;color:var(--ink);outline:none;box-shadow:inset 0 1px 3px rgba(126,86,57,.05)}
+.shop-add-row input:focus{border-color:var(--red)}
+.shop-add-row .btn-primary{margin-top:0;width:auto;min-width:88px;padding:10px 16px;font-size:14px;border-radius:999px}
 .shop-del{margin-left:auto;border:0;background:none;color:var(--ink-2);font-size:15px;padding:2px 4px}
 .arch-link{display:block;width:100%;margin:0 0 12px;padding:10px 14px;border:1px dashed rgba(47,158,99,.45);border-radius:14px;background:rgba(47,158,99,.06);color:var(--green);font-size:12.5px;font-weight:600;text-align:left;cursor:pointer}
-.expire-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}
-.expire-grid .btn-outline,.expire-grid .btn-primary{width:100%;min-height:44px;font-size:13px}
+.expire-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.expire-grid .btn-outline,.expire-grid .btn-primary{margin-top:0;width:100%;min-height:46px;height:46px;padding:8px 6px;font-size:13px;display:flex;align-items:center;justify-content:center;line-height:1.2}
+.arch-btn{flex:none;width:auto;min-width:76px;background:#fff;color:var(--green);border:1px solid var(--green);border-radius:999px;padding:7px 14px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
 .sug-chip{display:inline-flex;align-items:center;gap:4px;background:var(--amber-soft);color:#b06f1d;font-size:11px;padding:6px 12px;border-radius:999px;border:0}
 
 /* 保鲜提醒 / 通知 */
@@ -1025,7 +1030,7 @@ function viewShop(){
   return `
   <div class="shop-add-row">
     <input id="shopAddInput" placeholder="添加食材，如 牛奶…">
-    <button class="btn-primary" style="padding:0 16px;min-height:40px" data-act="shop-add-input">添加</button>
+    <button class="btn-primary" data-act="shop-add-input">＋ 添加</button>
   </div>
   <div class="sv-card">
     <div class="sv-sec">待采购 <small>${undone} 项</small></div>
@@ -1090,7 +1095,7 @@ function viewArchived(){
   return ARCHIVED.map((a,i) => `
     <div class="sv-card">
       <div class="ing-row"><span>${a.item.emoji || "🥫"} ${a.item.name}</span><span class="${a.reason === "consumed" ? "have" : "missing"}">${a.reason === "consumed" ? "已消耗" : a.reason === "wasted" ? "已浪费" : "已过期清理"}</span></div>
-      <div class="ing-row"><span style="font-size:12px;color:var(--ink-2)">${a.at}</span><button class="btn-outline" style="padding:7px 14px;font-size:12px" data-act="arch-restore" data-i="${i}">↩ 复原</button></div>
+      <div class="ing-row"><span style="font-size:12px;color:var(--ink-2)">${a.at}</span><button class="arch-btn" data-act="arch-restore" data-i="${i}">↩ 复原</button></div>
     </div>`).join("");
 }
 
