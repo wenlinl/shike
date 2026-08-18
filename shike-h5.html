@@ -51,12 +51,13 @@ a{cursor:pointer}
 /* ---------- 品牌栏 ---------- */
 .brandbar{
   position:fixed;top:calc(env(safe-area-inset-top) + 40px);left:0;right:0;z-index:40;
-  background:rgba(248,241,233,.94);backdrop-filter:blur(12px);
+  background:linear-gradient(135deg,#2f9e63,#5dbf8b);backdrop-filter:blur(12px);
+  box-shadow:0 4px 16px rgba(47,158,99,.18);
 }
 .brandbar .in{max-width:480px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 18px}
 .brand{line-height:1.15}
-.brand .logo{font-size:23px;font-weight:800;color:var(--red);letter-spacing:1.5px}
-.brand .slogan{font-size:10.5px;color:var(--ink-2);margin-top:3px;letter-spacing:.2px}
+.brand .logo{font-size:23px;font-weight:800;color:#fff;letter-spacing:1.5px}
+.brand .slogan{font-size:10.5px;color:rgba(255,255,255,.92);margin-top:3px;letter-spacing:.2px}
 .brand-actions{display:flex;align-items:center;gap:10px}
 .icon-btn{position:relative;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid rgba(239,227,213,.9);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:#7a6857}
 .icon-btn .dot{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
@@ -326,6 +327,12 @@ main{padding:8px 16px 0}
 .shop-qty{display:flex;align-items:center;gap:7px;color:var(--ink-2);font-size:13px}
 .qty-btn{width:25px;height:25px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:14px}
 .shop-add{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.shop-add-row{display:flex;gap:8px;margin-bottom:12px}
+.shop-add-row input{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px;background:#fff;color:var(--ink)}
+.shop-del{margin-left:auto;border:0;background:none;color:var(--ink-2);font-size:15px;padding:2px 4px}
+.arch-link{display:block;width:100%;margin:0 0 12px;padding:10px 14px;border:1px dashed rgba(47,158,99,.45);border-radius:14px;background:rgba(47,158,99,.06);color:var(--green);font-size:12.5px;font-weight:600;text-align:left;cursor:pointer}
+.expire-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}
+.expire-grid .btn-outline,.expire-grid .btn-primary{width:100%;min-height:44px;font-size:13px}
 .sug-chip{display:inline-flex;align-items:center;gap:4px;background:var(--amber-soft);color:#b06f1d;font-size:11px;padding:6px 12px;border-radius:999px;border:0}
 
 /* 保鲜提醒 / 通知 */
@@ -551,7 +558,7 @@ main{padding:8px 16px 0}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
           </button>
           <button class="icon-btn filter-btn" id="invFilterBtn" aria-label="筛选">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 7v5l-4 2v-7z"/></svg>
           </button>
         </div>
       </div>
@@ -581,6 +588,8 @@ main{padding:8px 16px 0}
           <div class="l2">已同步更新</div>
         </div>
       </div>
+
+      <button class="arch-link" data-view="archived">🗂️ 已处理记录 <span id="archN">0</span> 件 ›</button>
 
       <div class="chips-wrap">
         <div class="chips-row" id="invChips"></div>
@@ -613,8 +622,6 @@ main{padding:8px 16px 0}
         <button class="hub-card" data-view="shop"><span class="h-ic">🛒</span><span class="h-t">购物清单</span><span class="h-s">待采购一键管理</span><span class="h-n" id="hubShopN">—</span></button>
         <button class="hub-card" data-view="nutrition"><span class="h-ic">🥗</span><span class="h-t">营养档案</span><span class="h-s">四大营养素概览</span></button>
         <button class="hub-card" data-view="waste"><span class="h-ic">🗑️</span><span class="h-t">浪费统计</span><span class="h-s">消耗 / 浪费 / 过期记录</span><span class="h-n" id="hubWasteN">—</span></button>
-        <button class="hub-card" data-view="log"><span class="h-ic">📋</span><span class="h-t">食材履历</span><span class="h-s">录入与处理记录</span></button>
-        <button class="hub-card" data-view="favorites"><span class="h-ic">♥</span><span class="h-t">我的收藏</span><span class="h-s">喜欢的菜谱</span></button>
         <button class="hub-card" data-view="prefs"><span class="h-ic">🌶️</span><span class="h-t">口味偏好</span><span class="h-s">推荐更懂你</span></button>
       </div>
 
@@ -635,15 +642,6 @@ main{padding:8px 16px 0}
       <div class="sec-head"><b>更多推荐</b><a id="shuffleBtn">换一批 ↻</a></div>
       <div id="moreList"></div>
 
-      <div class="cream-panel prefs">
-        <div class="panel-head"><b>口味偏好</b><a data-view="prefs">编辑偏好 ›</a></div>
-        <div class="pref-row" id="prefRow">
-          <button class="pref green active">清淡</button>
-          <button class="pref orange">家常</button>
-          <button class="pref red">微辣</button>
-        </div>
-        <div class="pref-caption">调整口味偏好，获得更精准的菜谱推荐</div>
-      </div>
     </section>
 
     <!-- ============ 我的 ============ -->
@@ -805,13 +803,9 @@ const TRACE = {
 
 const QUICK = [
   { t:"扫描食材", i:"📷", c:"qc1", v:"tab:scan" },
-  { t:"智能推荐", i:"✨", c:"qc2", ai:true, v:"recipe:0:AI 为你推荐" },
   { t:"营养分析", i:"🥗", c:"qc3", sub:"均衡膳食", v:"view:nutrition" },
   { t:"食材履历", i:"📋", c:"qc4", sub:"来源可查", v:"view:log" },
-  { t:"快速录入", i:"⚡", c:"qc1", v:"view:quickAdd" },
-  { t:"菜谱灵感", i:"🍳", c:"qc2", v:"tab:recipe" },
-  { t:"吃得更健康", i:"🌱", c:"qc3", v:"recipe:2:健康清淡推荐" },
-  { t:"追溯记录", i:"🧾", c:"qc4", v:"view:trace" }
+  { t:"快速录入", i:"⚡", c:"qc1", v:"view:quickAdd" }
 ];
 const CAT_EMOJI = { 蔬菜:"🥬", 乳品:"🥛", 肉类:"🥩", 蛋类:"🥚", 水果:"🍎", 零食:"🍞", 主食:"🍚", 其他:"🥫" };
 const AV_MAP = { 妈妈:"👩", 爸爸:"👨", 爷爷:"👴", 姐姐:"👧" };
@@ -830,6 +824,8 @@ let FILTER_STATUS = "";
 let SRV_SHOP = null;
 let WASTE = { logs: [], summary: { consumed: 0, wasted: 0, expired: 0, total: 0 } };
 let SRV_RECIPES = false;
+let ARCHIVED = [];
+let NUTR_SRV = null;
 
 /* ================= 工具 ================= */
 function daysLeft(exp){
@@ -979,6 +975,7 @@ const VIEW_CFG = {
   quickAdd: { title:"快速录入", right:"保存" },
   filter:   { title:"筛选", right:"重置" },
   waste:    { title:"浪费统计", right:"" },
+  archived: { title:"已处理记录", right:"" },
   item:     { title:"食材详情", right:"" },
   recipe:   { title:"菜谱详情", right:"" }
 };
@@ -992,6 +989,7 @@ function openView(name, payload){
   document.getElementById("svBody").innerHTML = renderView(name, payload);
   document.getElementById("subview").classList.add("open");
   document.body.style.overflow = "hidden";
+  if (name === "nutrition") loadNutrition();
 }
 function closeView(){
   document.getElementById("subview").classList.remove("open");
@@ -1015,6 +1013,7 @@ function renderView(name, p){
   if (name === "quickAdd") return viewQuickAdd();
   if (name === "filter") return viewFilter();
   if (name === "waste") return viewWaste();
+  if (name === "archived") return viewArchived();
   if (name === "item") return viewItem(p.name);
   if (name === "recipe") return viewRecipe(p.idx, p.banner);
   return "";
@@ -1024,6 +1023,10 @@ function viewShop(){
   const list = SRV_SHOP || SHOP;
   const undone = list.filter(s => !s.done).length;
   return `
+  <div class="shop-add-row">
+    <input id="shopAddInput" placeholder="添加食材，如 牛奶…">
+    <button class="btn-primary" style="padding:0 16px;min-height:40px" data-act="shop-add-input">添加</button>
+  </div>
   <div class="sv-card">
     <div class="sv-sec">待采购 <small>${undone} 项</small></div>
     ${list.map((s,i) => `
@@ -1035,6 +1038,7 @@ function viewShop(){
           ${s.qty} ${s.unit || ""}
           <button class="qty-btn" data-act="shop-qty" data-i="${i}" data-id="${s.id || ""}" data-d="1">＋</button>
         </div>
+        <button class="shop-del" data-act="shop-del" data-i="${i}" data-id="${s.id || ""}">✕</button>
       </div>`).join("")}
   </div>
   <div class="sv-card">
@@ -1081,6 +1085,15 @@ function viewWaste(){
   </div>`;
 }
 
+function viewArchived(){
+  if (!ARCHIVED.length) return `<div class="empty-box">还没有已处理的食材<br><span style="font-size:11px">在食材详情里点「吃掉了 / 扔掉了 / 已过期清理」会归档到这里，误触可复原</span></div>`;
+  return ARCHIVED.map((a,i) => `
+    <div class="sv-card">
+      <div class="ing-row"><span>${a.item.emoji || "🥫"} ${a.item.name}</span><span class="${a.reason === "consumed" ? "have" : "missing"}">${a.reason === "consumed" ? "已消耗" : a.reason === "wasted" ? "已浪费" : "已过期清理"}</span></div>
+      <div class="ing-row"><span style="font-size:12px;color:var(--ink-2)">${a.at}</span><button class="btn-outline" style="padding:7px 14px;font-size:12px" data-act="arch-restore" data-i="${i}">↩ 复原</button></div>
+    </div>`).join("");
+}
+
 function viewRemind(){
   const list = INV.filter(i => daysLeft(i.exp) <= 2 && !HANDLED.has(i.name))
     .sort((a,b) => daysLeft(a.exp) - daysLeft(b.exp));
@@ -1117,10 +1130,40 @@ function viewMembers(){
 }
 
 function viewNutrition(){
+  const s = NUTR_SRV;
+  if (s){
+    const rows = [
+      ["蛋白质", s.totals.protein, "g"],
+      ["维生素C", s.totals.vitaminC, "mg"],
+      ["膳食纤维", s.totals.fiber, "g"],
+      ["钙", s.totals.calcium, "mg"],
+    ];
+    const refs = [60, 100, 25, 800];
+    return `
+  <div class="sv-card">
+    <div class="sv-sec">今日营养概览 <small>基于今天消耗 / 取出 / 过期的 ${s.items.length} 种食材</small></div>
+    ${rows.map(([k, v, u], i) => `
+      <div class="nutr-bar-row"><span class="nutr-k">${k}</span>
+        <div class="nutr-track"><i style="width:${Math.min(100, (v / refs[i]) * 100)}%"></i></div>
+        <span class="nutr-v">${v}${u}</span>
+      </div>`).join("")}
+  </div>
+  ${s.analysis ? `
+  <div class="sv-card">
+    <div class="sv-sec">AI 营养分析</div>
+    <div class="pref-caption" style="color:var(--ink);line-height:1.6">${s.analysis.summary}</div>
+    ${(s.analysis.suggestions || []).map(x => `<div class="remind-item"><div class="remind-ic">💡</div><div class="remind-body"><div class="remind-meta">${x}</div></div></div>`).join("")}
+  </div>` : `
+  <div class="sv-card">
+    <div class="sv-sec">暂无消耗记录</div>
+    <div class="pref-caption">在食材详情里点「吃掉了 / 扔掉了 / 已过期清理」后，这里会自动生成营养分析与 AI 建议</div>
+  </div>`}`;
+  }
+  // 本地演示兜底
   const max = Math.max(...NUTR.map(n => n[1]));
   return `
   <div class="sv-card">
-    <div class="sv-sec">今日营养概览 <small>基于 12 种库存食材估算</small></div>
+    <div class="sv-sec">今日营养概览 <small>演示数据</small></div>
     ${NUTR.map(([k,v]) => `
       <div class="nutr-bar-row"><span class="nutr-k">${k}</span>
         <div class="nutr-track"><i style="width:${v}%"></i></div>
@@ -1132,6 +1175,15 @@ function viewNutrition(){
     <div class="remind-item"><div class="remind-ic">🍳</div><div class="remind-body"><div class="remind-name">早餐补钙</div><div class="remind-meta">牛奶、酸奶库存充足，建议早餐搭配</div></div></div>
     <div class="remind-item"><div class="remind-ic">🥦</div><div class="remind-body"><div class="remind-name">午餐补膳食纤维</div><div class="remind-meta">西兰花、生菜建议今天食用</div></div></div>
   </div>`;
+}
+
+async function loadNutrition(){
+  try {
+    const res = await fetch(`${API_BASE}/api/nutrition`, { signal: AbortSignal.timeout(8000) });
+    const j = await res.json();
+    if (j && j.code === 0){ NUTR_SRV = j; }
+  } catch (e) { NUTR_SRV = null; }
+  if (currentView && currentView.name === "nutrition") refreshView();
 }
 
 function viewLog(){
@@ -1214,7 +1266,7 @@ function viewItem(name){
     <div class="ing-row"><span>建议</span><span>${d <= 1 ? "尽快食用或放入菜谱" : "冷藏保鲜，注意密封"}</span></div>
   </div>
   <div class="sv-sec">过期处理</div>
-  <div class="detail-actions">
+  <div class="expire-grid">
     <button class="btn-outline" data-act="item-eat" data-name="${it.name}">🥢 吃掉了</button>
     <button class="btn-outline" data-act="item-waste" data-name="${it.name}">🗑️ 扔掉了</button>
     <button class="btn-outline" data-act="item-expired" data-name="${it.name}">⏰ 已过期清理</button>
@@ -1313,7 +1365,8 @@ function act(action, el){
       fetch(`${API_BASE}/api/consume`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name: it.name, reason, quantity: 1 }) }).catch(()=>{});
     }
     const i = INV.indexOf(it);
-    if (i >= 0) INV.splice(i, 1);
+    if (i >= 0){ INV.splice(i, 1); ARCHIVED.unshift({ item: it, reason, at: new Date().toLocaleString("zh-CN", { hour12:false }) }); }
+    const an = document.getElementById("archN"); if (an) an.textContent = ARCHIVED.length;
     toast(reason === "consumed" ? `「${it.name}」已记录消耗` : reason === "wasted" ? `「${it.name}」已记录浪费` : `「${it.name}」已记录过期清理`);
     closeView(); renderHome(); renderChips(); renderInv();
   } else if (a === "item-restock"){
@@ -1322,6 +1375,34 @@ function act(action, el){
       fetch(`${API_BASE}/api/shopping-list`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name: it.name, qty: 1, unit: "份", source: "expiry" }) }).catch(()=>{});
       toast(`「${it.name}」已加入购物清单`);
     }
+  } else if (a === "arch-restore"){
+    const idx = +el.dataset.i, a = ARCHIVED[idx];
+    if (!a) return;
+    ARCHIVED.splice(idx, 1);
+    INV.unshift(a.item);
+    if (a.item._db && a.item.exp){
+      const days = Math.max(1, Math.round((new Date(a.item.exp) - new Date()) / 86400000));
+      fetch(`${API_BASE}/api/items`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name:a.item.name, category:a.item.cat, container:a.item.c || "冰箱", expiryDays: days, keepDays: days }) }).catch(()=>{});
+    }
+    const an = document.getElementById("archN"); if (an) an.textContent = ARCHIVED.length;
+    toast(`「${a.item.name}」已复原`);
+    refreshView(); renderHome(); renderChips(); renderInv();
+  } else if (a === "shop-add-input"){
+    const inp = document.getElementById("shopAddInput");
+    const name = (inp ? inp.value.trim() : "");
+    if (!name){ toast("请输入食材名称"); return; }
+    const list = SRV_SHOP || SHOP;
+    if (!list.some(s => s.name === name)){
+      list.push({ name, qty:1, unit:"份", done:false });
+      fetch(`${API_BASE}/api/shopping-list`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name, qty:1, unit:"份", source:"manual" }) }).catch(()=>{});
+    }
+    if (inp) inp.value = "";
+    toast(`「${name}」已加入购物清单`); refreshView();
+  } else if (a === "shop-del"){
+    const list = SRV_SHOP || SHOP, i = +el.dataset.i;
+    const it = list[i]; if (!it) return;
+    if (SRV_SHOP && it.id){ fetch(`${API_BASE}/api/shopping-list/${it.id}`, { method:"DELETE" }).catch(()=>{}); }
+    list.splice(i, 1); refreshView();
   }
 }
 
@@ -1499,11 +1580,6 @@ document.getElementById("invChips").addEventListener("click", e => {
 
 /* ================= 菜谱页交互 ================= */
 document.getElementById("shuffleBtn").addEventListener("click", () => { moreIdx++; renderRecipe(); toast("为你换了一批新菜谱"); });
-document.getElementById("prefRow").addEventListener("click", e => {
-  const p = e.target.closest(".pref"); if (!p) return;
-  document.querySelectorAll("#prefRow .pref").forEach(x => x.classList.remove("active"));
-  p.classList.add("active"); toast("偏好已更新，菜谱将更懂你");
-});
 document.getElementById("helpItem").addEventListener("click", () => toast("意见已收到，感谢反馈 ❤️"));
 document.getElementById("aboutItem").addEventListener("click", () => toast("食刻 v1.1.0 · 让每一餐都新鲜安心"));
 document.getElementById("bellBtn").addEventListener("click", () => openView("notif"));
@@ -1721,6 +1797,7 @@ tick(); setInterval(tick, 10000);
 renderHome(); renderChips(); renderInv(); renderRecipe();
 syncInventory();
 loadShoppingHub(); loadWaste(); syncRecipes();
+const arch0 = document.getElementById("archN"); if (arch0) arch0.textContent = ARCHIVED.length;
 startCamera();
 const hash = location.hash.slice(1);
 if (["home","scan","inv","recipe","me"].includes(hash)) go(hash);

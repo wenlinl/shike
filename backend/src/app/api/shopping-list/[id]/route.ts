@@ -26,4 +26,14 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   }
 }
 
+export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
+  try {
+    await prisma.shoppingListItem.delete({ where: { id } });
+    return xzdJson({ code: 0 });
+  } catch {
+    return xzdJson({ code: 1, msg: "记录不存在" }, 404);
+  }
+}
+
 export { xzdOptions as OPTIONS };
