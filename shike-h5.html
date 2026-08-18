@@ -28,7 +28,8 @@
   --shadow-sm:0 4px 14px rgba(126,86,57,.07);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;height:100%}
+html,body{height:100%;overflow:hidden}
 body{
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
   background:var(--bg); color:var(--ink);
@@ -68,7 +69,7 @@ a{cursor:pointer}
 .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f6c8a8,#e8a37f);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow-sm)}
 
 /* ---------- 布局 ---------- */
-main{padding:8px 16px 20px;margin-top:calc(env(safe-area-inset-top) + 104px);height:calc(100vh - env(safe-area-inset-top) - 104px - env(safe-area-inset-bottom) - 76px);height:calc(100dvh - env(safe-area-inset-top) - 104px - env(safe-area-inset-bottom) - 76px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+main{position:absolute;top:calc(env(safe-area-inset-top) + 104px);bottom:calc(env(safe-area-inset-bottom) + 78px);left:50%;transform:translateX(-50%);width:100%;max-width:480px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 16px 20px}
 .page{display:none}
 .page.active{display:block;animation:fadeUp .28s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
