@@ -33,6 +33,7 @@ body{
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
   background:var(--bg); color:var(--ink);
   padding-top:0;
+  overflow:hidden;
   padding-bottom:calc(env(safe-area-inset-bottom) + 104px);
   -webkit-font-smoothing:antialiased;
 }
@@ -54,7 +55,7 @@ a{cursor:pointer}
   width:100%;max-width:480px;height:64px;z-index:60;
   background:linear-gradient(135deg,rgba(239,90,65,.16),rgba(212,47,31,.10));
   backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,47,31,.18);
-  border-radius:0 0 18px 18px;box-shadow:0 6px 18px rgba(212,47,31,.10);
+  border-radius:0;box-shadow:none;
 }
 .brandbar .in{max-width:480px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 18px}
 .brand{line-height:1.15}
@@ -67,7 +68,7 @@ a{cursor:pointer}
 .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f6c8a8,#e8a37f);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow-sm)}
 
 /* ---------- 布局 ---------- */
-main{padding:8px 16px 20px;margin-top:calc(env(safe-area-inset-top) + 104px);height:calc(100dvh - env(safe-area-inset-top) - 104px - env(safe-area-inset-bottom) - 76px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+main{padding:8px 16px 20px;margin-top:calc(env(safe-area-inset-top) + 104px);height:calc(100vh - env(safe-area-inset-top) - 104px - env(safe-area-inset-bottom) - 76px);height:calc(100dvh - env(safe-area-inset-top) - 104px - env(safe-area-inset-bottom) - 76px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 .page{display:none}
 .page.active{display:block;animation:fadeUp .28s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -993,13 +994,11 @@ function openView(name, payload){
     ? `<button class="sv-right-btn" data-act="right:${name}">${right}</button>` : "";
   document.getElementById("svBody").innerHTML = renderView(name, payload);
   document.getElementById("subview").classList.add("open");
-  document.body.style.overflow = "hidden";
   const m = document.querySelector("main"); if (m) m.style.overflow = "hidden";
   if (name === "nutrition") loadNutrition();
 }
 function closeView(){
   document.getElementById("subview").classList.remove("open");
-  document.body.style.overflow = "";
   const m = document.querySelector("main"); if (m) m.style.overflow = "";
   currentView = null;
 }
