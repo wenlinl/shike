@@ -32,7 +32,7 @@ html{-webkit-text-size-adjust:100%}
 body{
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
   background:var(--bg); color:var(--ink);
-  padding-top:calc(env(safe-area-inset-top) + 40px);
+  padding-top:0;
   padding-bottom:calc(env(safe-area-inset-bottom) + 104px);
   -webkit-font-smoothing:antialiased;
 }
@@ -50,8 +50,8 @@ a{cursor:pointer}
 
 /* ---------- 品牌栏 ---------- */
 .brandbar{
-  position:sticky;top:calc(env(safe-area-inset-top) + 40px);
-  z-index:60;max-width:480px;margin:0 auto;
+  position:fixed;top:calc(env(safe-area-inset-top) + 40px);left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;height:64px;z-index:60;
   background:linear-gradient(135deg,rgba(239,90,65,.16),rgba(212,47,31,.10));
   backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,47,31,.18);
   border-radius:0 0 18px 18px;box-shadow:0 6px 18px rgba(212,47,31,.10);
@@ -67,7 +67,7 @@ a{cursor:pointer}
 .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f6c8a8,#e8a37f);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow-sm)}
 
 /* ---------- 布局 ---------- */
-main{padding:8px 16px 0}
+main{padding:8px 16px 20px;margin-top:calc(env(safe-area-inset-top) + 104px);height:calc(100dvh - env(safe-area-inset-top) - 104px - env(safe-area-inset-bottom) - 76px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 .page{display:none}
 .page.active{display:block;animation:fadeUp .28s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -306,10 +306,10 @@ main{padding:8px 16px 0}
 .tab.active .ic{background:#fde7e2;color:var(--red)}
 
 /* ---------- 子页面（弹层） ---------- */
-.subview{position:fixed;inset:0;z-index:45;background:var(--bg);display:none;margin:0 auto;max-width:480px}
+.subview{position:fixed;top:calc(env(safe-area-inset-top) + 104px);left:0;right:0;bottom:0;z-index:45;background:var(--bg);display:none;margin:0 auto;max-width:480px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .subview.open{display:block;animation:slideIn .26s ease}
 @keyframes slideIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
-.sv-head{position:sticky;top:calc(env(safe-area-inset-top) + 86px);z-index:2;background:rgba(248,241,233,.96);backdrop-filter:blur(10px);padding:14px 16px 10px;display:flex;align-items:center;gap:10px}
+.sv-head{position:sticky;top:0;z-index:2;background:rgba(248,241,233,.96);backdrop-filter:blur(10px);padding:14px 16px 10px;display:flex;align-items:center;gap:10px}
 .back-btn{width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--line);color:var(--ink);font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);flex:none;line-height:1}
 .sv-title{font-size:19px;font-weight:800;color:var(--ink);flex:1}
 .sv-right{flex:none}
@@ -862,7 +862,7 @@ function go(page){
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.page === page));
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById("page-" + page).classList.add("active");
-  window.scrollTo(0, 0);
+  const m = document.querySelector("main"); if (m) m.scrollTop = 0;
   if (page !== "scan") pauseAutoScan(); else resumeAutoScan();
   try { history.replaceState(null, "", "#" + page); } catch(e){}
 }
@@ -994,11 +994,13 @@ function openView(name, payload){
   document.getElementById("svBody").innerHTML = renderView(name, payload);
   document.getElementById("subview").classList.add("open");
   document.body.style.overflow = "hidden";
+  const m = document.querySelector("main"); if (m) m.style.overflow = "hidden";
   if (name === "nutrition") loadNutrition();
 }
 function closeView(){
   document.getElementById("subview").classList.remove("open");
   document.body.style.overflow = "";
+  const m = document.querySelector("main"); if (m) m.style.overflow = "";
   currentView = null;
 }
 function refreshView(){
