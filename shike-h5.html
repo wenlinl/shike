@@ -449,7 +449,9 @@ main{position:absolute;top:calc(env(safe-area-inset-top) + 104px);bottom:calc(en
   <main>
     <!-- ============ 首页 ============ -->
     <section class="page active" id="page-home">
-      <div class="greet">你好，今天的冰箱状态</div>
+      <div class="page-head">
+        <div><div class="t">你好，今天的冰箱状态</div><div class="s">今天也要好好吃饭 · 让每一餐都新鲜安心</div></div>
+      </div>
 
       <div class="fridge">
         <div class="fridge-left">
@@ -720,7 +722,7 @@ main{position:absolute;top:calc(env(safe-area-inset-top) + 104px);bottom:calc(en
         <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M12 3.5v17"/><path d="M7.5 7h2M7.5 10.5h2"/><path d="M14.5 15.5h2M14.5 19h2"/></svg></span>库存
       </button>
       <button class="tab" data-page="recipe">
-        <span class="ic">✨</span>妙用
+        <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 014.24 10.24c-.7.7-1.24 1.54-1.24 2.26V16h-6v-.5c0-.72-.54-1.56-1.24-2.26A6 6 0 0112 3z"/></svg></span>妙用
       </button>
       <button class="tab" data-page="me">
         <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.7 14.8a4.3 4.3 0 006.6 0"/><path d="M9.2 10h.01M14.8 10h.01"/></svg></span>我的
