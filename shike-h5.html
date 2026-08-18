@@ -287,7 +287,15 @@ main{padding:8px 16px 0}
 .app-footer{text-align:center;font-size:10.5px;color:#c0ad9a;margin-top:22px;letter-spacing:.5px}
 
 /* ---------- 底部悬浮 Tab 栏 ---------- */
-.tabbar{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 10px);padding:0 14px;z-index:30}
+  /* ---- 妙用（整合页）---- */
+  .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .hub-card{border:1px solid var(--line);border-radius:13px;background:#fff;padding:13px 14px;text-align:left;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;gap:3px;box-shadow:var(--shadow)}
+  .hub-card:active{transform:scale(.98)}
+  .hub-card .h-ic{font-size:22px}
+  .hub-card .h-t{font-size:14px;font-weight:700;color:var(--ink)}
+  .hub-card .h-s{font-size:11px;color:var(--ink-2)}
+  .hub-card .h-n{align-self:flex-start;font-size:11px;color:var(--green);background:var(--green-soft);border-radius:999px;padding:1px 8px;margin-top:2px}
+  .tabbar{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 10px);padding:0 14px;z-index:30}
 .tabbar .in{max-width:452px;margin:0 auto;background:var(--card);border-radius:26px;box-shadow:0 12px 32px rgba(126,86,57,.18);border:1px solid rgba(239,227,213,.85);display:flex;height:66px;padding:7px 4px}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:none;color:var(--ink-2);font-size:10px;border-radius:18px;transition:.2s}
 .tab .ic{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:11px;color:#a79787}
@@ -542,7 +550,9 @@ main{padding:8px 16px 0}
           <button class="icon-btn filter-btn" id="sortBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
           </button>
-          <div class="avatar" style="width:38px;height:38px;font-size:17px">👩</div>
+          <button class="icon-btn filter-btn" id="invFilterBtn" aria-label="筛选">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
+          </button>
         </div>
       </div>
 
@@ -595,9 +605,20 @@ main{padding:8px 16px 0}
     <!-- ============ 菜谱 ============ -->
     <section class="page" id="page-recipe">
       <div class="page-head">
-        <div><div class="t">智能菜谱</div><div class="s">根据库存智能推荐，减少浪费</div></div>
+        <div><div class="t">妙用 · 生活灵感</div><div class="s">购物清单 · 菜谱 · 营养 · 浪费统计，一个入口全搞定</div></div>
         <button class="fav-pill" data-view="favorites"><b>♥</b>我的收藏</button>
       </div>
+
+      <div class="hub-grid">
+        <button class="hub-card" data-view="shop"><span class="h-ic">🛒</span><span class="h-t">购物清单</span><span class="h-s">待采购一键管理</span><span class="h-n" id="hubShopN">—</span></button>
+        <button class="hub-card" data-view="nutrition"><span class="h-ic">🥗</span><span class="h-t">营养档案</span><span class="h-s">四大营养素概览</span></button>
+        <button class="hub-card" data-view="waste"><span class="h-ic">🗑️</span><span class="h-t">浪费统计</span><span class="h-s">消耗 / 浪费 / 过期记录</span><span class="h-n" id="hubWasteN">—</span></button>
+        <button class="hub-card" data-view="log"><span class="h-ic">📋</span><span class="h-t">食材履历</span><span class="h-s">录入与处理记录</span></button>
+        <button class="hub-card" data-view="favorites"><span class="h-ic">♥</span><span class="h-t">我的收藏</span><span class="h-s">喜欢的菜谱</span></button>
+        <button class="hub-card" data-view="prefs"><span class="h-ic">🌶️</span><span class="h-t">口味偏好</span><span class="h-s">推荐更懂你</span></button>
+      </div>
+
+      <div class="sec-head" style="margin-top:2px"><b>菜谱灵感</b><span style="font-size:11px;color:var(--ink-2);font-weight:400">根据库存智能推荐，减少浪费</span></div>
 
       <div class="cream-panel">
         <div class="panel-head"><b>当前可用食材</b><a data-goto="inv">查看全部 ›</a></div>
@@ -664,6 +685,7 @@ main{padding:8px 16px 0}
         <button class="menu-item" data-view="favorites"><span class="mi-ic" style="background:#fde3dc">❤️</span>我的收藏<span class="mi-arrow">›</span></button>
         <button class="menu-item" data-view="notif"><span class="mi-ic" style="background:#dcefdc">🔔</span>通知设置<span class="mi-arrow">›</span></button>
         <button class="menu-item" data-view="nutrition"><span class="mi-ic" style="background:#ddebfa">🥗</span>营养档案<span class="mi-arrow">›</span></button>
+        <button class="menu-item" data-view="prefs"><span class="mi-ic" style="background:#fdf3e0">🌶️</span>口味偏好<span class="mi-arrow">›</span></button>
         <button class="menu-item" id="helpItem"><span class="mi-ic" style="background:#f2e6d8">💬</span>帮助与反馈<span class="mi-arrow">›</span></button>
         <button class="menu-item" id="aboutItem"><span class="mi-ic" style="background:#f2e6d8">ℹ️</span>关于食刻<span class="mi-arrow">›</span></button>
       </div>
@@ -695,7 +717,7 @@ main{padding:8px 16px 0}
         <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M12 3.5v17"/><path d="M7.5 7h2M7.5 10.5h2"/><path d="M14.5 15.5h2M14.5 19h2"/></svg></span>库存
       </button>
       <button class="tab" data-page="recipe">
-        <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 11a4.5 4.5 0 013.2-7.6A4.6 4.6 0 0117 4.4a4.5 4.5 0 011.5 6.6"/><path d="M5 11h14l1.2 5.5H3.8z"/><path d="M7 16.5h10V21H7z"/></svg></span>菜谱
+        <span class="ic">✨</span>妙用
       </button>
       <button class="tab" data-page="me">
         <span class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.7 14.8a4.3 4.3 0 006.6 0"/><path d="M9.2 10h.01M14.8 10h.01"/></svg></span>我的
@@ -803,6 +825,11 @@ const FAVS = new Set();
 const PREF_SEL = new Set(["清淡"]);
 const HANDLED = new Set();
 let currentView = null;
+let FILTER_CATS = new Set();
+let FILTER_STATUS = "";
+let SRV_SHOP = null;
+let WASTE = { logs: [], summary: { consumed: 0, wasted: 0, expired: 0, total: 0 } };
+let SRV_RECIPES = false;
 
 /* ================= 工具 ================= */
 function daysLeft(exp){
@@ -874,7 +901,12 @@ function renderChips(){
   }).join("");
 }
 function renderInv(){
-  let list = INV.filter(i => activeCat === "全部" || i.cat === activeCat);
+  let list = INV.filter(i =>
+    (activeCat === "全部" || i.cat === activeCat) &&
+    (FILTER_CATS.size === 0 || FILTER_CATS.has(i.cat)) &&
+    (FILTER_STATUS === "" ||
+      (FILTER_STATUS === "临期" ? daysLeft(i.exp) <= 2 :
+       FILTER_STATUS === "已过期" ? daysLeft(i.exp) < 0 : daysLeft(i.exp) > 2)));
   if (query) list = list.filter(i => i.name.includes(query) || i.cat.includes(query));
   if (sortMode === "days") list = [...list].sort((a,b) => daysLeft(a.exp) - daysLeft(b.exp));
   else if (sortMode === "cat") list = [...list].sort((a,b) => a.cat.localeCompare(b.cat));
@@ -945,6 +977,8 @@ const VIEW_CFG = {
   notif:    { title:"通知中心", right:"全部已读" },
   favorites:{ title:"我的收藏", right:"" },
   quickAdd: { title:"快速录入", right:"保存" },
+  filter:   { title:"筛选", right:"重置" },
+  waste:    { title:"浪费统计", right:"" },
   item:     { title:"食材详情", right:"" },
   recipe:   { title:"菜谱详情", right:"" }
 };
@@ -979,32 +1013,71 @@ function renderView(name, p){
   if (name === "notif") return viewNotif();
   if (name === "favorites") return viewFavorites();
   if (name === "quickAdd") return viewQuickAdd();
+  if (name === "filter") return viewFilter();
+  if (name === "waste") return viewWaste();
   if (name === "item") return viewItem(p.name);
   if (name === "recipe") return viewRecipe(p.idx, p.banner);
   return "";
 }
 
 function viewShop(){
-  const undone = SHOP.filter(s => !s.done).length;
+  const list = SRV_SHOP || SHOP;
+  const undone = list.filter(s => !s.done).length;
   return `
   <div class="sv-card">
     <div class="sv-sec">待采购 <small>${undone} 项</small></div>
-    ${SHOP.map((s,i) => `
+    ${list.map((s,i) => `
       <div class="shop-item">
-        <button class="shop-check ${s.done ? "on" : ""}" data-act="shop-toggle" data-i="${i}">${s.done ? "✓" : ""}</button>
+        <button class="shop-check ${s.done ? "on" : ""}" data-act="shop-toggle" data-i="${i}" data-id="${s.id || ""}">${s.done ? "✓" : ""}</button>
         <span class="shop-name ${s.done ? "done" : ""}">${s.name}</span>
         <div class="shop-qty">
-          <button class="qty-btn" data-act="shop-qty" data-i="${i}" data-d="-1">−</button>
-          ${s.qty} ${s.unit}
-          <button class="qty-btn" data-act="shop-qty" data-i="${i}" data-d="1">＋</button>
+          <button class="qty-btn" data-act="shop-qty" data-i="${i}" data-id="${s.id || ""}" data-d="-1">−</button>
+          ${s.qty} ${s.unit || ""}
+          <button class="qty-btn" data-act="shop-qty" data-i="${i}" data-id="${s.id || ""}" data-d="1">＋</button>
         </div>
       </div>`).join("")}
   </div>
   <div class="sv-card">
     <div class="sv-sec">一键加购 <small>根据菜谱缺料自动建议</small></div>
-    <div class="shop-add">${SHOP_SUGGEST.filter(n => !SHOP.some(s => s.name === n)).map(n =>
+    <div class="shop-add">${SHOP_SUGGEST.filter(n => !(SRV_SHOP||SHOP).some(s => s.name === n)).map(n =>
       `<button class="sug-chip" data-act="shop-add" data-name="${n}">＋ ${n}</button>`).join("")}</div>
     <div class="pref-caption">扫描或菜谱缺料会自动补充到这里</div>
+  </div>`;
+}
+
+function viewFilter(){
+  const cats = [...new Set(INV.map(i => i.cat))];
+  return `
+  <div class="sv-card">
+    <div class="sv-sec">品类</div>
+    <div class="chips" style="margin:0 0 6px">${cats.map(c =>
+      `<div class="chip ${FILTER_CATS.has(c) ? "active" : ""}" data-act="filter-cat" data-name="${c}">${c}</div>`).join("")}</div>
+    <div class="sv-sec">状态</div>
+    <div class="chips">${["正常","临期","已过期"].map(s =>
+      `<div class="chip ${FILTER_STATUS === s ? "active" : ""}" data-act="filter-status" data-name="${s}">${s}</div>`).join("")}</div>
+    <div class="pref-caption">已选：品类 ${FILTER_CATS.size} 项 · 状态 ${FILTER_STATUS || "全部"}</div>
+  </div>
+  <div class="detail-actions">
+    <button class="btn-outline" data-act="filter-reset">重置</button>
+    <button class="btn-primary" data-act="filter-apply">确定</button>
+  </div>`;
+}
+
+function viewWaste(){
+  const s = WASTE.summary;
+  return `
+  <div class="sv-card">
+    <div class="sv-sec">累计记录</div>
+    <div class="ing-row"><span>已消耗</span><span class="have">${s.consumed} 件</span></div>
+    <div class="ing-row"><span>浪费</span><span class="missing">${s.wasted} 件</span></div>
+    <div class="ing-row"><span>过期清理</span><span class="missing">${s.expired} 件</span></div>
+    <div class="ing-row"><span>合计</span><span>${s.total} 件</span></div>
+  </div>
+  <div class="sv-card">
+    <div class="sv-sec">最近记录</div>
+    ${WASTE.logs.length ? WASTE.logs.slice(0, 20).map(l =>
+      `<div class="ing-row"><span>${l.name}</span><span class="${l.reason === "consumed" ? "have" : "missing"}">${l.reason === "consumed" ? "消耗" : l.reason === "wasted" ? "浪费" : "过期"} ×${l.quantity}</span></div>`).join("")
+      : `<div class="pref-caption">暂无记录，吃掉/扔掉/过期时会在食材详情里记录</div>`}
   </div>`;
 }
 
@@ -1108,7 +1181,7 @@ function viewNotif(){
 function viewFavorites(){
   const favs = RECIPES.filter(r => FAVS.has(r.name));
   return favs.length ? favs.map(r => recipeCard(r, true)).join("") :
-    `<div class="empty-box">还没有收藏的菜谱<br><span style="font-size:11px">去「智能菜谱」里点 ♡ 收藏吧</span></div>`;
+    `<div class="empty-box">还没有收藏的菜谱<br><span style="font-size:11px">去「妙用」里点 ♡ 收藏吧</span></div>`;
 }
 
 function viewQuickAdd(){
@@ -1140,9 +1213,12 @@ function viewItem(name){
     <div class="ing-row"><span>存放位置</span><span>${it.storage}</span></div>
     <div class="ing-row"><span>建议</span><span>${d <= 1 ? "尽快食用或放入菜谱" : "冷藏保鲜，注意密封"}</span></div>
   </div>
+  <div class="sv-sec">过期处理</div>
   <div class="detail-actions">
-    <button class="btn-outline" data-act="item-use" data-name="${it.name}">已用完</button>
-    <button class="btn-primary" data-act="item-note">记一笔</button>
+    <button class="btn-outline" data-act="item-eat" data-name="${it.name}">🥢 吃掉了</button>
+    <button class="btn-outline" data-act="item-waste" data-name="${it.name}">🗑️ 扔掉了</button>
+    <button class="btn-outline" data-act="item-expired" data-name="${it.name}">⏰ 已过期清理</button>
+    <button class="btn-primary" data-act="item-restock" data-name="${it.name}">🛒 加入购物清单</button>
   </div>`;
 }
 
@@ -1175,20 +1251,29 @@ function viewRecipe(idx, banner){
 function act(action, el){
   const [a, ...rest] = action.split(":");
   if (a === "shop-toggle"){
-    const i = +el.dataset.i; SHOP[i].done = !SHOP[i].done; refreshView();
+    const list = SRV_SHOP || SHOP, i = +el.dataset.i;
+    if (SRV_SHOP && el.dataset.id){ fetch(`${API_BASE}/api/shopping-list/${el.dataset.id}`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ done: !list[i].done }) }).catch(()=>{}); }
+    list[i].done = !list[i].done; refreshView();
   } else if (a === "shop-qty"){
-    const i = +el.dataset.i, d = +el.dataset.d;
-    SHOP[i].qty = Math.max(1, SHOP[i].qty + d); refreshView();
+    const list = SRV_SHOP || SHOP, i = +el.dataset.i, d = +el.dataset.d;
+    list[i].qty = Math.max(1, list[i].qty + d);
+    if (SRV_SHOP && el.dataset.id){ fetch(`${API_BASE}/api/shopping-list/${el.dataset.id}`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ qty: list[i].qty }) }).catch(()=>{}); }
+    refreshView();
   } else if (a === "shop-add"){
-    if (!SHOP.some(s => s.name === el.dataset.name)) { SHOP.push({ name:el.dataset.name, qty:1, unit:"份", done:false }); }
+    const list = SRV_SHOP || SHOP;
+    if (!list.some(s => s.name === el.dataset.name)) {
+      list.push({ name:el.dataset.name, qty:1, unit:"份", done:false });
+      fetch(`${API_BASE}/api/shopping-list`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name:el.dataset.name, qty:1, unit:"份", source:"recipe" }) }).catch(()=>{});
+    }
     toast(`${el.dataset.name} 已加入购物清单`); refreshView();
   } else if (a === "right"){
     const v = rest[0];
-    if (v === "shop"){ SHOP.forEach(s => s.done = true); toast("已完成项已清空"); refreshView(); }
+    if (v === "shop"){ const list = SRV_SHOP || SHOP; list.forEach(s => s.done = true); if (SRV_SHOP) list.forEach(s => { if (s.id) fetch(`${API_BASE}/api/shopping-list/${s.id}`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ done: true }) }).catch(()=>{}); }); toast("已完成项已清空"); refreshView(); }
     else if (v === "prefs"){ toast("偏好已保存 · 推荐将更精准"); closeView(); }
     else if (v === "notif"){ NOTIFS.forEach(n => n.unread = false); document.getElementById("bellDot").classList.add("hidden"); toast("通知已全部标记为已读"); refreshView(); }
     else if (v === "quickAdd"){ quickSave(); }
     else if (v === "members"){ toast("邀请链接已生成 · 有效期 24 小时"); }
+    else if (v === "filter"){ FILTER_CATS.clear(); FILTER_STATUS = ""; refreshView(); }
   } else if (a === "remind-cook"){
     const idx = RECIPE_FOR[el.dataset.name] ?? 0;
     openView("recipe", { idx, banner:`为「${el.dataset.name}」推荐` });
@@ -1205,28 +1290,38 @@ function act(action, el){
   } else if (a === "detail-fav"){
     const n = el.dataset.name;
     FAVS.has(n) ? FAVS.delete(n) : FAVS.add(n);
+    const r = RECIPES.find(x => x.name === n);
+    if (r && r.id){ fetch(`${API_BASE}/api/recipes/${r.id}`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"favorite", liked: FAVS.has(n) }) }).catch(()=>{}); }
     el.innerHTML = FAVS.has(n) ? "♥ 已收藏" : "♡ 收藏";
     el.classList.toggle("on", FAVS.has(n));
     toast(FAVS.has(n) ? "已加入收藏" : "已取消收藏");
   } else if (a === "detail-cook"){
     toast(`开做「${el.dataset.name}」· 完成后记得在库存扣减`);
-  } else if (a === "item-use"){
+  } else if (a === "filter-cat"){
+    const n = el.dataset.name; FILTER_CATS.has(n) ? FILTER_CATS.delete(n) : FILTER_CATS.add(n); refreshView();
+  } else if (a === "filter-status"){
+    FILTER_STATUS = FILTER_STATUS === el.dataset.name ? "" : el.dataset.name; refreshView();
+  } else if (a === "filter-reset"){
+    FILTER_CATS.clear(); FILTER_STATUS = ""; refreshView();
+  } else if (a === "filter-apply"){
+    closeView(); renderChips(); renderInv(); toast("筛选已应用");
+  } else if (a === "item-eat" || a === "item-waste" || a === "item-expired"){
+    const reason = a === "item-eat" ? "consumed" : a === "item-waste" ? "wasted" : "expired";
+    const it = INV.find(x => x.name === el.dataset.name);
+    if (!it) return;
+    if (it._db){
+      fetch(`${API_BASE}/api/consume`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name: it.name, reason, quantity: 1 }) }).catch(()=>{});
+    }
+    const i = INV.indexOf(it);
+    if (i >= 0) INV.splice(i, 1);
+    toast(reason === "consumed" ? `「${it.name}」已记录消耗` : reason === "wasted" ? `「${it.name}」已记录浪费` : `「${it.name}」已记录过期清理`);
+    closeView(); renderHome(); renderChips(); renderInv();
+  } else if (a === "item-restock"){
     const it = INV.find(x => x.name === el.dataset.name);
     if (it){
-      if (it._db){
-        fetch(`${API_BASE}/api/consume`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: it.name, reason: "consumed", quantity: 1 })
-        }).catch(() => {});
-      }
-      const i = INV.indexOf(it);
-      if (i >= 0) INV.splice(i, 1);
-      toast(`「${it.name}」已从库存移除`);
-      closeView(); renderHome(); renderChips(); renderInv();
+      fetch(`${API_BASE}/api/shopping-list`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name: it.name, qty: 1, unit: "份", source: "expiry" }) }).catch(()=>{});
+      toast(`「${it.name}」已加入购物清单`);
     }
-  } else if (a === "item-note"){
-    toast("已记录 · 同步到家庭动态");
   }
 }
 
@@ -1243,6 +1338,7 @@ function quickSave(){
     when:`今天 ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`,
     exp: exp.toISOString().slice(0,10), storage:"保鲜中"
   });
+  fetch(`${API_BASE}/api/items`, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name, category: cat, container: "冰箱", expiryDays: days, keepDays: days }) }).catch(()=>{});
   toast(`「${name}」已录入并同步给家庭成员`);
   closeView(); renderHome(); renderChips(); renderInv(); renderRecipe();
 }
@@ -1295,6 +1391,50 @@ async function syncInventory(){
   } catch (e) { /* 离线/失败时保留本地演示数据 */ }
 }
 
+async function loadShoppingHub(){
+  try {
+    const res = await fetch(`${API_BASE}/api/shopping-list`, { signal: AbortSignal.timeout(6000) });
+    const j = await res.json();
+    if (j && j.code === 0 && Array.isArray(j.items)){
+      SRV_SHOP = j.items.map(s => ({ id: s.id, name: s.name, qty: s.qty, unit: s.unit || "", done: s.done }));
+    }
+  } catch (e) { /* 保留本地 */ }
+  const n = document.getElementById("hubShopN");
+  const list = SRV_SHOP || SHOP;
+  if (n) n.textContent = list.filter(s => !s.done).length ? `${list.filter(s => !s.done).length} 项待购` : "—";
+}
+
+async function loadWaste(){
+  try {
+    const res = await fetch(`${API_BASE}/api/consume`, { signal: AbortSignal.timeout(6000) });
+    const j = await res.json();
+    if (j && j.code === 0){ WASTE = { logs: j.logs || [], summary: j.summary || WASTE.summary }; }
+  } catch (e) { /* 保留本地 */ }
+  const n = document.getElementById("hubWasteN");
+  if (n) n.textContent = WASTE.summary.total ? `${WASTE.summary.total} 件` : "—";
+}
+
+async function syncRecipes(){
+  try {
+    const res = await fetch(`${API_BASE}/api/recipes`, { signal: AbortSignal.timeout(6000) });
+    const j = await res.json();
+    if (j && j.code === 0 && Array.isArray(j.recipes) && j.recipes.length){
+      RECIPES.length = 0;
+      j.recipes.forEach(r => {
+        RECIPES.push({
+          id: r.id, name: r.name, time: `${r.timeMin || 15} 分钟`, tag: r.tag || "家常",
+          tcls: r.tag === "清淡" ? "tag-green" : r.tag === "微辣" ? "tag-red" : "tag-orange",
+          desc: r.desc || "", nutr: r.nutr || "", emoji: r.emoji || "🍽️", grad: r.grad || "",
+          ing: (r.ingredients || []).map(x => [x.name, x.qty, x.status === "有" ? "有" : "缺"]),
+          steps: r.steps || [], liked: !!r.liked, timesCooked: r.timesCooked || 0
+        });
+      });
+      SRV_RECIPES = true;
+      renderHome(); renderRecipe();
+    }
+  } catch (e) { /* 保留本地菜谱 */ }
+}
+
 /* ================= 全局跳转 ================= */
 function handleView(spec){
   const [kind, ...args] = spec.split(":");
@@ -1344,6 +1484,7 @@ document.getElementById("invSearchInput").addEventListener("input", e => {
 document.getElementById("invSearchClear").addEventListener("click", () => {
   document.getElementById("invSearchInput").value = ""; query = ""; renderInv();
 });
+document.getElementById("invFilterBtn").addEventListener("click", () => openView("filter"));
 document.getElementById("sortBtn").addEventListener("click", cycleSort);
 document.getElementById("sortBtn2").addEventListener("click", cycleSort);
 function cycleSort(){
@@ -1579,6 +1720,7 @@ function tick(){
 tick(); setInterval(tick, 10000);
 renderHome(); renderChips(); renderInv(); renderRecipe();
 syncInventory();
+loadShoppingHub(); loadWaste(); syncRecipes();
 startCamera();
 const hash = location.hash.slice(1);
 if (["home","scan","inv","recipe","me"].includes(hash)) go(hash);

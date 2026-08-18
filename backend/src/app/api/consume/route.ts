@@ -5,6 +5,32 @@ import { xzdJson, xzdOptions } from "@/lib/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+export async function GET() {
+  const logs = await prisma.consumptionLog.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 200,
+  });
+  const summary = { consumed: 0, wasted: 0, expired: 0, total: 0 };
+  for (const l of logs) {
+    summary.total += l.quantity;
+    if (l.reason === "consumed") summary.consumed += l.quantity;
+    else if (l.reason === "wasted") summary.wasted += l.quantity;
+    else if (l.reason === "expired") summary.expired += l.quantity;
+  }
+  return xzdJson({
+    code: 0,
+    logs: logs.map((l) => ({
+      id: l.id,
+      name: l.name,
+      reason: l.reason,
+      quantity: l.quantity,
+      note: l.note,
+      createdAt: l.createdAt,
+    })),
+    summary,
+  });
+}
+
 export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as {
     name?: string;

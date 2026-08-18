@@ -7,11 +7,18 @@ export const dynamic = "force-dynamic";
 
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
-  const body = (await req.json().catch(() => null)) as { done?: boolean } | null;
+  const body = (await req.json().catch(() => null)) as {
+    done?: boolean;
+    qty?: number;
+  } | null;
   try {
     const item = await prisma.shoppingListItem.update({
       where: { id },
-      data: { done: Boolean(body?.done), boughtAt: body?.done ? new Date() : null },
+      data: {
+        done: body?.done !== undefined ? Boolean(body.done) : undefined,
+        qty: body?.qty != null ? Math.max(1, Math.min(999, Number(body.qty))) : undefined,
+        boughtAt: body?.done ? new Date() : body?.done === false ? null : undefined,
+      },
     });
     return xzdJson({ code: 0, item });
   } catch {
