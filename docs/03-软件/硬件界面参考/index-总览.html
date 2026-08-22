@@ -31,9 +31,10 @@ h1{font-size:24px;margin-bottom:4px}
 <div class="grid" id="grid"></div>
 <div class="note">
   使用：把整个文件夹交给硬件烧录 AI 即可；每个界面页面本体即 240×320（与硬件屏幕等大），右上角 i 角标可切换查看实现说明。
-  同目录另有各界面 PNG 预览图，方便快速查看。
+  各界面 PNG 预览图统一存放于 media/软件示意图/硬件设备界面/，本页直接引用。
 </div>
 <script>
+const IMG = "../../../media/软件示意图/硬件设备界面/";
 const screens = [
   ["01-待机页.html","IDLE 待机页","放入/取出 + 临期提醒"],
   ["02-拍照倒计时.html","SCAN 倒计时","3→2→1 半透明大数字"],
@@ -47,7 +48,7 @@ const screens = [
 ];
 document.getElementById("grid").innerHTML = screens.map(s => `
   <a class="cell" href="${s[0]}">
-    <img src="${s[0].replace('.html','.png')}" alt="${s[1]}">
+    <img src="${IMG}${s[0].replace('.html','.png')}" alt="${s[1]}">
     <div class="n">${s[1]}</div>
     <div class="d">${s[2]}</div>
   </a>`).join("");

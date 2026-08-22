@@ -55,7 +55,7 @@
 
 ### Team Background（必填，可直接粘贴）
 
-> ShiKe is built by a 5-person founding team covering the complete skill set for hardware-startup execution: embedded development (TuyaOpen firmware, sensor integration, flashing), cloud backend (Next.js, Prisma, Docker — 11 APIs and a 15-table schema, already deployed), frontend and product (mobile H5, home dashboard, interactive device demo), and product narrative/pitching.
+> ShiKe is built by a four-person founding team covering the complete skill set for hardware-startup execution: embedded development (TuyaOpen firmware, sensor integration, flashing), cloud backend (Next.js, Prisma, Docker — 11 APIs and a 15-table schema, already deployed), frontend and product (mobile H5, home dashboard, interactive device demo), and product narrative/pitching.
 >
 > The team shipped the full loop — hardware → cloud AI → software — from concept to a demo-ready prototype, with disciplined SOPs including API contracts, firmware flashing procedures, and test plans, and a live deployment at shike.live. We iterate fast while keeping strong documentation, which keeps handoff and scaling costs low.
 

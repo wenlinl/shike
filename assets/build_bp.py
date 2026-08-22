@@ -708,7 +708,7 @@ def main():
     for r in doc.paragraphs[-1].runs:
         set_run_font(r, size=10, color=GRAY)
 
-    out = "/Users/lwl/Documents/ChatGPT/HsHH/ShiKe-Business-Plan.docx"
+    out = "/Users/lwl/Documents/ChatGPT/HsHH/docs/04-商业/ShiKe-Business-Plan.docx"
     doc.save(out)
     print("saved", out)
 
