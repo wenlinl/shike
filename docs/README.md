@@ -24,6 +24,7 @@ docs/
 | 云端接口 | [后端对接说明](./03-软件/后端对接说明.md) |
 | Arduino 环境 + ZXing 条码库 | [Arduino环境与条码库接入](./03-软件/Arduino环境与条码库接入.md) |
 | 条码 + YOLO 同帧并行设计 | [识别管线-条码YOLO同帧并行](./02-硬件/识别管线-条码YOLO同帧并行.md) |
+| 外置平板 v1 改造方案 | [外置平板-v1-界面与固件改造方案](./03-软件/外置平板-v1-界面与固件改造方案.md) |
 | 固件代码 | [firmware/README](../firmware/README.md)（内模组 Arduino + 外置平板参考） |
 | 演示怎么讲 | [Demo 操作说明](./05-执行/Demo操作说明.md) + [web-demos](../web-demos/) |
 | 旧文档去哪了 | [版本档案](./archive/README.md) |
