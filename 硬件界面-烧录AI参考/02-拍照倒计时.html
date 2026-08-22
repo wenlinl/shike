@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 02 拍照倒计时 (240×320)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:#1d2b17;font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden}
+.cam-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,#3d4c30 0%,#22301f 62%,#182213 100%)}
+.cam-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.22),rgba(0,0,0,0) 32%,rgba(0,0,0,0) 70%,rgba(0,0,0,.3))}
+.tag-top{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.38);color:#fff;font-size:11px;padding:5px 12px;border-radius:999px;white-space:nowrap;z-index:3}
+.corner{position:absolute;width:26px;height:26px;border:3px solid rgba(143,208,111,.92);z-index:2}
+.corner.tl{top:26px;left:26px;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
+.corner.tr{top:26px;right:26px;border-left:0;border-bottom:0;border-radius:0 8px 0 0}
+.corner.bl{bottom:26px;left:26px;border-right:0;border-top:0;border-radius:0 0 0 8px}
+.corner.br{bottom:26px;right:26px;border-left:0;border-top:0;border-radius:0 0 8px 0}
+.count{position:absolute;left:60px;top:80px;width:120px;height:160px;display:flex;align-items:center;justify-content:center;font-size:112px;font-weight:800;color:rgba(255,255,255,.55);text-shadow:0 4px 18px rgba(0,0,0,.35);z-index:3}
+.hint{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:7px 14px;border-radius:999px;white-space:nowrap;z-index:3;text-align:center}
+.hint small{display:block;font-size:9px;opacity:.8;margin-top:2px}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(255,255,255,.45);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:#50382b;margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:#50382b}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="cam-bg"></div>
+  <div class="tag-top">放入 · 冰箱</div>
+  <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+  <div class="count">3</div>
+  <div class="hint">请把食品放到镜头前<small>3 秒后自动拍照</small></div>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>SCAN</b>。进入本页后：GC2145 实时预览铺满全屏作背景（本图为纯背景示意，无装饰物），上方标签显示当前动作与容器。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>背景</td><td>摄像头实时画面（GC2145 预览上屏，参考 copy 工程 app_photo.c）；示意为暗色渐变</td></tr>
+    <tr><td>四角框</td><td>L 形描边，嫩绿 rgba(143,208,111,.92)，3px 粗</td></tr>
+    <tr><td>倒计时数字</td><td><b>区域 120×160 居中（left:60 top:80）</b>；字号 112px；白色 55% 透明度，必须能看到背后画面</td></tr>
+    <tr><td>倒计时节奏</td><td>3 → 2 → 1，每秒一帧；归零自动抓帧（640×480 JPEG）→ “咔嚓”音效 → 上传</td></tr>
+    <tr><td>上传</td><td>POST /api/scan（multipart：image、deviceId、action、container、timestamp）</td></tr>
+  </table>
+  失败/超时 → 07-网络错误；低置信 → 06-识别失败；成功 → 04/05-识别结果。
+</div>
+</body>
+</html>

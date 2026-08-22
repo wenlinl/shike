@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 06 识别失败 (240×320)</title>
+<style>
+:root{--bg:#f8f1e9;--ink:#50382b;--ink2:#a08c7c;--red:#e23c2b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.stat{height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:10px;color:var(--ink2)}
+.mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 24px;text-align:center}
+.ic{width:74px;height:74px;border-radius:50%;background:#fde3dc;display:flex;align-items:center;justify-content:center;font-size:36px}
+.t1{font-size:20px;font-weight:800;color:var(--ink)}
+.t2{font-size:11.5px;color:var(--ink2);line-height:1.6}
+.btns{padding:8px 14px 14px;display:flex;flex-direction:column;gap:9px}
+.btn{height:54px;border-radius:17px;font-size:16px;font-weight:800;border:0;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:linear-gradient(135deg,#ef5a41,#c93122);color:#fff}
+.btn.ghost{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:var(--ink);margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="stat"><span>08:30</span><span>●</span><span>08-16 周六</span></div>
+  <div class="mid">
+    <div class="ic">❓</div>
+    <div class="t1">没看清，再试一次</div>
+    <div class="t2">识别置信度过低<br>未写入库存，请重新对准再拍</div>
+  </div>
+  <div class="btns">
+    <button class="btn primary">📷 重新扫描</button>
+    <button class="btn ghost">返回待机</button>
+  </div>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>LOW_CONF</b>。触发：<code>code==0</code> 但品名为空 / <code>confidence &lt; 0.5</code>；或响应 code≠0。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>图标</td><td>74px 圆形浅粉底 ❓</td></tr>
+    <tr><td>文案</td><td>「没看清，再试一次」+「未写入库存」</td></tr>
+    <tr><td>重新扫描</td><td>红色主按钮 → 回到 SCAN（同一 action/container）</td></tr>
+    <tr><td>返回待机</td><td>白底红描边 → IDLE</td></tr>
+  </table>
+  原则：识别失败不猜日期、不写库存。
+</div>
+</body>
+</html>

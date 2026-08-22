@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 04 识别结果-放入 (240×320)</title>
+<style>
+:root{--bg:#f8f1e9;--card:#fffdf9;--ink:#50382b;--ink2:#a08c7c;--line:#efe3d5;--red:#e23c2b;--red-d:#c93122;--green2:#3d7f50;--green-soft:#e8f1e9}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.stat{height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:10px;color:var(--ink2)}
+.ok{margin:6px 12px 0;background:var(--green-soft);border-radius:12px;padding:6px 10px;font-size:10.5px;color:var(--green2);font-weight:700;display:flex;align-items:center;gap:5px}
+.name{padding:6px 12px 2px;font-size:22px;font-weight:800;color:var(--ink);display:flex;align-items:baseline;gap:6px}
+.name small{font-size:9.5px;color:var(--green2);font-weight:600}
+.card{background:var(--card);border-radius:16px;margin:2px 12px;padding:7px 10px;box-shadow:0 2px 8px rgba(126,86,57,.07)}
+.row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;color:var(--ink2)}
+.row b{color:var(--ink);font-weight:600}
+.row .red{color:var(--red);font-weight:700}
+.chips{display:flex;gap:4px;margin-top:4px}
+.chip{flex:1;text-align:center;font-size:9px;padding:3px 2px;border-radius:999px;border:1px solid var(--line);color:var(--ink2);background:#fff;white-space:nowrap}
+.chip.on{background:var(--red);border-color:var(--red);color:#fff;font-weight:700}
+.btns{padding:6px 12px 4px;display:flex;flex-direction:column;gap:7px;margin-top:auto}
+.btn{height:46px;border-radius:16px;font-size:15px;font-weight:800;border:0;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.in{background:linear-gradient(135deg,#ef5a41,#c93122);color:#fff;box-shadow:0 6px 12px rgba(201,49,34,.25)}
+.btn.ghost{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+.note{font-size:8.5px;color:var(--ink2);text-align:center;padding-bottom:2px}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:var(--ink);margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="stat"><span>08:30</span><span>●</span><span>08-16 周六</span></div>
+  <div class="ok">✓ 识别成功 · 置信度 92%</div>
+  <div class="name">光明鲜牛奶 <small>建议：冰箱</small></div>
+  <div class="card">
+    <div class="row"><span>当前时间</span><b>2026-08-16 08:30</b></div>
+    <div class="row"><span>保质期</span><b>至 08-17 · <span class="red">剩 2 天</span></b></div>
+    <div class="row" style="display:block">
+      <span>建议容器</span>
+      <div class="chips">
+        <span class="chip on">冰箱</span><span class="chip">零食柜</span><span class="chip">药盒</span><span class="chip">调料柜</span><span class="chip">主食柜</span>
+      </div>
+    </div>
+  </div>
+  <div class="btns">
+    <button class="btn in">✓ 确认入库</button>
+    <button class="btn ghost">↻ 重拍</button>
+  </div>
+  <div class="note">确认后库存 +1 · 已同步 4 位家庭成员</div>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>RESULT(in)</b>。识别成功（confidence≥0.5）后展示；数据来自响应：name、scannedAt、expiryDate、daysLeft、suggestedContainer。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>成功标签</td><td>浅绿底绿字胶囊；显示置信度百分比</td></tr>
+    <tr><td>品名</td><td>23px 粗体；右上角显示建议容器</td></tr>
+    <tr><td>信息卡</td><td>当前时间 / 保质期（含剩余天数，红色强调）/ 建议容器 5 个 chips，默认选中建议项，可点选切换</td></tr>
+    <tr><td>确认入库</td><td>红色渐变，52px 高；点击 → POST /items（action=in）→ 回 IDLE</td></tr>
+    <tr><td>重拍</td><td>白底红描边；回到 SCAN（不计库存）</td></tr>
+  </table>
+</div>
+</body>
+</html>

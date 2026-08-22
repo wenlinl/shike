@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>食刻 · 硬件界面总览</title>
+<style>
+:root{--ink:#50382b;--ink2:#a08c7c;--red:#e23c2b;--line:#efe3d5;--bg:#f8f1e9}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",sans-serif;padding:24px 16px 60px;max-width:960px;margin:0 auto}
+h1{font-size:24px;margin-bottom:4px}
+.sub{color:var(--ink2);font-size:13px;margin-bottom:20px;line-height:1.7}
+.flow{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-bottom:22px;font-size:13px;line-height:1.9;box-shadow:0 4px 14px rgba(126,86,57,.06)}
+.flow b{color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px}
+.cell{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;text-align:center;text-decoration:none;color:var(--ink);box-shadow:0 4px 14px rgba(126,86,57,.06);transition:.15s}
+.cell:hover{transform:translateY(-2px)}
+.cell img{width:120px;height:160px;border:1px solid #e8dccb;border-radius:8px;background:#fff;object-fit:cover}
+.cell .n{font-size:12px;font-weight:700;margin-top:8px}
+.cell .d{font-size:10px;color:var(--ink2);margin-top:2px}
+.note{font-size:11.5px;color:var(--ink2);margin-top:22px;line-height:1.8}
+</style>
+</head>
+<body>
+<h1>食刻 · 硬件界面参考总览</h1>
+<div class="sub">目标板 T5-E1 · ST7789 240×320 触控彩屏 · 每个文件均为独立界面（240×320），文件内附实现说明。</div>
+<div class="flow">
+  <b>状态机：</b>BOOT（启动页）→ IDLE（待机）→ SCAN（拍照倒计时）→ RECOGNIZING（识别中）→ RESULT in/out（识别结果）→ 回 IDLE<br>
+  兜底：LOW_CONF（没看清重拍）｜NET_FAIL（网络错误重试）｜OFFLINE（断网本地模式）
+</div>
+<div class="grid" id="grid"></div>
+<div class="note">
+  使用：把整个文件夹交给硬件烧录 AI 即可；每个界面页面本体即 240×320（与硬件屏幕等大），右上角 i 角标可切换查看实现说明。
+  同目录另有各界面 PNG 预览图，方便快速查看。
+</div>
+<script>
+const screens = [
+  ["01-待机页.html","IDLE 待机页","放入/取出 + 临期提醒"],
+  ["02-拍照倒计时.html","SCAN 倒计时","3→2→1 半透明大数字"],
+  ["03-识别中.html","RECOGNIZING","正在识别… 15s 超时"],
+  ["04-识别结果-放入.html","RESULT 放入","品名/保质期/容器确认"],
+  ["05-识别结果-取出.html","RESULT 取出","出库确认 库存 −1"],
+  ["06-识别失败-重拍.html","LOW_CONF","没看清，重新扫描"],
+  ["07-网络错误.html","NET_FAIL","网络不好，重试"],
+  ["08-断网离线.html","OFFLINE","本地库存 + 重连"],
+  ["09-启动页.html","BOOT 启动页","品牌 + 连接云端"]
+];
+document.getElementById("grid").innerHTML = screens.map(s => `
+  <a class="cell" href="${s[0]}">
+    <img src="${s[0].replace('.html','.png')}" alt="${s[1]}">
+    <div class="n">${s[1]}</div>
+    <div class="d">${s[2]}</div>
+  </a>`).join("");
+</script>
+</body>
+</html>

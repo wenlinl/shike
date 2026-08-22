@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 08 断网离线 (240×320)</title>
+<style>
+:root{--bg:#f8f1e9;--card:#fffdf9;--ink:#50382b;--ink2:#a08c7c;--red:#e23c2b;--green:#4d9a62;--amber-soft:#fdf0cd}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.offline-bar{background:#4a3a32;color:#fff;font-size:10.5px;padding:7px 10px;display:flex;align-items:center;gap:6px;font-weight:700}
+.title{padding:8px 12px 4px;font-size:16px;font-weight:800;color:var(--ink)}
+.title small{display:block;font-size:9.5px;color:var(--ink2);font-weight:400;margin-top:2px}
+.list{padding:0 12px;flex:1;overflow:hidden}
+.item{background:var(--card);border-radius:12px;padding:7px 9px;margin-bottom:6px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 4px rgba(126,86,57,.06)}
+.item .em{font-size:16px}
+.item .nm{flex:1;font-size:11px;color:var(--ink);font-weight:600}
+.item .dl{font-size:10px;font-weight:700}
+.item .dl.red{color:var(--red)}.item .dl.amber{color:#b06f1d}.item .dl.green{color:var(--green)}
+.note{background:var(--amber-soft);border-radius:12px;margin:0 12px 8px;padding:7px 10px;font-size:10px;color:#a06b1c;line-height:1.5}
+.btn{height:46px;margin:0 12px 10px;border-radius:15px;background:#fff;color:var(--red);border:1.5px solid var(--red);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:var(--ink);margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="offline-bar">○ 当前离线 · 本地模式</div>
+  <div class="title">最近库存 <small>网络恢复后自动同步</small></div>
+  <div class="list">
+    <div class="item"><span class="em">🥦</span><span class="nm">西兰花</span><span class="dl red">剩 1 天</span></div>
+    <div class="item"><span class="em">🥩</span><span class="nm">牛肉</span><span class="dl red">今天到期</span></div>
+    <div class="item"><span class="em">🍅</span><span class="nm">番茄</span><span class="dl red">今天到期</span></div>
+    <div class="item"><span class="em">🥬</span><span class="nm">生菜</span><span class="dl amber">剩 3 天</span></div>
+    <div class="item"><span class="em">🥚</span><span class="nm">鸡蛋</span><span class="dl green">剩 10 天</span></div>
+  </div>
+  <div class="note">⚠ 断网状态下无法扫描识别<br>请检查网络，恢复后重试</div>
+  <button class="btn">↻ 重新连接</button>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>OFFLINE</b>。断网 / 云端不可达时进入；展示本地缓存的最近库存与提醒，扫描入口禁用。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>离线条</td><td>深棕底白字，置顶</td></tr>
+    <tr><td>最近库存</td><td>本地缓存（上次 GET /items / GET /reminders），按剩余天数升序，最多 5 条</td></tr>
+    <tr><td>提示</td><td>浅橙条：断网无法扫描识别</td></tr>
+    <tr><td>重新连接</td><td>白底红描边 → 探测网络：成功回 IDLE，失败停留本页</td></tr>
+  </table>
+</div>
+</body>
+</html>

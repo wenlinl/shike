@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 09 启动页 (240×320)</title>
+<style>
+:root{--red:#e23c2b;--ink2:#a08c7c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:linear-gradient(170deg,#fdf3ec,#f6e6d8);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.logo{width:76px;height:76px;border-radius:24px;background:linear-gradient(135deg,#ef5a41,#c93122);color:#fff;font-size:38px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(201,49,34,.3)}
+.t1{font-size:24px;font-weight:800;color:var(--red);letter-spacing:2px}
+.t2{font-size:10px;color:var(--ink2);letter-spacing:.5px}
+.loading{display:flex;align-items:center;gap:7px;margin-top:14px;font-size:11px;color:var(--ink2)}
+.ring{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(201,49,34,.22);border-top-color:var(--red);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ver{position:absolute;bottom:12px;font-size:9px;color:#c9b6a2}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:#50382b;margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:#50382b}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="logo">食</div>
+  <div class="t1">食刻</div>
+  <div class="t2">让每一餐都新鲜安心</div>
+  <div class="loading"><span class="ring"></span>正在连接云端…</div>
+  <div class="ver">固件 v1.0.0 · T5-E1</div>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>BOOT</b>（上电 2–3 秒）。品牌展示 + 探测网络。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>Logo</td><td>76px 圆角方块，红色渐变，居中「食」</td></tr>
+    <tr><td>连接状态</td><td>转圈 + 「正在连接云端…」；成功 → IDLE，失败 → OFFLINE</td></tr>
+    <tr><td>版本号</td><td>底部 9px 浅色小字</td></tr>
+  </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f7f4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="食刻">
+<title>食刻 · 冰箱食品保质期管理</title>
+<style>
+  :root {
+    --bg: #f3f7f4;
+    --card: #ffffff;
+    --ink: #1d2b24;
+    --ink-2: #66786e;
+    --line: #e4ece6;
+    --green: #2f9e63;
+    --green-soft: #e5f5ec;
+    --amber: #e8a13a;
+    --amber-soft: #fdf3e0;
+    --red: #d95d54;
+    --red-soft: #fdecea;
+    --blue: #3b7dd8;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(29,43,36,.06), 0 6px 18px rgba(29,43,36,.05);
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { touch-action: manipulation; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    padding-top: var(--safe-t);
+  }
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; padding-bottom: calc(74px + var(--safe-b)); }
+
+  /* ---- 顶栏 ---- */
+  .topbar {
+    position: sticky; top: var(--safe-t); z-index: 20;
+    background: rgba(243,247,244,.92); backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; gap: 10px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #2f9e63, #7ccb96);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 700;
+  }
+  .brand h1 { font-size: 17px; letter-spacing: .5px; }
+  .brand .sub { font-size: 11px; color: var(--ink-2); margin-top: 1px; }
+  .topclock { text-align: right; }
+  .topclock .time { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .topclock .date { font-size: 11px; color: var(--ink-2); }
+
+  /* ---- 内容区 ---- */
+  main { padding: 12px 14px 0; }
+  section.page { display: none; }
+  section.page.active { display: block; }
+
+  .banner {
+    background: linear-gradient(100deg, #eaf6ef, #f8fcf9);
+    border: 1px solid #d4eadb; border-radius: var(--radius);
+    padding: 12px 14px; margin: 4px 0 12px; display: flex; gap: 10px;
+  }
+  .banner .icon { font-size: 20px; }
+  .banner .t { font-weight: 700; font-size: 14px; }
+  .banner .d { font-size: 12px; color: var(--ink-2); margin-top: 3px; line-height: 1.5; }
+  .banner .tag {
+    align-self: flex-start; background: #fff; border: 1px solid #cfe6d8; color: var(--green);
+    border-radius: 999px; padding: 3px 9px; font-size: 11px; white-space: nowrap;
+  }
+
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .kpi {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 14px; border-top: 3px solid var(--green);
+  }
+  .kpi.amber { border-top-color: var(--amber); }
+  .kpi.red { border-top-color: var(--red); }
+  .kpi .label { font-size: 12px; color: var(--ink-2); }
+  .kpi .num { font-size: 26px; font-weight: 800; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .kpi .num small { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .kpi .note { font-size: 11px; color: var(--ink-2); margin-top: 3px; }
+
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; margin-bottom: 12px; }
+  .card h2 { font-size: 15px; display: flex; align-items: center; gap: 7px; margin-bottom: 12px; }
+  .card h2 .hint { font-size: 11px; color: var(--ink-2); font-weight: 400; }
+
+  /* ---- 容器筛选 chips ---- */
+  .chips { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 4px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: 0 0 auto; border: 1px solid var(--line); background: #fff; color: var(--ink-2);
+    border-radius: 999px; padding: 9px 16px; font-size: 14px; cursor: pointer;
+    transition: all .15s; min-height: 40px; display: flex; align-items: center; gap: 6px;
+  }
+  .chip:active { transform: scale(.97); }
+  .chip.active { background: var(--green); border-color: var(--green); color: #fff; }
+  .chip .cnt { font-size: 12px; background: rgba(0,0,0,.08); border-radius: 999px; padding: 0 7px; }
+  .chip.active .cnt { background: rgba(255,255,255,.25); }
+
+  /* ---- 库存卡片 ---- */
+  .items { display: flex; flex-direction: column; gap: 10px; }
+  .item {
+    border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px;
+    background: #fff; display: flex; flex-direction: column; gap: 9px;
+  }
+  .item.soon { border-color: #f0d49c; background: #fffdf7; }
+  .item.expired { border-color: #eeb9b5; background: #fff8f7; }
+  .item .row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .item .name { font-weight: 700; font-size: 15px; }
+  .badge { font-size: 11px; border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+  .badge.normal { background: var(--green-soft); color: var(--green); }
+  .badge.soon { background: var(--amber-soft); color: #b5761d; }
+  .badge.expired { background: var(--red-soft); color: var(--red); }
+  .item .meta { font-size: 13px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 14px; line-height: 1.5; }
+  .item .meta b { color: var(--ink); font-weight: 600; }
+  .item .row2 { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .item .conf { font-size: 11px; color: var(--ink-2); }
+  .item select {
+    font-size: 16px; border: 1px solid var(--line); border-radius: 9px;
+    padding: 6px 8px; background: #fff; color: var(--ink); min-height: 38px;
+  }
+  .item .bar { height: 4px; border-radius: 2px; background: #edf2ee; overflow: hidden; }
+  .item .bar i { display: block; height: 100%; border-radius: 2px; }
+  .empty { text-align: center; color: var(--ink-2); font-size: 13px; padding: 30px 0; }
+
+  /* ---- 菜谱 ---- */
+  .daychips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .daychips::-webkit-scrollbar { display: none; }
+  .daychip {
+    flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 15px; font-size: 13px; cursor: pointer; color: var(--ink-2); background: #fff;
+    min-height: 38px; display: flex; align-items: center;
+  }
+  .daychip.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .dishes { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+  .dish { border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; background: #fff; }
+  .dish .dname { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dish .mini { font-size: 11px; color: var(--green); background: var(--green-soft); padding: 2px 9px; border-radius: 999px; }
+  .dish ul { list-style: none; margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+  .dish li { padding: 3px 0; }
+  .dish .ok { color: var(--green); }
+  .dish .miss { color: var(--amber); }
+  .dish .missing-note { font-size: 12px; color: #b5761d; margin-top: 6px; }
+
+  /* ---- 统计 ---- */
+  .stat-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stat-card { background: #fafcfb; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .stat-card .n { font-size: 21px; font-weight: 800; }
+  .stat-card .l { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+  .bars { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); }
+  .bar-row .k { width: 58px; flex: 0 0 auto; }
+  .bar-row .track { flex: 1; height: 13px; background: #edf2ee; border-radius: 7px; overflow: hidden; }
+  .bar-row .track i { display: block; height: 100%; border-radius: 7px; background: linear-gradient(90deg, #2f9e63, #7ccb96); }
+  .bar-row .v { width: 32px; text-align: right; font-weight: 600; color: var(--ink); }
+
+  /* ---- 记录 ---- */
+  .feed { list-style: none; }
+  .feed li {
+    display: flex; gap: 10px; padding: 11px 0; border-bottom: 1px dashed var(--line);
+    font-size: 13px; align-items: baseline; line-height: 1.45;
+  }
+  .feed li:last-child { border-bottom: 0; }
+  .feed .t { color: var(--ink-2); font-variant-numeric: tabular-nums; font-size: 11px; white-space: nowrap; }
+  .feed .act { font-weight: 700; white-space: nowrap; font-size: 12px; }
+  .feed .act.in { color: var(--green); }
+  .feed .act.out { color: var(--blue); }
+  .feed .act.sys { color: var(--amber); }
+  .feed .d { color: var(--ink-2); }
+
+  footer { text-align: center; color: var(--ink-2); font-size: 11px; padding: 14px 16px 8px; }
+
+  /* ---- 底部 Tab ---- */
+  .tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    background: rgba(255,255,255,.94); backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    padding-bottom: var(--safe-b);
+  }
+  .tabbar .inner { max-width: 480px; margin: 0 auto; display: flex; }
+  .tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; padding: 8px 0 7px; color: var(--ink-2); font-size: 10px; cursor: pointer;
+    min-height: 52px; border: 0; background: transparent; font-family: inherit;
+  }
+  .tab .ico { font-size: 21px; line-height: 1; }
+  .tab.active { color: var(--green); font-weight: 700; }
+
+  /* ================= 动态 UI 增强 ================= */
+  body { background: linear-gradient(160deg,#f3f7f4,#e8f2ec 30%,#f3f7f4 65%,#edf6f0); background-size: 280% 280%; animation: skBg 14s ease-in-out infinite; }
+  @keyframes skBg { 0%,100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
+  section.page.active { animation: skPage .4s ease both; }
+  @keyframes skPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .banner { animation: skBanner 3.2s ease-in-out infinite; }
+  @keyframes skBanner { 0%,100% { box-shadow: 0 0 0 rgba(47,158,99,0); } 50% { box-shadow: 0 6px 22px rgba(47,158,99,.16); } }
+  .kpi, .stat-card, .card, .daychip, .chip { transition: transform .2s ease, box-shadow .2s ease; }
+  @media (hover: hover) { .kpi:hover, .stat-card:hover, .card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(29,43,36,.10); } }
+  .kpi:active, .daychip:active, .chip:active { transform: scale(.97); }
+  .stat-cards .stat-card { animation: skRise .5s ease both; }
+  .stat-cards .stat-card:nth-child(2) { animation-delay: .06s; }
+  .stat-cards .stat-card:nth-child(3) { animation-delay: .12s; }
+  .stat-cards .stat-card:nth-child(4) { animation-delay: .18s; }
+  @keyframes skRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .bar-row .track i { transition: width 1.1s cubic-bezier(.25,.8,.25,1); }
+  .item .bar i { transition: width 1s cubic-bezier(.25,.8,.25,1); }
+  .topclock { position: relative; padding-left: 13px; }
+  .topclock::before { content: ""; position: absolute; left: 0; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: skDot 1.7s ease-out infinite; }
+  @keyframes skDot { 0% { box-shadow: 0 0 0 0 rgba(47,158,99,.55); } 70% { box-shadow: 0 0 0 8px rgba(47,158,99,0); } 100% { box-shadow: 0 0 0 0 rgba(47,158,99,0); } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">鲜</div>
+      <div>
+        <h1>食刻</h1>
+        <div class="sub">食刻在场 · 不浪费每一份食材</div>
+      </div>
+    </div>
+    <div class="topclock">
+      <div class="time" id="clockTime">--:--</div>
+      <div class="date" id="clockDate">----</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="banner">
+      <span class="icon">🔔</span>
+      <div style="flex:1;min-width:0;">
+        <div class="t">下班前推送（17:30 示例）</div>
+        <div class="d">4 样临期：牛奶（2 天）、豆腐（2 天）、鸡胸肉（3 天）、西兰花（2 天）· 建议今晚做「家常豆腐」，补货：牛奶 ×1、小葱 ×1</div>
+      </div>
+      <span class="tag">已推送 2 条</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="label">在库食材</div>
+        <div class="num" id="kpiTotal">0<small> 件</small></div>
+        <div class="note">5 个容器</div>
+      </div>
+      <div class="kpi amber">
+        <div class="label">临期 ≤3 天</div>
+        <div class="num" id="kpiSoon">0<small> 件</small></div>
+        <div class="note">待机屏置顶</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">已过期</div>
+        <div class="num" id="kpiExpired">0<small> 件</small></div>
+        <div class="note">建议处理</div>
+      </div>
+      <div class="kpi">
+        <div class="label">本月避免浪费</div>
+        <div class="num">6<small> 件</small></div>
+        <div class="note">约 ¥42 · 补货 3 次</div>
+      </div>
+    </div>
+
+    <section class="page active" id="page-inventory">
+      <div class="card">
+        <h2>库存总览 <span class="hint">点容器筛选 · 分类可改</span></h2>
+        <div class="chips" id="containerChips"></div>
+        <div class="items" id="items"></div>
+        <div class="empty" id="empty" style="display:none;">该容器暂无食材</div>
+      </div>
+    </section>
+
+    <section class="page" id="page-recipes">
+      <div class="card">
+        <h2>周度菜谱 <span class="hint">优先消耗临期食材</span></h2>
+        <div class="daychips" id="dayChips"></div>
+        <div class="dishes" id="dishes"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-stats">
+      <div class="card">
+        <h2>月度统计 <span class="hint">2026-08 · 演示数据</span></h2>
+        <div class="stat-cards">
+          <div class="stat-card"><div class="n">3</div><div class="l">本月补货次数</div></div>
+          <div class="stat-card"><div class="n">6</div><div class="l">已及时消耗（件）</div></div>
+          <div class="stat-card"><div class="n">1</div><div class="l">浪费（件）</div></div>
+          <div class="stat-card"><div class="n">¥42</div><div class="l">避免浪费金额</div></div>
+        </div>
+        <h2 style="font-size:14px;margin-bottom:10px;">各品类消耗（近 30 天）</h2>
+        <div class="bars" id="bars"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-feed">
+      <div class="card">
+        <h2>最近记录 <span class="hint">扫描结果同步</span></h2>
+        <ul class="feed">
+          <li><span class="t">15:58</span><span class="act in">补给</span><span class="d">光明鲜牛奶 · 自动分类 → 冰箱 · 置信 0.92</span></li>
+          <li><span class="t">15:32</span><span class="act in">补给</span><span class="d">老豆腐 · 手动修改 → 冰箱</span></li>
+          <li><span class="t">12:10</span><span class="act sys">提醒</span><span class="d">晨间汇总：4 样临期置顶</span></li>
+          <li><span class="t">昨天</span><span class="act out">取出</span><span class="d">薯片 · 库存 -1 · 零食柜</span></li>
+          <li><span class="t">昨天</span><span class="act sys">提醒</span><span class="d">冰箱温度正常（4.2°C）</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>食刻在场 · 不浪费每一份食材 ｜ 演示数据 · 对接 /api/scan 后自动更新</footer>
+  </main>
+
+  <nav class="tabbar">
+    <div class="inner">
+      <button class="tab active" data-page="inventory"><span class="ico">📦</span>库存</button>
+      <button class="tab" data-page="recipes"><span class="ico">🍳</span>菜谱</button>
+      <button class="tab" data-page="stats"><span class="ico">📊</span>统计</button>
+      <button class="tab" data-page="feed"><span class="ico">📋</span>记录</button>
+    </div>
+  </nav>
+</div>
+
+<script>
+const CONTAINERS = ["冰箱", "零食柜", "药盒", "调料柜", "主食柜"];
+const NOW = new Date();
+
+let ITEMS = [
+  { id: 1,  name: "光明鲜牛奶", cat: "乳制品", c: "冰箱",   qty: 1,  exp: "2026-08-17", conf: 0.92 },
+  { id: 2,  name: "老豆腐",     cat: "豆制品", c: "冰箱",   qty: 1,  exp: "2026-08-17", conf: 0.88 },
+  { id: 3,  name: "鸡胸肉",     cat: "肉类",   c: "冰箱",   qty: 1,  exp: "2026-08-18", conf: 0.90 },
+  { id: 4,  name: "西兰花",     cat: "蔬菜",   c: "冰箱",   qty: 1,  exp: "2026-08-17", conf: 0.85 },
+  { id: 5,  name: "番茄",       cat: "蔬菜",   c: "冰箱",   qty: 2,  exp: "2026-08-14", conf: 0.91 },
+  { id: 6,  name: "鸡蛋（6 枚）", cat: "蛋类",  c: "冰箱",   qty: 6,  exp: "2026-08-25", conf: 0.93 },
+  { id: 7,  name: "原味酸奶（4 杯）", cat: "乳制品", c: "冰箱", qty: 4, exp: "2026-08-20", conf: 0.94 },
+  { id: 8,  name: "薯片",       cat: "零食",   c: "零食柜", qty: 2,  exp: "2026-08-30", conf: 0.96 },
+  { id: 9,  name: "混合坚果",   cat: "零食",   c: "零食柜", qty: 1,  exp: "2026-09-01", conf: 0.90 },
+  { id: 10, name: "黑巧克力",   cat: "零食",   c: "零食柜", qty: 1,  exp: "2026-09-15", conf: 0.95 },
+  { id: 11, name: "布洛芬",     cat: "药品",   c: "药盒",   qty: 1,  exp: "2027-02-01", conf: 0.97 },
+  { id: 12, name: "创可贴",     cat: "药品",   c: "药盒",   qty: 10, exp: "2028-01-01", conf: 0.98 },
+  { id: 13, name: "生抽酱油",   cat: "调味品", c: "调料柜", qty: 1,  exp: "2027-01-01", conf: 0.96 },
+  { id: 14, name: "陈醋",       cat: "调味品", c: "调料柜", qty: 1,  exp: "2026-12-01", conf: 0.95 },
+  { id: 15, name: "大米（5kg）", cat: "主食",   c: "主食柜", qty: 1,  exp: "2027-06-01", conf: 0.99 },
+  { id: 16, name: "挂面",       cat: "主食",   c: "主食柜", qty: 2,  exp: "2027-03-01", conf: 0.97 },
+];
+
+const RECIPES = [
+  { day: "周一", dishes: [
+    { name: "番茄炒蛋", uses: ["番茄 ×2", "鸡蛋 ×2"], missing: ["小葱 ×1"], tag: "清库存" },
+    { name: "凉拌豆腐", uses: ["老豆腐 ×1"], missing: ["香菜 ×1"], tag: "临期优先" }
+  ]},
+  { day: "周二", dishes: [
+    { name: "香煎鸡胸肉", uses: ["鸡胸肉 ×1"], missing: [], tag: "临期优先" },
+    { name: "蒜蓉西兰花", uses: ["西兰花 ×1"], missing: ["大蒜 ×1"], tag: "临期优先" }
+  ]},
+  { day: "周三", dishes: [
+    { name: "牛奶燕麦粥", uses: ["光明鲜牛奶 ×1"], missing: ["燕麦片 ×1"], tag: "临期优先" },
+    { name: "酸奶水果杯", uses: ["原味酸奶 ×1"], missing: ["香蕉 ×1"], tag: "快手" }
+  ]},
+  { day: "周四", dishes: [
+    { name: "酱油炒饭", uses: ["大米", "鸡蛋 ×2"], missing: [], tag: "清库存" },
+    { name: "坚果酸奶", uses: ["混合坚果", "原味酸奶 ×1"], missing: [], tag: "零采购" }
+  ]},
+  { day: "周五", dishes: [
+    { name: "家常豆腐煲", uses: ["老豆腐"], missing: ["香菇 ×1"], tag: "周末硬菜" },
+    { name: "薯片鸡翅", uses: ["薯片"], missing: ["鸡翅 ×2"], tag: "零食新吃法" }
+  ]},
+  { day: "周六", dishes: [
+    { name: "番茄蛋汤面", uses: ["番茄 ×1", "鸡蛋 ×1", "挂面"], missing: [], tag: "零采购" },
+    { name: "巧克力牛奶", uses: ["黑巧克力", "光明鲜牛奶"], missing: [], tag: "零采购" }
+  ]},
+  { day: "周日", dishes: [
+    { name: "三鲜豆腐羹", uses: ["老豆腐", "鸡蛋"], missing: ["虾仁 ×1"], tag: "下周备餐" },
+    { name: "白粥配小菜", uses: ["大米"], missing: [], tag: "清库存" }
+  ]}
+];
+
+const BARS = [["乳制品", 12], ["蔬菜", 8], ["零食", 9], ["肉类", 5], ["调味品", 3], ["主食", 4]];
+
+let activeContainer = "全部";
+let activeDay = 0;
+
+function daysLeft(exp) {
+  const a = new Date(exp), b = new Date(NOW);
+  a.setHours(0,0,0,0); b.setHours(0,0,0,0);
+  return Math.round((a - b) / 86400000);
+}
+function statusOf(item) {
+  const d = daysLeft(item.exp);
+  return d < 0 ? "expired" : d <= 3 ? "soon" : "normal";
+}
+function fmt(item) {
+  const d = daysLeft(item.exp);
+  if (d < 0) return `已过期 ${-d} 天`;
+  if (d === 0) return "今天到期";
+  return `还剩 ${d} 天`;
+}
+
+function renderChips() {
+  const chips = ["全部", ...CONTAINERS];
+  document.getElementById("containerChips").innerHTML = chips.map(c => {
+    const cnt = c === "全部" ? ITEMS.length : ITEMS.filter(i => i.c === c).length;
+    return `<div class="chip ${activeContainer === c ? "active" : ""}" data-c="${c}">${c}<span class="cnt">${cnt}</span></div>`;
+  }).join("");
+}
+
+function skAnimateCount(el, target, suffix){
+  if(!el) return;
+  const dur = 750, t0 = performance.now();
+  (function tick(now){
+    const t = Math.min(1,(now - t0)/dur), e = 1 - Math.pow(1-t,3);
+    el.innerHTML = Math.round(target*e) + (suffix||"");
+    if(t<1) requestAnimationFrame(tick);
+  })(t0);
+}
+
+function renderItems() {
+  const el = document.getElementById("items");
+  const list = ITEMS
+    .filter(i => activeContainer === "全部" || i.c === activeContainer)
+    .sort((a, b) => daysLeft(a.exp) - daysLeft(b.exp));
+  document.getElementById("empty").style.display = list.length ? "none" : "block";
+  el.innerHTML = list.map(item => {
+    const st = statusOf(item), d = daysLeft(item.exp);
+    const pct = Math.max(0, Math.min(100, Math.round((1 - d / 60) * 100)));
+    const color = st === "expired" ? "var(--red)" : st === "soon" ? "var(--amber)" : "var(--green)";
+    const badge = st === "expired" ? "已过期" : st === "soon" ? "临期" : "正常";
+    return `
+      <div class="item ${st}">
+        <div class="row1">
+          <span class="name">${item.name}</span>
+          <span class="badge ${st}">${badge}</span>
+        </div>
+        <div class="meta">
+          <span>品类 <b>${item.cat}</b></span>
+          <span>数量 <b>${item.qty}</b></span>
+          <span>到期 <b>${item.exp}</b></span>
+          <span>${fmt(item)}</span>
+        </div>
+        <div class="row2">
+          <span class="conf">识别置信 ${Math.round(item.conf * 100)}%</span>
+          <select data-id="${item.id}" aria-label="修改 ${item.name} 分类">
+            ${CONTAINERS.map(c => `<option ${c === item.c ? "selected" : ""}>${c}</option>`).join("")}
+          </select>
+        </div>
+        <div class="bar"><i data-w="${pct}" style="width:0;background:${color}"></i></div>
+      </div>`;
+  }).join("");
+  requestAnimationFrame(() => { el.querySelectorAll(".bar i").forEach(i => { i.style.width = i.dataset.w + "%"; }); });
+}
+
+function renderDayChips() {
+  document.getElementById("dayChips").innerHTML = RECIPES.map((r, i) =>
+    `<div class="daychip ${activeDay === i ? "active" : ""}" data-i="${i}">${r.day}</div>`).join("");
+}
+
+function renderDishes() {
+  const r = RECIPES[activeDay];
+  document.getElementById("dishes").innerHTML = r.dishes.map(d => `
+    <div class="dish">
+      <div class="dname">${d.name} <span class="mini">${d.tag}</span></div>
+      <ul>
+        <li class="ok">✔ 用掉库存：${d.uses.join("、")}</li>
+        ${d.missing.length ? `<li class="miss">✖ 还缺：${d.missing.join("、")}</li>` : `<li class="ok">✔ 食材全齐，零采购</li>`}
+      </ul>
+      ${d.missing.length ? `<div class="missing-note">已自动加入补货清单</div>` : ""}
+    </div>`).join("");
+}
+
+function renderBars() {
+  const max = Math.max(...BARS.map(b => b[1]));
+  document.getElementById("bars").innerHTML = BARS.map(([k, v]) => `
+    <div class="bar-row"><span class="k">${k}</span>
+      <div class="track"><i data-w="${(v / max * 100).toFixed(1)}" style="width:0"></i></div>
+      <span class="v">${v}</span>
+    </div>`).join("");
+  requestAnimationFrame(() => { document.querySelectorAll("#bars .track i").forEach(i => { i.style.width = i.dataset.w + "%"; }); });
+}
+
+function renderKpis() {
+  const soon = ITEMS.filter(i => statusOf(i) === "soon").length;
+  const expired = ITEMS.filter(i => statusOf(i) === "expired").length;
+  skAnimateCount(document.getElementById("kpiTotal"), ITEMS.length, "<small> 件</small>");
+  skAnimateCount(document.getElementById("kpiSoon"), soon, "<small> 件</small>");
+  skAnimateCount(document.getElementById("kpiExpired"), expired, "<small> 件</small>");
+}
+
+async function loadServerData() {
+  if (window.__xzdLoading) return;
+  window.__xzdLoading = true;
+  try {
+    const res = await fetch("https://shike.live/api/items", {
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || data.code !== 0 || !Array.isArray(data.items)) {
+      return;
+    }
+    // 服务器为准：硬件扫描出入库后这里实时更新（含清空库存的情况）
+    ITEMS = data.items.map((it) => ({
+      id: it.id,
+      name: it.name,
+      cat: it.category || "其他",
+      c: it.container || "冰箱",
+      qty: it.quantity ?? 1,
+      exp: it.expiryDate || "2099-01-01",
+      conf: it.confidence ?? 0,
+    }));
+    renderChips(); renderItems(); renderKpis();
+    updateBanner();
+  } catch {
+    // 服务器不可达时保留本地演示数据
+  } finally {
+    window.__xzdLoading = false;
+  }
+}
+
+function updateBanner() {
+  const soon = ITEMS.filter(i => statusOf(i) === "soon")
+    .sort((a, b) => daysLeft(a.exp) - daysLeft(b.exp));
+  const expired = ITEMS.filter(i => statusOf(i) === "expired");
+  const t = document.querySelector(".banner .t");
+  const d = document.querySelector(".banner .d");
+  const tag = document.querySelector(".banner .tag");
+  if (t) {
+    if (expired.length) t.textContent = `${expired.length} 样已过期 · 建议尽快处理`;
+    else if (soon.length) t.textContent = `${soon.length} 样临期（≤3 天）`;
+    else t.textContent = "库存状态良好，暂无临期提醒";
+  }
+  if (d) {
+    if (soon.length) {
+      d.textContent = "临期：" + soon.slice(0, 3).map(i =>
+        `${i.name}（${daysLeft(i.exp) === 0 ? "今天到期" : `剩 ${daysLeft(i.exp)} 天`}）`).join("、");
+    } else if (expired.length) {
+      d.textContent = "已过期：" + expired.slice(0, 3).map(i => i.name).join("、");
+    } else {
+      d.textContent = "已同步服务器实时库存（shike.live/api/items），数据由硬件扫描自动更新";
+    }
+  }
+  if (tag) tag.textContent = ITEMS.length ? `${ITEMS.length} 件在库` : "库存为空";
+}
+
+function switchPage(name) {
+  document.querySelectorAll("section.page").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.page === name));
+  document.getElementById(`page-${name}`).classList.add("active");
+  window.scrollTo({ top: 0 });
+}
+
+function tick() {
+  const t = new Date();
+  const hh = String(t.getHours()).padStart(2, "0");
+  const mm = String(t.getMinutes()).padStart(2, "0");
+  const ss = String(t.getSeconds()).padStart(2, "0");
+  document.getElementById("clockTime").textContent = `${hh}:${mm}:${ss}`;
+  document.getElementById("clockDate").textContent = `${t.getMonth() + 1}月${t.getDate()}日`;
+}
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => switchPage(tab.dataset.page));
+});
+document.getElementById("containerChips").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  activeContainer = chip.dataset.c;
+  renderChips(); renderItems();
+});
+document.getElementById("dayChips").addEventListener("click", e => {
+  const chip = e.target.closest(".daychip");
+  if (!chip) return;
+  activeDay = Number(chip.dataset.i);
+  renderDayChips(); renderDishes();
+});
+document.getElementById("items").addEventListener("change", e => {
+  const sel = e.target;
+  if (sel.tagName !== "SELECT") return;
+  const item = ITEMS.find(i => String(i.id) === sel.dataset.id);
+  if (!item) return;
+  const prev = item.c;
+  item.c = sel.value;                 // 乐观更新
+  renderChips(); renderItems();
+  fetch(`https://shike.live/api/items/${item.id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ container: sel.value }),
+    signal: AbortSignal.timeout(6000),
+  }).catch(() => {
+    item.c = prev;                    // 失败回滚并重新同步
+    renderChips(); renderItems();
+    loadServerData();
+  });
+});
+
+renderChips(); renderItems(); renderDayChips(); renderDishes(); renderBars(); renderKpis();
+loadServerData();
+tick(); setInterval(tick, 1000);
+setInterval(loadServerData, 5000);    // 硬件出入库后网页端自动刷新
+</script>
+</body>
+</html>

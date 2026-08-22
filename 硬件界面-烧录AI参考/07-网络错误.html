@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 07 网络错误 (240×320)</title>
+<style>
+:root{--bg:#f8f1e9;--ink:#50382b;--ink2:#a08c7c;--red:#e23c2b;--amber-soft:#fdf0cd}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.stat{height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:10px;color:var(--ink2)}
+.mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 24px;text-align:center}
+.ic{width:74px;height:74px;border-radius:50%;background:var(--amber-soft);display:flex;align-items:center;justify-content:center;font-size:34px}
+.t1{font-size:20px;font-weight:800;color:var(--ink)}
+.t2{font-size:11.5px;color:var(--ink2);line-height:1.6}
+.btns{padding:8px 14px 14px;display:flex;flex-direction:column;gap:9px}
+.btn{height:54px;border-radius:17px;font-size:16px;font-weight:800;border:0;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:linear-gradient(135deg,#ef5a41,#c93122);color:#fff}
+.btn.ghost{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:var(--ink);margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="stat"><span>08:30</span><span>○ 离线</span><span>08-16 周六</span></div>
+  <div class="mid">
+    <div class="ic">📡</div>
+    <div class="t1">网络不好，请重试</div>
+    <div class="t2">照片未上传成功<br>本次动作已保留，不会丢失</div>
+  </div>
+  <div class="btns">
+    <button class="btn primary">↻ 重试</button>
+    <button class="btn ghost">返回待机</button>
+  </div>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>NET_FAIL</b>。触发：HTTP 非 200 / 超时（建议 15s）/ <code>code≠0</code>。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>状态条</td><td>右侧显示 ○ 离线</td></tr>
+    <tr><td>文案</td><td>「网络不好，请重试」+「本次动作已保留」</td></tr>
+    <tr><td>重试</td><td>红色主按钮 → 重新上传同一帧（不重拍），仍失败则停留本页</td></tr>
+    <tr><td>返回待机</td><td>回 IDLE</td></tr>
+  </table>
+</div>
+</body>
+</html>
