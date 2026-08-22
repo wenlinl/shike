@@ -23,6 +23,7 @@ docs/
 | 硬件怎么做出来 | [BOM 采购清单](./02-硬件/BOM-采购清单.md) → [V1 样机构建](./02-硬件/V1样机-构建方案.md) → [烧录需求](./02-硬件/烧录需求.md) → [手动测试方案](./02-硬件/手动测试方案.md) |
 | 云端接口 | [后端对接说明](./03-软件/后端对接说明.md) |
 | Arduino 环境 + ZXing 条码库 | [Arduino环境与条码库接入](./03-软件/Arduino环境与条码库接入.md) |
+| 条码 + YOLO 同帧并行设计 | [识别管线-条码YOLO同帧并行](./02-硬件/识别管线-条码YOLO同帧并行.md) |
 | 固件代码 | [firmware/README](../firmware/README.md)（内模组 Arduino + 外置平板参考） |
 | 演示怎么讲 | [Demo 操作说明](./05-执行/Demo操作说明.md) + [web-demos](../web-demos/) |
 | 旧文档去哪了 | [版本档案](./archive/README.md) |
