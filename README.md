@@ -14,7 +14,7 @@
 |---|---|---|
 | H5 手机端 | https://shike.live/shike-h5.html | 首页 / 扫描 / 库存 / 菜谱 / 我的（iPhone 适配） |
 | 大屏版 | https://shike.live/shike-web.html | 库存排行 / 临期提醒 / 周度菜谱 / 月度统计 |
-| 硬件交互模拟 | [shike-hardware-demo.html](shike-hardware-demo.html) | 本地浏览器即可体验设备交互全流程 |
+| 硬件交互模拟 | [食刻-硬件交互Demo.html](web-demos/食刻-硬件交互Demo.html) | 本地浏览器即可体验设备交互全流程 |
 | 代码仓库 | https://github.com/wenlinl/shike | 固件 / 后端 / 前端 / 文档 |
 
 > 演示依赖：浏览器 + 摄像头权限 + 联网（识别走云端 `https://shike.live/api/scan`）；首页 / 库存 / 菜谱 / 我的为演示数据（接口已就绪），扫描页为真实 AI 识别。
@@ -141,25 +141,36 @@
 ```text
 .
 ├── README.md                     # 本文档
-├── shike-h5.html                 # 移动端 H5（iPhone 16 适配，底部 5 Tab）
-├── shike-web.html                # 大屏版 Web Demo
-├── shike-hardware-demo.html      # 硬件交互模拟 Demo（本地可开）
-├── Demo操作说明.md                # 3 分钟演示步骤与依赖说明
-├── docs/                         # 产品 / 后端 / 固件 / 结构文档
-├── hardware/case-3d/             # 3D 打印外壳（STL + 预览图 + 建模脚本）
-├── firmware/                     # 硬件烧录源码（T5-E1 TuyaOpen，WiFi 凭据已打码）
-└── backend/                      # 后端接口参考代码（Prisma + Next.js，已部署）
+├── docs/                         # 文档库（按域整理，完整索引见 docs/README.md）
+│   ├── 01-产品/                  # 产品总览、需求
+│   ├── 02-硬件/                  # 设计基线 / 规格书 / 选型 / BOM / 构建 / 烧录 / 测试
+│   ├── 03-软件/                  # 后端对接、界面参考
+│   ├── 04-商业/                  # 商业化分析、出海战略
+│   ├── 05-执行/                  # 冲刺安排、风险、Demo 说明
+│   └── archive/                  # 版本档案（被取代文档按版本归档，不删除）
+├── firmware/                     # 固件：内模组 Arduino 示例 + 外置平板参考
+├── hardware/                     # 硬件工程：3D 外壳 / 器件库 / BOM 图
+├── web-demos/                    # 三个 HTML 演示（H5 / 大屏 / 硬件交互）
+├── media/                        # 宣传素材（图片 / 视频 / 示意图）
+├── assets/                       # 生成脚本
+└── 项目资料/                     # 赛事活动材料（按活动归档）
 ```
 
 ## 文档索引
 
-| 文档 | 内容 |
-|---|---|
-| [docs/产品文档.md](docs/产品文档.md) | 产品逻辑、已实现能力、未实现项（v3） |
-| [docs/后端对接说明.md](docs/后端对接说明.md) | 11 个 API 契约、数据库 15 张表、部署方式 |
-| [docs/固件烧录需求.md](docs/固件烧录需求.md) | 硬件 / 开发环境 / 烧录 SOP |
-| [docs/硬件描述.md](docs/硬件描述.md) | 硬件原型描述与 BOM |
-| [docs/磁吸门版硬件设计方案.md](docs/磁吸门版硬件设计方案.md) | 门内连续扫描形态、低延时管线、BOM 成本 |
+| 域 | 文档 | 内容 |
+|---|---|---|
+| 产品 | [产品总览](docs/01-产品/产品总览.md) | 产品定义、功能、场景、架构 |
+| 硬件 | [设计基线](docs/02-硬件/设计基线-硬件逻辑梳理.md) | 硬件逻辑单一事实源（SSOT） |
+| 硬件 | [成品规格书](docs/02-硬件/成品规格书-HW1.md) | 可量产成品规格与 BOM |
+| 硬件 | [BOM 采购清单](docs/02-硬件/BOM-采购清单.md) | 采购进度与实付记录 |
+| 硬件 | [烧录需求](docs/02-硬件/烧录需求.md) | 构建 / 烧录 SOP / 固件需求 / 引脚表 |
+| 软件 | [后端对接说明](docs/03-软件/后端对接说明.md) | API 契约、数据库、部署方式 |
+| 商业 | [商业化分析报告](docs/04-商业/商业化分析报告.md) | 全面评估与商业化分析 |
+| 执行 | [Demo 操作说明](docs/05-执行/Demo操作说明.md) | 3 分钟演示步骤与依赖说明 |
+| 历史 | [版本档案](docs/archive/README.md) | 被取代文档的版本谱系 |
+
+> 完整文档导航见 [docs/README.md](docs/README.md)。
 
 ---
 

@@ -2,7 +2,7 @@
 
 > 版本：v4.0 ｜ 创建：2026-08-21 ｜ 更新：2026-08-21（**登记已采购物料（用户购物截图）**：A1 Sense ¥113.85、A2 Grove Shield ¥38.85、A3 MAX98357A+3W 喇叭套装 ¥13.3、A5 光敏二极管模块 ¥2.76、A7 大按键 1 位 ¥4.33、A9 400 孔面包板 ¥4.17——主方案核心件已买齐，剩余仅电池/线/电源等可选件，详见 §9）
 > 用途：采购硬件 → 手动拼接 → 手动测试，让双模组样机落地（验证全功能链路）。
-> 说明：本清单为**开发板 / 现成模块拼装版**（验证逻辑用）；成品定制 PCB 版见[成品落地规格书](./食刻-HW1-成品落地规格书.md) §3。
+> 说明：本清单为**开发板 / 现成模块拼装版**（验证逻辑用）；成品定制 PCB 版见[成品落地规格书](./成品规格书-HW1.md) §3。
 > 价格：人民币（¥ CNY），为参考区间，以实际购买为准。
 
 ---
@@ -129,36 +129,36 @@
 
 | # | 产品图 | 图源 |
 |---|---|---|
-| A1 | ![A1 XIAO ESP32S3 Sense](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A1-XIAO-ESP32S3-Sense.jpg) | 官网：Seeed Studio 官方 Wiki |
-| A2 | ![A2 Grove Shield for XIAO](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A2-GroveShield-XIAO.png) | 官网：Seeed 官方 Wiki（**选定款**：Grove Base，8×Grove + 14 GPIO + 电池管理，¥30–45） |
-| A2′ | ![A2 备选 XIAO Expansion Board](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A2-XIAO扩展板.jpg) | 官网：Seeed 官方 Wiki（备选：多 OLED / RTC / 蜂鸣器 / JST 电池座，¥100–135，本项目用不上） |
-| A3 | ![A3 MAX98357A 功放](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A3-MAX98357A功放.jpg) | 分销官方图：Adafruit（ADI MAX98357A 官方成品板） |
-| A4 | ![A4 喇叭 40mm 8Ω](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A4-喇叭40mm8欧.jpg) | 立创：INGHAi 40mm/8Ω 喇叭商品图（淘宝杂牌更便宜；品牌件 ¥25+） |
-| A5 | ![A5 光敏模块](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A5-光敏模块GL5516.jpg) | 立创：GL5516 光敏电阻（同类 LM393 模块核心件示意）；**已定款：4 针光敏二极管模块（¥3.07，DO/AO）** |
-| A6 | ![A6 硬件库 HW-003 KY009 RGB](/Users/lwl/Documents/ChatGPT/HsHH/硬件库/图片/HW-003-KY009全彩RGBLED模块-正面.jpg) | **硬件库实拍**：KY-009 全彩 RGB 模块（三通道混白补光，¥0） |
-| A7 | ![A7 轻触按键（示意）](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A7-按键模块.jpg) | 已选：淘宝"电子积木大按键模块 1 位版"（¥5.92）；图为轻触开关示意 |
-| A8 | ![A8 1000mAh 电池](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A8-电池1000mAh.jpg) | 立创：FLYOUNG 3.7V/1000mAh 聚合物锂电池商品图 |
-| A9 | ![A9 面包板 400 孔](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A9-面包板400孔.jpg) | 立创：CONNFLY 400 孔面包板商品图；杜邦线用硬件库 HW-009/010/011（母对母差 3 根可补） |
+| A1 | ![A1 XIAO ESP32S3 Sense](../hardware/bom-images/A1-XIAO-ESP32S3-Sense.jpg) | 官网：Seeed Studio 官方 Wiki |
+| A2 | ![A2 Grove Shield for XIAO](../hardware/bom-images/A2-GroveShield-XIAO.png) | 官网：Seeed 官方 Wiki（**选定款**：Grove Base，8×Grove + 14 GPIO + 电池管理，¥30–45） |
+| A2′ | ![A2 备选 XIAO Expansion Board](../hardware/bom-images/A2-XIAO扩展板.jpg) | 官网：Seeed 官方 Wiki（备选：多 OLED / RTC / 蜂鸣器 / JST 电池座，¥100–135，本项目用不上） |
+| A3 | ![A3 MAX98357A 功放](../hardware/bom-images/A3-MAX98357A功放.jpg) | 分销官方图：Adafruit（ADI MAX98357A 官方成品板） |
+| A4 | ![A4 喇叭 40mm 8Ω](../hardware/bom-images/A4-喇叭40mm8欧.jpg) | 立创：INGHAi 40mm/8Ω 喇叭商品图（淘宝杂牌更便宜；品牌件 ¥25+） |
+| A5 | ![A5 光敏模块](../hardware/bom-images/A5-光敏模块GL5516.jpg) | 立创：GL5516 光敏电阻（同类 LM393 模块核心件示意）；**已定款：4 针光敏二极管模块（¥3.07，DO/AO）** |
+| A6 | ![A6 硬件库 HW-003 KY009 RGB](../hardware/component-library/图片/HW-003-KY009全彩RGBLED模块-正面.jpg) | **硬件库实拍**：KY-009 全彩 RGB 模块（三通道混白补光，¥0） |
+| A7 | ![A7 轻触按键（示意）](../hardware/bom-images/A7-按键模块.jpg) | 已选：淘宝"电子积木大按键模块 1 位版"（¥5.92）；图为轻触开关示意 |
+| A8 | ![A8 1000mAh 电池](../hardware/bom-images/A8-电池1000mAh.jpg) | 立创：FLYOUNG 3.7V/1000mAh 聚合物锂电池商品图 |
+| A9 | ![A9 面包板 400 孔](../hardware/bom-images/A9-面包板400孔.jpg) | 立创：CONNFLY 400 孔面包板商品图；杜邦线用硬件库 HW-009/010/011（母对母差 3 根可补） |
 
 ### B 外置平板
 
 | # | 产品图 | 图源 |
 |---|---|---|
-| B0 | ![B0 硬件库 HW-013 T5-BOARD](/Users/lwl/Documents/ChatGPT/HsHH/硬件库/图片/HW-013-T5-BOARD-V102-ESP32-S3开发板-实物.jpg) | **硬件库实拍**：HW-013 T5-BOARD V1.02（ESP32-S3 + 3.5" LCD，**已确认支持触屏**，主方案直接复用） |
-| B1 | ![B1 ESP32S3-Zero](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/B1-ESP32S3-Zero.jpg) | 官方同款板型：Waveshare 官方文档（ESP32-S3-Zero；合宙同名板外观一致，购买认准合宙官方店，以实物为准） |
-| B2 | ![B2 2.4寸 ST7789 屏](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/B2-2.4寸ST7789屏.jpg) | 官网同规格：Newhaven 2.4"/240×320/ST7789 产品图（BOM 款为 ST7789+CST816S 通用模组，无官网图，此为屏芯同款示意） |
-| B3 | ![B3 按键（同 A7）](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/A7-按键模块.jpg) | 同 A7：立创轻触开关商品图 |
-| B4 | ![B4 PIR AM312](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/B4-PIR-AM312.jpg) | 立创：森霸 AM312 人体感应传感器商品图 |
-| B5 | ![B5 IP5306](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/B5-IP5306.jpg) | 立创：英集芯 IP5306 电源管理 IC 商品图（模块为通用组装件，无官网图） |
-| B6 | ![B6 ESP32-S3-BOX-3](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/B6-ESP32-S3-BOX-3.png) | 官网：乐鑫 Espressif 官方产品图 |
+| B0 | ![B0 硬件库 HW-013 T5-BOARD](../hardware/component-library/图片/HW-013-T5-BOARD-V102-ESP32-S3开发板-实物.jpg) | **硬件库实拍**：HW-013 T5-BOARD V1.02（ESP32-S3 + 3.5" LCD，**已确认支持触屏**，主方案直接复用） |
+| B1 | ![B1 ESP32S3-Zero](../hardware/bom-images/B1-ESP32S3-Zero.jpg) | 官方同款板型：Waveshare 官方文档（ESP32-S3-Zero；合宙同名板外观一致，购买认准合宙官方店，以实物为准） |
+| B2 | ![B2 2.4寸 ST7789 屏](../hardware/bom-images/B2-2.4寸ST7789屏.jpg) | 官网同规格：Newhaven 2.4"/240×320/ST7789 产品图（BOM 款为 ST7789+CST816S 通用模组，无官网图，此为屏芯同款示意） |
+| B3 | ![B3 按键（同 A7）](../hardware/bom-images/A7-按键模块.jpg) | 同 A7：立创轻触开关商品图 |
+| B4 | ![B4 PIR AM312](../hardware/bom-images/B4-PIR-AM312.jpg) | 立创：森霸 AM312 人体感应传感器商品图 |
+| B5 | ![B5 IP5306](../hardware/bom-images/B5-IP5306.jpg) | 立创：英集芯 IP5306 电源管理 IC 商品图（模块为通用组装件，无官网图） |
+| B6 | ![B6 ESP32-S3-BOX-3](../hardware/bom-images/B6-ESP32-S3-BOX-3.png) | 官网：乐鑫 Espressif 官方产品图 |
 
 ### C 测试与工具
 
 | # | 产品图 | 图源 |
 |---|---|---|
-| C1 | ![C1 Type-C 数据线](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/C1-Type-C数据线.jpg) | 立创：Type-C 数据线商品图（通用耗材示意） |
-| C2 | ![C2 5V 充电头](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/C2-5V充电头.jpg) | 立创：立创开发板 5V/3A Type-C 电源适配器商品图（通用件示意） |
-| C3 | ![C3 优利德 UT33A+](/Users/lwl/Documents/ChatGPT/HsHH/BOM图片/C3-万用表UT33A.jpg) | 官网：UNI-T 优利德 UT33+ 系列产品图 |
+| C1 | ![C1 Type-C 数据线](../hardware/bom-images/C1-Type-C数据线.jpg) | 立创：Type-C 数据线商品图（通用耗材示意） |
+| C2 | ![C2 5V 充电头](../hardware/bom-images/C2-5V充电头.jpg) | 立创：立创开发板 5V/3A Type-C 电源适配器商品图（通用件示意） |
+| C3 | ![C3 优利德 UT33A+](../hardware/bom-images/C3-万用表UT33A.jpg) | 官网：UNI-T 优利德 UT33+ 系列产品图 |
 | C4/C5 | — | 条码卡自打印 / 家用冰箱，无需配图 |
 
 ### 8.1 价格核验记录（v1.5）
