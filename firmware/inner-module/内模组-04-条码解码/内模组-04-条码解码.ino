@@ -10,11 +10,10 @@
  *   成功：打印条码号 → 转 JPEG 上传云端查库（品名/保质期）
  *   失败：自动转 JPEG 上传 → 云端视觉兜底（与设计基线 §2.3 决策树一致）
  *
- * 条码库说明（重要）：
- *   - 选项 A（推荐）：ZXing-C++（zxing-cpp）的 ESP32 移植，支持 EAN-13；
- *   - 选项 B：自实现 EAN-13 解码（模块宽度法），只支持 EAN-13、体积最小；
- *   - ❌ quirc 只能解 QR 码，不能解 EAN-13 条码，不要选它。
- *   库引入后只需实现 decodeBarcode()，其余管线已接好。
+ * 条码库（已接入）：
+ *   - micro-zxing（zxing-cpp 的 ESP32 维护移植），灰度帧直接 ZXing::ReadBarcodes 解码；
+ *   - 安装步骤见 docs/03-软件/Arduino环境与条码库接入.md（含 C++17 配置，2.0.x 默认 C++11 会编译失败）；
+ *   - ❌ quirc 只能解 QR 码，不能解 EAN-13 条码。
  */
 
 #include <WiFi.h>
@@ -22,6 +21,7 @@
 #include <time.h>
 #include "esp_camera.h"
 #include "img_converters.h"
+#include <ReadBarcode.h>  // ZXing（micro-zxing/lib/zxing → Arduino 库 ZXing/src）
 #include "config.h"
 
 const char* ACTION = ACTION_IN;   // 本示例固定"放入"；动作由外置平板下发（见完整链路 05）
@@ -57,16 +57,36 @@ static void initCamera() {
   }
 }
 
-// ===== 条码解码接口（TODO：引入 ZXing-C++ 移植后实现）=====
+// ===== 条码解码接口（已接入 micro-zxing = zxing-cpp ESP32 移植）=====
 // 输入：灰度图 buffer、宽、高；输出：条码号（成功返回 1，失败 0）
 static int decodeBarcode(const uint8_t* buf, int width, int height, char* outCode) {
-  // TODO(你)：
-  // 1) 引入 ZXing-C++ 的 ESP32 移植库（支持 EAN-13；quirc 只解 QR，不能用）；
-  // 2) 对 buf 做解码（可选：先做边缘/二值化预处理）；
-  // 3) 成功后把条码号写入 outCode（如 "6901028076896"）并 return 1。
-  (void)buf; (void)width; (void)height; (void)outCode;
-  Serial.println("[条码] 解码库未接入（TODO）→ 自动走云端视觉兜底");
-  return 0;
+  if (!buf || width <= 0 || height <= 0) return 0;
+
+  // 只启用货架/商品需要的格式：EAN-13（国内商品主编码）、UPC-A、EAN-8、Code128（生鲜称重签常见）。
+  // 比 BarcodeFormat::Any 快且误报少；如后续需要别的格式再放宽。
+  auto hints = ZXing::DecodeHints()
+                   .setFormats(ZXing::BarcodeFormat::EAN13 | ZXing::BarcodeFormat::UPCA |
+                               ZXing::BarcodeFormat::EAN8 | ZXing::BarcodeFormat::Code128)
+                   .setMaxNumberOfSymbols(1)
+                   .setTryRotate(true)
+                   .setTryHarder(true);
+
+  // 灰度帧直接构造 ImageView，零拷贝；ReadBarcodes 失败返回空列表（不抛异常）。
+  ZXing::ImageView image(buf, width, height, ZXing::ImageFormat::Lum);
+  uint32_t t0 = micros();
+  auto results = ZXing::ReadBarcodes(image, hints);
+  uint32_t dt = micros() - t0;
+
+  if (results.empty()) {
+    Serial.printf("[条码] 本地未识别（解码耗时 %lu us）→ 走云端视觉兜底\n", (unsigned long)dt);
+    return 0;
+  }
+
+  Serial.printf("[条码] 格式=%s 解码耗时 %lu us\n",
+                ZXing::ToString(results[0].format()).c_str(), (unsigned long)dt);
+  strncpy(outCode, results[0].text().c_str(), 31);
+  outCode[31] = '\0';
+  return 1;
 }
 
 // 灰度帧 → fmt2jpg 编码 JPEG → multipart 上传（deviceId/action/container/timestamp）

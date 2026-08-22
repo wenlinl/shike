@@ -9,7 +9,7 @@
 | 内模组-D2-拍照上云 | M4 | 最小云端链路：拍照 → 上传 → 串口打印识别结果 |
 | 内模组-02-语音播报 | M3 | 拍照 → 云端识别 → MAX98357A 播"叮" |
 | 内模组-03-事件检测 | M6/M7 | 灰度帧差事件检测（放入/取出候选，**独立烧录**）|
-| 内模组-04-条码解码 | M2 | 条码本地解码（灰度 + fmt2jpg）+ 云端视觉兜底 |
+| 内模组-04-条码解码 | M2 | 条码本地解码（灰度 + ZXing + fmt2jpg）+ 云端视觉兜底 |
 | 内模组-05-完整链路 | M5/D3 | 扫码触发（动作由平板触屏经云端下发）→ 上传 → 播报；断网队列重传 |
 
 ## 配置：config.h
@@ -38,6 +38,9 @@
 
 ## 烧录（Arduino IDE）
 
-1. 安装 esp32 包 ≥ 2.0.8，开发板选 **Seeed XIAO ESP32S3**；
-2. 库：`esp32-camera`（拍照）、WiFi / HTTPClient（自带）；条码库见 04 内 TODO；
-3. 端口找不到 / 上传失败：**按住 BOOT 再插 USB** 进入 BootLoader 后重传。
+完整步骤见《[Arduino 环境与条码库接入](../docs/03-软件/Arduino环境与条码库接入.md)》，要点：
+
+1. 装 esp32 包（推荐 2.0.14），开发板选 **Seeed XIAO ESP32S3**；
+2. `esp32-camera` 随板卡包内置，**无需单独装库**；WiFi / HTTPClient 自带；
+3. 条码库：装 micro-zxing 为 Arduino 库 `ZXing`（模板：[ZXing-library.properties](./inner-module/ZXing-library.properties)），并在 2.0.x 下配 C++17（见文档第六节），04 的 `decodeBarcode()` 已实现；
+4. 端口找不到 / 上传失败：**按住 BOOT 再插 USB** 进入 BootLoader 后重传。
