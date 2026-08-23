@@ -27,17 +27,21 @@
 
 ### Project Description（必填，可直接粘贴）
 
-> ShiKe is an AI-powered food scanner that attaches to any existing refrigerator and turns it into a smart pantry. Users simply pass food in front of the camera: the device snaps a photo, cloud AI identifies the item and reads its expiry date, and the inventory updates automatically — zero manual entry. A fridge-side screen plus mobile H5 and a home dashboard show what is about to expire, what to cook, and what to buy next.
+> ShiKe is an AI food scanner that attaches to any existing refrigerator and turns it into a smart pantry. Users pass food in front of the scanner once: an outer touchscreen tablet starts a scan session, and a door-side camera module decodes EAN-13 barcodes on-device (millisecond response) with vision fallback for unpackaged items; voice feedback confirms each item ("ding + name"), and a close-door settlement summarizes the session for one-tap confirmation — zero manual entry. A fridge-side screen, mobile H5, and a home dashboard show what is about to expire, what to cook, and what to buy next.
 >
 > The problem is global: roughly one-third of all food is wasted; China alone wastes over 100 million tons a year, and Japan loses 4.6 million tons (2.24 million from households). Existing answers are either expensive built-in smart fridges or tedious manual-entry apps. ShiKe is a low-cost retrofit that makes food management a one-second scan.
 >
-> We have a working end-to-end prototype: single-board hardware (camera + touchscreen + audio), a live cloud backend with vision AI (Next.js + Prisma, deployed at shike.live), mobile H5, home dashboard, and a 3D-printed enclosure. Business model: affordable hardware plus a subscription for AI/cloud features, with a later B2B expiry-compliance SaaS for canteens, restaurants, and pharmacies.
+> We have a working end-to-end prototype: a dual-module hardware build (outer touchscreen tablet + inner door-side camera module), a live cloud backend (Next.js + Prisma, deployed at shike.live), mobile H5, home dashboard, and a 3D-printed enclosure. Recognition is local-first — on-device barcode decoding in milliseconds, on-device YOLO category in ≤500 ms, and cloud lookup for exact names and expiry dates in under 2 seconds — and low-confidence results are never auto-recorded. Business model: affordable hardware plus a subscription for AI/cloud features, with a later B2B expiry-compliance SaaS for canteens, restaurants, and pharmacies.
 
 ### Business Plan Upload（PDF/DOC/DOCX/PPT/PPTX，≤10MB）
 
-推荐上传项目里的 **[食刻_最小MVP与Pitch双主线执行方案.docx](./食刻_最小MVP与Pitch双主线执行方案.docx)**。
+推荐上传新生成的英文商业计划书（与申请表同语言、信息最全，9 页含执行摘要 / 市场 / 商业模式 / 财务三情景 / 团队 / 路线图 / 资金用途）：
 
-如需一页版商业计划书（PDF）用于上传，可以让 Codex 基于《商业化分析报告》生成。
+**[ShiKe-Business-Plan.docx](../../docs/04-商业/ShiKe-Business-Plan.docx)**
+
+备用（中文版，已归档）：[执行方案-v1-最小MVP与Pitch双主线执行方案.docx](../../docs/archive/执行方案-v1-最小MVP与Pitch双主线执行方案.docx)
+
+如需 PDF 版，可直接将 DOCX 导出为 PDF 后上传（表单支持 PDF / DOCX）。
 
 ## 2 Team Information（团队信息）
 
@@ -55,9 +59,9 @@
 
 ### Team Background（必填，可直接粘贴）
 
-> ShiKe is built by a four-person founding team covering the complete skill set for hardware-startup execution: embedded development (TuyaOpen firmware, sensor integration, flashing), cloud backend (Next.js, Prisma, Docker — 11 APIs and a 15-table schema, already deployed), frontend and product (mobile H5, home dashboard, interactive device demo), and product narrative/pitching.
+> ShiKe is built by a four-person founding team with diverse, complementary backgrounds, covering the full journey from hardware and cloud services to mobile apps and product storytelling.
 >
-> The team shipped the full loop — hardware → cloud AI → software — from concept to a demo-ready prototype, with disciplined SOPs including API contracts, firmware flashing procedures, and test plans, and a live deployment at shike.live. We iterate fast while keeping strong documentation, which keeps handoff and scaling costs low.
+> The team shipped the full loop — hardware → cloud → software — from concept to a demo-ready prototype, with disciplined execution: clear specifications, testing plans, and a live deployment at shike.live. We iterate fast while keeping strong documentation, which keeps handoff and scaling costs low.
 
 ## 3 Additional Information（补充信息）
 

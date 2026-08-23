@@ -316,9 +316,10 @@ def main():
     # 1 Executive summary
     doc.add_heading("1  Executive Summary", level=1)
     para(doc, "ShiKe is an AI food scanner that clips onto any existing refrigerator and turns "
-              "it into a smart pantry. Users pass food in front of the camera once; the device "
-              "photographs it, cloud AI identifies the item and reads its expiry date, and the "
-              "family inventory updates automatically — no typing, no barcode hunting, no tags. "
+              "it into a smart pantry. Users pass food in front of the scanner once; on-device "
+              "recognition (barcode-first, with vision fallback) identifies the item and its "
+              "expiry date, and the family inventory updates automatically — no typing, no "
+              "manual barcode hunting, no tags. "
               "A fridge-side screen, a mobile app, and a home dashboard then answer the three "
               "questions every household asks: What do we have? What is about to expire? What "
               "can we cook tonight?")
@@ -329,7 +330,7 @@ def main():
               "new buyers, and manual-entry apps fail because people forget to type.")
     para(doc, "ShiKe's answer is a low-cost retrofit with zero learning curve. We have already "
               "shipped the full loop — hardware to cloud AI to software — as a working prototype: "
-              "single-board hardware, a live backend (shike.live, 11 APIs, 15 tables), mobile H5, "
+              "a dual-module hardware prototype, a live backend (shike.live, 11 APIs, 15 tables), mobile H5, "
               "web dashboard, and a 3D-printed enclosure. We are raising an 18-month seed round "
               "to push recognition accuracy past 90%, launch through crowdfunding, and enter "
               "Japan — the first market with policy tailwind, standardized date labels, and no "
@@ -382,11 +383,12 @@ def main():
               "updates by ±1, and every screen in the home reflects the result immediately.")
     bullets(doc, [
         [("Hardware scanner: ", True, False, None),
-         ("single-board device with camera, touchscreen, and audio — works on any fridge, "
-          "cabinet, or medicine drawer.", False, False, None)],
+         ("dual-module device — an outer touchscreen tablet plus an inner camera module — "
+          "works on any fridge, cabinet, or medicine drawer.", False, False, None)],
         [("Cloud AI recognition: ", True, False, None),
-         ("identifies product name and expiry date in 3–5 seconds; low-confidence results are "
-          "rejected and the user is asked to rescan rather than guessing.", False, False, None)],
+         ("identifies product name and expiry date in milliseconds to under two seconds; "
+          "low-confidence results are rejected and the user is asked to rescan rather than "
+          "guessing.", False, False, None)],
         [("Family inventory: ", True, False, None),
          ("stock tracked by container (fridge, snack box, medicine box, spice rack, pantry), "
           "with restock and consumption modes.", False, False, None)],
@@ -410,14 +412,16 @@ def main():
               "demonstrated end to end:")
     bullets(doc, [
         [("Hardware: ", True, False, None),
-         ("a T5-E1 single board (camera, touchscreen, audio, Wi-Fi) with TuyaOpen firmware, "
-          "burned and running the scan flow with HTTPS image upload.", False, False, None)],
+         ("a dual-module build — an outer T5-E1 touchscreen tablet and an inner XIAO ESP32-S3 "
+          "camera module with barcode-first scan and voice feedback — running TuyaOpen + "
+          "Arduino firmware with live HTTPS upload.", False, False, None)],
         [("Cloud: ", True, False, None),
          ("a live backend at shike.live (Next.js + Prisma + SQLite on Docker) with 11 APIs and "
           "15 tables, including real scan data.", False, False, None)],
         [("Vision AI: ", True, False, None),
-         ("Doubao vision model via Volcano Ark, 3–5 s per scan, low-confidence results not "
-          "recorded.", False, False, None)],
+         ("local-first pipeline — on-device EAN-13 barcode decode (ms), on-device YOLO "
+          "category (≤500 ms), cloud lookup for exact name/expiry via Doubao (P95 <2 s); "
+          "low-confidence results not recorded.", False, False, None)],
         [("Software: ", True, False, None),
          ("mobile H5 (5 tabs), a web dashboard, and an interactive hardware demo; the H5 scan "
           "page calls the real API.", False, False, None)],
