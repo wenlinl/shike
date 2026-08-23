@@ -12,6 +12,7 @@
 
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <time.h>
 #include "esp_camera.h"
 #include "config.h"
@@ -80,8 +81,9 @@ static camera_fb_t* takePhoto() {
 // ===== 5. multipart 上传到 shike.live =====
 static void uploadPhoto(camera_fb_t* fb) {
   HTTPClient http;
-  http.begin(SERVER_URL);
-  http.setInsecure();  // 测试阶段跳过证书校验（商用必须去掉此行并配置 CA）
+  WiFiClientSecure httpClient;
+  httpClient.setInsecure();  // 测试阶段跳过证书校验（商用必须校验证书）
+  http.begin(httpClient, SERVER_URL);
   http.setTimeout(15000);
 
   char ts[32];
@@ -110,26 +112,18 @@ static void uploadPhoto(camera_fb_t* fb) {
   http.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
   http.addHeader("Content-Length", String(totalLen));
 
-  int httpCode = http.POST([&](uint8_t* buf, size_t maxLen, size_t total) -> size_t {
-    (void)total;
-    size_t written = 0;
-    if (total == 0) {
-      memcpy(buf, bodyStart.c_str(), bodyStart.length());
-      written = bodyStart.length();
-    } else if (total < bodyStart.length() + fb->len) {
-      size_t imgStart = bodyStart.length();
-      size_t offset = total - imgStart;
-      size_t toCopy = min(fb->len - offset, maxLen);
-      memcpy(buf, fb->buf + offset, toCopy);
-      written = toCopy;
-    } else {
-      size_t endOffset = total - (bodyStart.length() + fb->len);
-      size_t toCopy = min(bodyEnd.length() - endOffset, maxLen);
-      memcpy(buf, bodyEnd.c_str() + endOffset, toCopy);
-      written = toCopy;
-    }
-    return written;
-  });
+  // esp32 core 2.0.x 无流式 POST：整包拼装到 PSRAM 后发送
+  uint8_t* bodyAll = (uint8_t*)ps_malloc(totalLen);
+  if (!bodyAll) {
+    Serial.println("上传失败: PSRAM 不足");
+    http.end();
+    return;
+  }
+  memcpy(bodyAll, bodyStart.c_str(), bodyStart.length());
+  memcpy(bodyAll + bodyStart.length(), fb->buf, fb->len);
+  memcpy(bodyAll + bodyStart.length() + fb->len, bodyEnd.c_str(), bodyEnd.length());
+  int httpCode = http.POST(bodyAll, totalLen);
+  free(bodyAll);
 
   if (httpCode > 0) {
     String resp = http.getString();

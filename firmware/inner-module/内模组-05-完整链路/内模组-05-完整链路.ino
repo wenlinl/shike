@@ -24,6 +24,7 @@
 
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <time.h>
 #include "esp_camera.h"
 #include "driver/i2s.h"
@@ -164,8 +165,9 @@ static const char* fetchPendingAction() {
     return ACTION_IN;
   }
   HTTPClient http;
-  http.begin(String(DEVICE_TASK_URL) + "?deviceId=" + DEVICE_ID);
-  http.setInsecure();
+  WiFiClientSecure httpClient;
+  httpClient.setInsecure();
+  http.begin(httpClient, String(DEVICE_TASK_URL) + "?deviceId=" + DEVICE_ID);
   http.setTimeout(5000);
   int code = http.GET();
   if (code > 0) {
@@ -195,8 +197,9 @@ static void uploadOne(camera_fb_t* fb, const char* action) {
   }
 
   HTTPClient http;
-  http.begin(SERVER_URL);
-  http.setInsecure();
+  WiFiClientSecure httpClient;
+  httpClient.setInsecure();
+  http.begin(httpClient, SERVER_URL);
   http.setTimeout(15000);
   String boundary = "----ShikeBoundary";
   String bodyStart = "--" + boundary + "\r\n"
@@ -214,20 +217,18 @@ static void uploadOne(camera_fb_t* fb, const char* action) {
   size_t totalLen = bodyStart.length() + fb->len + bodyEnd.length();
   http.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
   http.addHeader("Content-Length", String(totalLen));
-  int code = http.POST([&](uint8_t* buf, size_t maxLen, size_t total) -> size_t {
-    size_t w = 0;
-    if (total == 0) { memcpy(buf, bodyStart.c_str(), bodyStart.length()); w = bodyStart.length(); }
-    else if (total < bodyStart.length() + fb->len) {
-      size_t o = total - bodyStart.length();
-      size_t c = min(fb->len - o, maxLen);
-      memcpy(buf, fb->buf + o, c); w = c;
-    } else {
-      size_t o = total - (bodyStart.length() + fb->len);
-      size_t c = min(bodyEnd.length() - o, maxLen);
-      memcpy(buf, bodyEnd.c_str() + o, c); w = c;
-    }
-    return w;
-  });
+  // esp32 core 2.0.x 无流式 POST：整包拼装到 PSRAM 后发送
+  uint8_t* bodyAll = (uint8_t*)ps_malloc(totalLen);
+  if (!bodyAll) {
+    Serial.println("上传失败: PSRAM 不足");
+    http.end();
+    return;
+  }
+  memcpy(bodyAll, bodyStart.c_str(), bodyStart.length());
+  memcpy(bodyAll + bodyStart.length(), fb->buf, fb->len);
+  memcpy(bodyAll + bodyStart.length() + fb->len, bodyEnd.c_str(), bodyEnd.length());
+  int code = http.POST(bodyAll, totalLen);
+  free(bodyAll);
   if (code > 0) {
     String resp = http.getString();
     Serial.printf("HTTP %d\n%s\n", code, resp.c_str());

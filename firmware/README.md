@@ -40,7 +40,8 @@
 
 完整步骤见《[Arduino 环境与条码库接入](../docs/03-软件/Arduino环境与条码库接入.md)》，要点：
 
-1. 装 esp32 包（推荐 2.0.14），开发板选 **Seeed XIAO ESP32S3**；
-2. `esp32-camera` 随板卡包内置，**无需单独装库**；WiFi / HTTPClient 自带；
-3. 条码库：装 micro-zxing 为 Arduino 库 `ZXing`（模板：[ZXing-library.properties](./inner-module/ZXing-library.properties)），并在 2.0.x 下配 C++17（见文档第六节），04 的 `decodeBarcode()` 已实现；
-4. 端口找不到 / 上传失败：**按住 BOOT 再插 USB** 进入 BootLoader 后重传。
+1. ✅ 环境已装（2026-08-23）：esp32 2.0.14 + ZXing 库 + C++17，4 个示例编译全部通过；
+2. 开发板选 **Seeed XIAO ESP32S3**（`esp32:esp32:XIAO_ESP32S3`）；
+3. `esp32-camera` 随板卡包内置，**无需单独装库**；WiFi / HTTPClient 自带；
+4. 2.0.x 兼容写法已应用：multipart 整包 POST + `WiFiClientSecure.setInsecure()`（不要用 3.x 的流式 `POST(lambda)` / `http.setInsecure()`）；
+5. 端口找不到 / 上传失败：**按住 BOOT 再插 USB** 进入 BootLoader 后重传。

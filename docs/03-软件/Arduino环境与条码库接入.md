@@ -1,18 +1,22 @@
 # 食刻 · Arduino 环境搭建 + ZXing 条码库接入
 
 > 适用对象：内模组（Seeed XIAO ESP32S3 Sense）。外置平板（T5-E1）用 TuyaOpen 烧录，不在此文档范围。
-> 更新时间：2026-08-22。硬件未到手前即可完成本页全部步骤（最后一步"选端口烧录"除外）。
+> 更新时间：2026-08-22 ｜ 环境状态：**已装好（2026-08-23）**——arduino-cli 1.5.1 + esp32 2.0.14 + ZXing 库 + C++17 配置，4 个内模组示例编译全部通过。
 
 ## 结论先行（三件事）
 
 | 事项 | 结论 |
 |---|---|
-| Arduino IDE | 需要装：官网下载 IDE 2.x |
-| esp32 板卡包 ≥ 2.0.8 | 需要装：板卡管理器装 `esp32 by Espressif Systems`（推荐 2.0.14）|
-| esp32-camera | **不需要单独装**：esp32 板卡包自带 `esp_camera.h`，装完板卡包即可 `#include "esp_camera.h"`。不要再去库管理器装第三方 "ESP32 Camera"，会重复定义报错 |
-| ZXing 条码库 | 需要接入：用 `micro-zxing`（zxing-cpp 的 ESP32 维护移植），复制为 Arduino 库后即可用（详见下文第五节）|
+| Arduino IDE / CLI | ✅ 已装：arduino-cli 1.5.1（brew）；IDE 图形版待网络恢复后 `brew install --cask arduino-ide` 补装（数据目录已共享） |
+| esp32 板卡包 ≥ 2.0.8 | ✅ 已装：**2.0.14**（板卡 `esp32:esp32:XIAO_ESP32S3`）|
+| esp32-camera | ✅ 随板卡包内置，`#include "esp_camera.h"` 直接可用 |
+| ZXing 条码库 | ✅ 已装：`~/Documents/Arduino/libraries/ZXing/`（micro-zxing 源码 + library.properties 模板）|
 
 一个关键坑：esp32 板卡包 **2.0.x 默认 C++11**，而 zxing-cpp 需要 **C++17**。装完必须做第六节的 C++17 配置，否则条码库编译报错。
+
+另一个兼容坑（2.0.14 已实测）：**3.x 的便捷 API 在 2.0.x 没有**——
+- `http.POST(lambda)` 流式上传不存在，需整包拼装到 PSRAM 后 `http.POST(buf, len)`（04/05/D2/02 已按此改写）；
+- `http.setInsecure()` 不存在，需 `WiFiClientSecure client; client.setInsecure(); http.begin(client, url)`。
 
 ---
 
