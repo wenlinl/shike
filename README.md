@@ -14,7 +14,7 @@
 |---|---|---|
 | H5 手机端 | https://shike.live/shike-h5.html | 首页 / 扫描 / 库存 / 菜谱 / 我的（iPhone 适配） |
 | 大屏版 | https://shike.live/shike-web.html | 库存排行 / 临期提醒 / 周度菜谱 / 月度统计 |
-| 硬件交互模拟 | [食刻-硬件交互Demo.html](web-demos/食刻-硬件交互Demo.html) | 本地浏览器即可体验设备交互全流程 |
+| 硬件交互模拟 | [食刻-硬件交互Demo.html](frontend/demos/食刻-硬件交互Demo.html) | 本地浏览器即可体验设备交互全流程 |
 | 代码仓库 | https://github.com/wenlinl/shike | 固件 / 后端 / 前端 / 文档 |
 
 > 演示依赖：浏览器 + 摄像头权限 + 联网（识别走云端 `https://shike.live/api/scan`）；首页 / 库存 / 菜谱 / 我的为演示数据（接口已就绪），扫描页为真实 AI 识别。
@@ -144,11 +144,12 @@
 │   ├── 05-执行/                  # 冲刺安排、风险、Demo 说明
 │   └── archive/                  # 版本档案（被取代文档按版本归档，不删除）
 ├── firmware/                     # 固件：内模组 Arduino 示例 + 外置平板参考
-├── hardware/                     # 硬件工程：3D 外壳 / 器件库 / BOM 图
-├── web-demos/                    # 三个 HTML 演示（H5 / 大屏 / 硬件交互）
+├── hardware/                     # 硬件工程：3D 外壳 / BOM 图
+├── frontend/                     # 前端：demos（演示页）+ tablet-ui（设备界面参考）
 ├── media/                        # 宣传素材（图片 / 视频 / 示意图）
-├── assets/                       # 生成脚本
-└── 项目资料/                     # 赛事活动材料（按活动归档）
+├── scripts/                      # 生成 / 构建脚本（海报、BP 等）
+├── inventory/                    # 硬件库存登记（仅本地）
+└── 项目资料/                     # 赛事活动材料（按活动归档，仅本地）
 ```
 
 ## 文档索引

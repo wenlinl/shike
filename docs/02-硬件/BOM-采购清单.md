@@ -135,7 +135,7 @@
 | A3 | ![A3 MAX98357A 功放](../hardware/bom-images/A3-MAX98357A功放.jpg) | 分销官方图：Adafruit（ADI MAX98357A 官方成品板） |
 | A4 | ![A4 喇叭 40mm 8Ω](../hardware/bom-images/A4-喇叭40mm8欧.jpg) | 立创：INGHAi 40mm/8Ω 喇叭商品图（淘宝杂牌更便宜；品牌件 ¥25+） |
 | A5 | ![A5 光敏模块](../hardware/bom-images/A5-光敏模块GL5516.jpg) | 立创：GL5516 光敏电阻（同类 LM393 模块核心件示意）；**已定款：4 针光敏二极管模块（¥3.07，DO/AO）** |
-| A6 | ![A6 硬件库 HW-003 KY009 RGB](../hardware/component-library/图片/HW-003-KY009全彩RGBLED模块-正面.jpg) | **硬件库实拍**：KY-009 全彩 RGB 模块（三通道混白补光，¥0） |
+| A6 | ![A6 硬件库 HW-003 KY009 RGB](../../hardware/bom-images/BOM图片/HW-003-KY009全彩RGBLED模块-正面.jpg) | **硬件库实拍**：KY-009 全彩 RGB 模块（三通道混白补光，¥0） |
 | A7 | ![A7 轻触按键（示意）](../hardware/bom-images/A7-按键模块.jpg) | 已选：淘宝"电子积木大按键模块 1 位版"（¥5.92）；图为轻触开关示意 |
 | A8 | ![A8 1000mAh 电池](../hardware/bom-images/A8-电池1000mAh.jpg) | 立创：FLYOUNG 3.7V/1000mAh 聚合物锂电池商品图 |
 | A9 | ![A9 面包板 400 孔](../hardware/bom-images/A9-面包板400孔.jpg) | 立创：CONNFLY 400 孔面包板商品图；杜邦线用硬件库 HW-009/010/011（母对母差 3 根可补） |
@@ -144,7 +144,7 @@
 
 | # | 产品图 | 图源 |
 |---|---|---|
-| B0 | ![B0 硬件库 HW-013 T5-BOARD](../hardware/component-library/图片/HW-013-T5-BOARD-V102-ESP32-S3开发板-实物.jpg) | **硬件库实拍**：HW-013 T5-BOARD V1.02（ESP32-S3 + 3.5" LCD，**已确认支持触屏**，主方案直接复用） |
+| B0 | ![B0 硬件库 HW-013 T5-BOARD](../../hardware/bom-images/BOM图片/HW-013-T5-BOARD-V102-ESP32-S3开发板-实物.jpg) | **硬件库实拍**：HW-013 T5-BOARD V1.02（ESP32-S3 + 3.5" LCD，**已确认支持触屏**，主方案直接复用） |
 | B1 | ![B1 ESP32S3-Zero](../hardware/bom-images/B1-ESP32S3-Zero.jpg) | 官方同款板型：Waveshare 官方文档（ESP32-S3-Zero；合宙同名板外观一致，购买认准合宙官方店，以实物为准） |
 | B2 | ![B2 2.4寸 ST7789 屏](../hardware/bom-images/B2-2.4寸ST7789屏.jpg) | 官网同规格：Newhaven 2.4"/240×320/ST7789 产品图（BOM 款为 ST7789+CST816S 通用模组，无官网图，此为屏芯同款示意） |
 | B3 | ![B3 按键（同 A7）](../hardware/bom-images/A7-按键模块.jpg) | 同 A7：立创轻触开关商品图 |

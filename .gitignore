@@ -2,4 +2,4 @@
 .DS_Store
 
 # 构建 / 渲染产物（仅本地保留，不上 GitHub）
-.pptx_build_s2026/
+build/

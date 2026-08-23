@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """「食刻」智能食品保质期扫描台 · 极简外观海报生成脚本。
 
-输出：assets/食刻-极简外观海报.png（1200 x 1697，A3 竖版 @150dpi）
+输出：media/产品宣传图/食刻-极简外观海报.png（1200 x 1697，A3 竖版 @150dpi）
 设计语言：米白底 + 近黑细线 + 单一绿色点缀，大留白。
 """
 
@@ -167,8 +167,8 @@ def main():
 
     # 降采样输出
     out = img.resize((W // SCALE, H // SCALE), Image.LANCZOS)
-    out.save("assets/食刻-极简外观海报.png")
-    print("saved assets/食刻-极简外观海报.png", out.size)
+    out.save("media/产品宣传图/食刻-极简外观海报.png")
+    print("saved media/产品宣传图/食刻-极简外观海报.png", out.size)
 
 
 if __name__ == "__main__":
