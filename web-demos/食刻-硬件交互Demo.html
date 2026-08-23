@@ -100,7 +100,7 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header class="topbar"><h1>食刻</h1><span>食刻在场 · 不浪费每一份食材 ｜ 硬件交互 Demo · 放入 / 取出 · 3 秒倒计时拍照 · 云端 AI 识别 → 网页大屏联动</span></header>
+<header class="topbar"><h1>食刻</h1><span>食刻在场 · 不浪费每一份食材 ｜ 硬件交互 Demo · 外置平板门外交互 · 内模组扫码识别（条码优先 + 语音播报）· 关门结算 → 网页大屏联动</span></header>
 
 <main class="stage">
   <!-- 硬件设备模拟 -->
@@ -117,22 +117,16 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
               <button class="dev-btn out" id="btnOut" type="button">取出</button>
             </div>
             <div class="dev-mini" id="devMini"></div>
+            <div class="dev-mini" id="devSession" style="background:rgba(38,111,190,.16);color:#9fc7ff">本次会话：暂无</div>
             <div class="dev-remind" id="devRemind">待机：常显临期 / 过期提醒</div>
+            <button class="ghost-btn" id="btnSettle" type="button" style="margin-top:.5rem">模拟关门结算</button>
           </div>
 
           <div id="devCam" class="dev-state hidden">
-            <canvas id="camCanvas" width="240" height="320"></canvas>
-            <div class="cam-tip" id="camTip">请把食品放到镜头前</div>
-            <div class="count" id="countNum"></div>
-            <div class="cam-actions hidden" id="camActions">
+            <div class="ring"></div>
+            <div class="status-line" style="color:#dff2e8" id="camTip">已通知内模组 · 请将食材对准门内镜头</div>
+            <div class="cam-actions" id="camActions">
               <button class="ghost-btn" id="btnCancel" type="button">取消</button>
-            </div>
-          </div>
-
-          <div id="devUpload" class="dev-state hidden">
-            <div class="upload-box">
-              <div class="ring"></div>
-              <div class="status-line" id="uploadText">上传中…</div>
             </div>
           </div>
 
@@ -143,8 +137,19 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
               <div class="res-exp" id="resExp"></div>
             </div>
             <div class="res-actions">
-              <button class="dev-btn ok" id="btnConfirm" type="button">确认</button>
-              <button class="ghost-btn" id="btnReshoot" type="button">重拍</button>
+              <button class="dev-btn ok" id="btnConfirm" type="button">完成</button>
+              <button class="ghost-btn" id="btnReshoot" type="button">再扫一次</button>
+            </div>
+          </div>
+
+          <div id="devSummary" class="dev-state hidden">
+            <div class="res-card">
+              <div class="res-name">关门结算 · 汇总确认</div>
+              <div class="res-row">放入 <b id="sumIn">0</b> 件 · 取出 <b id="sumOut">0</b> 件 · 未识别 <b id="sumUnknown">0</b> 件</div>
+              <div class="res-exp" id="sumHint">连续扫码已入会话，一键确认即入账</div>
+            </div>
+            <div class="res-actions">
+              <button class="dev-btn ok" id="btnSettleOk" type="button">一键确认</button>
             </div>
           </div>
         </div>
@@ -199,7 +204,7 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   <p id="pushBody"></p>
 </div>
 
-<div class="foot-note">说明：设备画面为演示模拟（浏览器允许时可调用真实摄像头）；倒计时数字为半透明、约占屏幕一半，背景为实时取景。识别结果由演示数据生成。</div>
+<div class="foot-note">说明：本页为 HW-v1 门外交互屏模拟——外置平板只做动作下发 / 结果显示，识别由内模组完成（条码优先 + 视觉兜底 + 语音"叮"声），关门结算一次确认；识别结果由演示数据生成。</div>
 
 <script>
 (function () {
@@ -213,8 +218,7 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   var action = "in";            // in | out
   var scanCount = 0;
   var timers = [];
-  var camRunning = false;
-  var videoEl = null;
+  var session = { in: [], out: [] };   // 本次会话：关门结算时统一入账
 
   function daysFromNow(n) {
     var d = new Date();
@@ -275,12 +279,14 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   /* ---------- DOM ---------- */
   var $ = function (id) { return document.getElementById(id); };
   var el = {
-    devIdle: $("devIdle"), devCam: $("devCam"), devUpload: $("devUpload"), devResult: $("devResult"),
-    camCanvas: $("camCanvas"), camTip: $("camTip"), countNum: $("countNum"), camActions: $("camActions"),
-    uploadText: $("uploadText"), resName: $("resName"), resMeta: $("resMeta"), resExp: $("resExp"),
+    devIdle: $("devIdle"), devCam: $("devCam"), devResult: $("devResult"), devSummary: $("devSummary"),
+    camTip: $("camTip"), camActions: $("camActions"),
+    resName: $("resName"), resMeta: $("resMeta"), resExp: $("resExp"),
     btnConfirm: $("btnConfirm"), btnReshoot: $("btnReshoot"), btnCancel: $("btnCancel"),
     btnIn: $("btnIn"), btnOut: $("btnOut"),
-    devMini: $("devMini"), devRemind: $("devRemind"), deviceLog: $("deviceLog"),
+    devMini: $("devMini"), devSession: $("devSession"), devRemind: $("devRemind"), deviceLog: $("deviceLog"),
+    btnSettle: $("btnSettle"), btnSettleOk: $("btnSettleOk"),
+    sumIn: $("sumIn"), sumOut: $("sumOut"), sumUnknown: $("sumUnknown"), sumHint: $("sumHint"),
     invList: $("invList"), tabs: $("tabs"),
     statTotal: $("statTotal"), statSoon: $("statSoon"), statExpired: $("statExpired"), statSaved: $("statSaved"),
     recipeOk: $("recipeOk"), recipeMiss: $("recipeMiss"), monthChart: $("monthChart"),
@@ -292,125 +298,46 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   function clearTimers() { timers.forEach(clearTimeout); timers = []; }
 
   function showState(name) {
-    ["devIdle", "devCam", "devUpload", "devResult"].forEach(function (k) {
+    ["devIdle", "devCam", "devResult", "devSummary"].forEach(function (k) {
       el[k].classList.toggle("hidden", k !== name);
     });
   }
 
-  /* ---------- 模拟摄像头 ---------- */
-  function startCam() {
-    showState("devCam");
-    el.camActions.classList.add("hidden");
-    el.countNum.textContent = "";
-    camRunning = true;
-    if (videoEl === null) {
-      videoEl = document.createElement("video");
-      videoEl.muted = true;
-      videoEl.playsInline = true;
-    }
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: { width: 240, height: 320 } })
-        .then(function (stream) {
-          videoEl.srcObject = stream;
-          videoEl.play().catch(function () {});
-          requestAnimationFrame(drawFrame);
-        })
-        .catch(function () { requestAnimationFrame(drawSim); });
-    } else {
-      requestAnimationFrame(drawSim);
-    }
-  }
-
-  function drawFrame() {
-    if (!camRunning) return;
-    var ctx = el.camCanvas.getContext("2d");
-    if (videoEl && videoEl.videoWidth > 0) {
-      ctx.drawImage(videoEl, 0, 0, 240, 320);
-    }
-    requestAnimationFrame(drawFrame);
-  }
-
-  function drawSim() {
-    if (!camRunning) return;
-    var ctx = el.camCanvas.getContext("2d");
-    var g = ctx.createLinearGradient(0, 0, 240, 320);
-    g.addColorStop(0, "#dcecf5"); g.addColorStop(1, "#a9c6d8");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, 240, 320);
-    ctx.fillStyle = "rgba(255,255,255,.55)";
-    ctx.fillRect(0, 96, 240, 6); ctx.fillRect(0, 210, 240, 6);
-    ctx.font = "46px serif"; ctx.textAlign = "center";
-    var t = Date.now() / 900;
-    ctx.fillText("🥛", 60 + Math.sin(t) * 5, 170);
-    ctx.fillText("🧃", 150 + Math.cos(t * 0.8) * 5, 155);
-    ctx.fillText("🍎", 110 + Math.sin(t * 1.3) * 4, 280);
-    ctx.fillText("🧄", 40, 60); ctx.fillText("🥚", 200, 70);
-    ctx.font = "12px sans-serif"; ctx.fillStyle = "#567";
-    ctx.fillText("演示取景：冰箱冷藏层", 120, 315);
-    requestAnimationFrame(drawSim);
-  }
-
-  function stopCam() {
-    camRunning = false;
-    if (videoEl && videoEl.srcObject) {
-      videoEl.srcObject.getTracks().forEach(function (tr) { tr.stop(); });
-      videoEl.srcObject = null;
-    }
-  }
-
-  /* ---------- 声音：咔嚓 ---------- */
-  function shutterSound() {
+  /* ---------- 声音：叮（内模组语音播报提示） ---------- */
+  function beepDing() {
     try {
       var AC = window.AudioContext || window.webkitAudioContext;
       var ctx = new AC();
-      var dur = 0.09;
-      var buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
-      var data = buf.getChannelData(0);
-      for (var i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
-      }
-      var src = ctx.createBufferSource();
-      src.buffer = buf;
-      var gain = ctx.createGain(); gain.gain.value = 0.35;
-      src.connect(gain); gain.connect(ctx.destination);
-      src.start();
-      setTimeout(function () { ctx.close(); }, 300);
+      var t0 = ctx.currentTime;
+      var gain = ctx.createGain(); gain.gain.value = 0.25;
+      gain.connect(ctx.destination);
+      [[880, 0, 0.09], [1320, 0.1, 0.12]].forEach(function (f) {
+        var o = ctx.createOscillator();
+        o.type = "sine";
+        o.frequency.value = f[0];
+        o.connect(gain);
+        o.start(t0 + f[1]);
+        o.stop(t0 + f[1] + f[2]);
+      });
+      setTimeout(function () { ctx.close(); }, 600);
     } catch (e) { /* 无音频环境忽略 */ }
   }
 
-  /* ---------- 扫描流程 ---------- */
+  /* ---------- 扫描流程（v1：平板下发动作，内模组识别） ---------- */
   function startScan(act) {
     clearTimers();
     action = act;
-    el.camTip.textContent = act === "in" ? "放入 · 请把食品放到镜头前" : "取出 · 请把食品放到镜头前";
-    startCam();
-    el.camActions.classList.remove("hidden");
-    var n = 3;
-    el.countNum.textContent = String(n);
-    var tick = function () {
-      if (n > 1) {
-        n--;
-        el.countNum.textContent = String(n);
-        later(tick, 1000);
-      } else {
-        el.countNum.textContent = "";
-        shutterSound();
-        captureAndUpload();
-      }
-    };
-    later(tick, 1000);
+    el.camTip.textContent = act === "in"
+      ? "已通知内模组 · 请将食材对准门内镜头（条码优先）"
+      : "已通知内模组 · 请将食材对准门内镜头（条码优先）";
+    showState("devCam");
+    later(beepDing, 1600);   // 内模组"叮"声（本地条码解码成功）
+    later(finishWait, 2400); // 条码本地解码 + 云端查库
   }
 
-  function captureAndUpload() {
-    stopCam();
-    showState("devUpload");
-    el.uploadText.textContent = "上传中…";
-    later(function () {
-      el.uploadText.textContent = "AI 解析中…";
-      later(function () {
-        var tpl = templates[Math.floor(Math.random() * templates.length)];
-        showResult(tpl);
-      }, 900);
-    }, 900);
+  function finishWait() {
+    var tpl = templates[Math.floor(Math.random() * templates.length)];
+    showResult(tpl);
   }
 
   function showResult(tpl) {
@@ -420,9 +347,9 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
       name: tpl.name, cat: tpl.cat, expiry: exp, suggested: tpl.container, scannedAt: now
     };
     el.resName.textContent = result.name;
-    el.resMeta.innerHTML = "扫描时间 <b>" + fmtDateTime(result.scannedAt) + "</b><br>建议容器 <b>" + result.suggested + "</b> · 分类 <b>" + result.cat + "</b>";
+    el.resMeta.innerHTML = "扫描时间 <b>" + fmtDateTime(result.scannedAt) + "</b><br>识别 <b>内模组条码优先 + 云端查库</b> · 建议容器 <b>" + result.suggested + "</b>";
     el.resExp.textContent = "保质期至 " + fmtDate(result.expiry) + "（剩 " + Math.max(0, tpl.shelf) + " 天）";
-    el.btnConfirm.textContent = action === "in" ? "确认入库" : "确认取出";
+    el.btnConfirm.textContent = "完成";
     showState("devResult");
   }
 
@@ -432,17 +359,16 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   el.btnReshoot.addEventListener("click", function () { clearTimers(); startScan(action); });
 
   function cancelScan() {
-    clearTimers(); stopCam(); showState("devIdle"); updateDeviceIdle();
+    clearTimers(); showState("devIdle"); updateDeviceIdle();
   }
 
   el.btnConfirm.addEventListener("click", function () {
     var tpl = lastResult();
     if (!tpl) return;
-    if (action === "in") addItem(tpl); else removeItem(tpl);
+    session[action].push(tpl);   // 记入本次会话，关门结算时统一入账
+    pushLog(action, (action === "in" ? "扫码放入 " : "扫码取出 ") + tpl.name + "（待结算）");
     showState("devIdle");
     updateDeviceIdle();
-    scanCount++;
-    if (scanCount === 1) later(showPush, 600); // 首次扫描后模拟下班前推送
   });
 
   var last = null;
@@ -450,6 +376,31 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   // showResult 时记录模板
   var _origShow = showResult;
   showResult = function (tpl) { last = tpl; _origShow(tpl); };
+
+  /* ---------- 关门结算（v1 汇总确认） ---------- */
+  el.btnSettle.addEventListener("click", function () {
+    if (session.in.length + session.out.length === 0) {
+      pushLog("push", "本次会话无扫码，无需结算");
+      renderLog();
+      return;
+    }
+    el.sumIn.textContent = session.in.length;
+    el.sumOut.textContent = session.out.length;
+    el.sumUnknown.textContent = 0;
+    el.sumHint.textContent = "连续扫码已入会话，一键确认即入账";
+    showState("devSummary");
+  });
+
+  el.btnSettleOk.addEventListener("click", function () {
+    session.in.forEach(addItem);
+    session.out.forEach(removeItem);
+    pushLog("push", "关门结算：放入 " + session.in.length + " / 取出 " + session.out.length + "，已确认");
+    session = { in: [], out: [] };
+    showState("devIdle");
+    updateDeviceIdle();
+    scanCount++;
+    if (scanCount === 1) later(showPush, 600); // 首次结算后模拟下班前推送
+  });
 
   function addItem(tpl) {
     var found = null;
@@ -493,6 +444,9 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     var exp = items.filter(function (it) { return status(it) === "expired"; });
     var mini = soon[0] ? soon[0].name + " · 还剩 " + daysLeft(soon[0]) + " 天" : "暂无临期";
     el.devMini.textContent = mini;
+    el.devSession.textContent = (session.in.length + session.out.length)
+      ? "本次会话：放入 " + session.in.length + " · 取出 " + session.out.length
+      : "本次会话：暂无";
     var parts = [];
     if (exp.length) parts.push(exp.length + " 件已过期");
     if (soon.length) parts.push(soon.length + " 件临期");
