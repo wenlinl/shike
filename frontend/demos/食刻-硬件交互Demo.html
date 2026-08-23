@@ -18,8 +18,8 @@ body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background
 .topbar{display:flex;align-items:baseline;gap:.8rem;flex-wrap:wrap;padding:.9rem 1.2rem;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff}
 .topbar h1{font-size:1.25rem;margin:0}
 .topbar span{font-size:.8rem;opacity:.85}
-.stage{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:1.1rem;padding:1.1rem 1.2rem;max-width:1280px;margin:0 auto}
-@media (max-width:900px){.stage{grid-template-columns:1fr}}
+.stage{display:flex;flex-direction:column;align-items:center;gap:1.1rem;padding:1.1rem 1.2rem;max-width:1280px;margin:0 auto}
+.stage .panel{width:100%;max-width:420px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem;box-shadow:var(--shadow)}
 .panel h2{font-size:.95rem;margin:0 0 .7rem;color:var(--ink)}
 
@@ -56,40 +56,6 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .status-line{font-size:.68rem;color:#a08c7c;text-align:center;min-height:1em}
 .device-log{width:100%;max-height:120px;overflow:auto;font-size:.68rem;color:#a08c7c;line-height:1.6;border-top:1px dashed var(--line);padding-top:.5rem}
 
-/* ---- 网页大屏 ---- */
-.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:.85rem}
-@media (max-width:520px){.chips{grid-template-columns:repeat(2,1fr)}}
-.chip{background:var(--chip-bg);border-radius:10px;padding:.55rem .7rem}
-.chip .k{font-size:.68rem;color:var(--muted)}
-.chip .v{font-size:1.15rem;font-weight:600;color:#50382b}
-.chip .v.soon{color:var(--soon)} .chip .v.bad{color:var(--expired)}
-.tabs{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.7rem}
-.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:.32rem .8rem;font-size:.76rem;cursor:pointer;color:var(--muted)}
-.tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
-.inv-row{display:grid;grid-template-columns:1fr auto auto;gap:.6rem;align-items:center;padding:.5rem .65rem;border-bottom:1px solid var(--line)}
-.inv-row:last-child{border-bottom:0}
-.inv-name{font-size:.82rem;font-weight:500}
-.inv-meta{font-size:.68rem;color:var(--muted)}
-.badge{font-size:.66rem;border-radius:999px;padding:.12rem .5rem;font-weight:600}
-.badge.normal{background:#e7f6ec;color:#15803d}
-.badge.soon{background:#fdf0cd;color:#a86a17}
-.badge.expired{background:#fbeae7;color:#c93122}
-.inv-qty{display:flex;align-items:center;gap:.35rem}
-.qty-btn{border:1px solid var(--line);background:#fff;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:.8rem;line-height:1}
-.inv-sel{border:1px solid var(--line);border-radius:8px;font-size:.7rem;padding:.22rem .3rem;color:var(--ink);background:#fff}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
-@media (max-width:700px){.two-col{grid-template-columns:1fr}}
-.sec-title{font-size:.8rem;font-weight:600;color:#50382b;margin:.2rem 0 .5rem}
-.recipe-ok{color:#15803d;font-size:.8rem;line-height:1.8}
-.recipe-miss{color:var(--muted);font-size:.78rem;line-height:1.8}
-.recipe-miss b{color:#a86a17}
-.bar-row{display:flex;align-items:center;gap:.5rem;margin:.32rem 0;font-size:.72rem;color:var(--muted)}
-.bar-track{flex:1;background:#efe3d5;border-radius:6px;height:14px;overflow:hidden}
-.bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#ef5a41,#c93122)}
-.bar-val{width:2.4rem;text-align:right;font-variant-numeric:tabular-nums}
-.log-list{font-size:.72rem;color:#a08c7c;line-height:1.8;max-height:190px;overflow:auto}
-.log-list .in{color:#4d9a62}.log-list .out{color:#5b8fc9}.log-list .push{color:#a86a17}
-
 /* ---- 推送弹窗 ---- */
 .push-toast{position:fixed;top:1rem;right:1rem;width:300px;background:#fffdf9;border:1px solid var(--line);border-left:5px solid var(--soon);border-radius:12px;box-shadow:var(--shadow);padding:.8rem .95rem;z-index:50;animation:slideIn .35s ease}
 @keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
@@ -100,7 +66,7 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header class="topbar"><h1>食刻</h1><span>食刻在场 · 不浪费每一份食材 ｜ 硬件交互 Demo · 外置平板门外交互 · 内模组扫码识别（条码优先 + 语音播报）· 关门结算 → 网页大屏联动</span></header>
+<header class="topbar"><h1>食刻</h1><span>食刻在场 · 不浪费每一份食材 ｜ 硬件交互 Demo · 外置平板门外交互 · 内模组扫码识别（条码优先 + 语音播报）· 关门结算</span></header>
 
 <main class="stage">
   <!-- 硬件设备模拟 -->
@@ -158,44 +124,6 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     </div>
   </section>
 
-  <!-- 网页端大屏 -->
-  <section class="panel">
-    <h2>网页端大屏（软件端）</h2>
-    <div class="chips">
-      <div class="chip"><div class="k">库存件数</div><div class="v" id="statTotal">0</div></div>
-      <div class="chip"><div class="k">临期 ≤3 天</div><div class="v soon" id="statSoon">0</div></div>
-      <div class="chip"><div class="k">已过期</div><div class="v bad" id="statExpired">0</div></div>
-      <div class="chip"><div class="k">本月少浪费</div><div class="v" id="statSaved">0 件</div></div>
-    </div>
-
-    <div class="sec-title">库存 · 按容器分类（自动分类 + 可手动修改）</div>
-    <div class="tabs" id="tabs">
-      <button class="tab active" data-c="全部" type="button">全部</button>
-      <button class="tab" data-c="冰箱" type="button">冰箱</button>
-      <button class="tab" data-c="零食柜" type="button">零食柜</button>
-      <button class="tab" data-c="药盒" type="button">药盒</button>
-      <button class="tab" data-c="调料柜" type="button">调料柜</button>
-      <button class="tab" data-c="主食柜" type="button">主食柜</button>
-    </div>
-    <div id="invList"></div>
-
-    <div class="two-col">
-      <div>
-        <div class="sec-title">周度菜谱 · 能做的菜 / 还缺的菜</div>
-        <div class="recipe-ok" id="recipeOk"></div>
-        <div class="recipe-miss" id="recipeMiss"></div>
-      </div>
-      <div>
-        <div class="sec-title">月度统计 · 各容器件数</div>
-        <div id="monthChart"></div>
-        <div style="margin-top:.7rem">
-          <button class="tab" id="btnPush" type="button">模拟下班前推送</button>
-        </div>
-        <div class="sec-title" style="margin-top:.8rem">操作记录</div>
-        <div class="log-list" id="logList"></div>
-      </div>
-    </div>
-  </section>
 </main>
 
 <div id="pushToast" class="push-toast hidden">
@@ -211,10 +139,8 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   "use strict";
 
   /* ---------- 数据 ---------- */
-  var CONTAINERS = ["冰箱", "零食柜", "药盒", "调料柜", "主食柜"];
   var nextId = 100;
   var log = [];
-  var currentTab = "全部";
   var action = "in";            // in | out
   var scanCount = 0;
   var timers = [];
@@ -257,14 +183,6 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     { id: 11, name: "苹果", cat: "水果", container: "冰箱", qty: 3, expiry: daysFromNow(5), suggested: "冰箱" }
   ];
 
-  var recipes = [
-    { name: "牛奶燕麦粥", need: ["牛奶", "大米"] },
-    { name: "香煎豆腐", need: ["豆腐", "酱油"] },
-    { name: "番茄炒蛋", need: ["鸡蛋", "番茄"] },
-    { name: "苹果沙拉", need: ["苹果", "酸奶"] },
-    { name: "薯片拌酸奶杯", need: ["薯片", "酸奶"] }
-  ];
-
   var templates = [
     { name: "光明鲜牛奶", cat: "乳制品", shelf: 5, container: "冰箱" },
     { name: "老酸奶", cat: "乳制品", shelf: 7, container: "冰箱" },
@@ -287,10 +205,6 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     devMini: $("devMini"), devSession: $("devSession"), devRemind: $("devRemind"), deviceLog: $("deviceLog"),
     btnSettle: $("btnSettle"), btnSettleOk: $("btnSettleOk"),
     sumIn: $("sumIn"), sumOut: $("sumOut"), sumUnknown: $("sumUnknown"), sumHint: $("sumHint"),
-    invList: $("invList"), tabs: $("tabs"),
-    statTotal: $("statTotal"), statSoon: $("statSoon"), statExpired: $("statExpired"), statSaved: $("statSaved"),
-    recipeOk: $("recipeOk"), recipeMiss: $("recipeMiss"), monthChart: $("monthChart"),
-    logList: $("logList"), btnPush: $("btnPush"),
     pushToast: $("pushToast"), pushBody: $("pushBody"), pushClose: $("pushClose")
   };
 
@@ -453,111 +367,8 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     el.devRemind.textContent = parts.length ? "待机提醒：" + parts.join("，") : "待机：无临期 / 过期物品";
   }
 
-  /* ---------- 渲染：库存 ---------- */
-  function renderStats() {
-    el.statTotal.textContent = items.reduce(function (s, it) { return s + it.qty; }, 0);
-    el.statSoon.textContent = items.filter(function (it) { return status(it) === "soon"; }).length;
-    el.statExpired.textContent = items.filter(function (it) { return status(it) === "expired"; }).length;
-    el.statSaved.textContent = (3 + log.filter(function (l) { return l.type === "out"; }).length) + " 件";
-  }
-
-  function renderInventory() {
-    var list = items.slice().sort(function (a, b) { return daysLeft(a) - daysLeft(b); });
-    if (currentTab !== "全部") list = list.filter(function (it) { return it.container === currentTab; });
-    if (!list.length) {
-      el.invList.innerHTML = '<div style="font-size:.76rem;color:var(--muted);padding:.6rem">该容器暂无库存</div>';
-      return;
-    }
-    var html = "";
-    list.forEach(function (it) {
-      var st = status(it);
-      var badge = st === "expired" ? "expired" : (st === "soon" ? "soon" : "normal");
-      var label = st === "expired" ? "已过期 " + (-daysLeft(it)) + " 天" : (st === "soon" ? "剩 " + daysLeft(it) + " 天" : "剩 " + daysLeft(it) + " 天");
-      html += '<div class="inv-row">' +
-        '<div><div class="inv-name">' + it.name + '</div>' +
-        '<div class="inv-meta">' + it.cat + " · " + fmtDate(it.expiry) + '</div></div>' +
-        '<div style="display:flex;align-items:center;gap:.5rem">' +
-        '<span class="badge ' + badge + '">' + label + '</span>' +
-        '<select class="inv-sel" data-id="' + it.id + '" aria-label="修改容器">' +
-        CONTAINERS.map(function (c) {
-          return '<option value="' + c + '"' + (c === it.container ? " selected" : "") + ">" + c + "</option>";
-        }).join("") +
-        '</select></div>' +
-        '<div class="inv-qty">' +
-        '<button class="qty-btn" data-id="' + it.id + '" data-d="-1" type="button">−</button>' +
-        '<span style="min-width:1.2rem;text-align:center;font-size:.8rem">' + it.qty + '</span>' +
-        '<button class="qty-btn" data-id="' + it.id + '" data-d="1" type="button">+</button>' +
-        '</div></div>';
-    });
-    el.invList.innerHTML = html;
-  }
-
-  el.invList.addEventListener("change", function (e) {
-    var sel = e.target;
-    if (sel.classList.contains("inv-sel")) {
-      var it = items.find(function (x) { return x.id === Number(sel.dataset.id); });
-      if (it) {
-        it.container = sel.value;
-        pushLog("in", "手动修改容器：" + it.name + " → " + sel.value);
-        renderAll();
-      }
-    }
-  });
-  el.invList.addEventListener("click", function (e) {
-    var btn = e.target.closest(".qty-btn");
-    if (!btn) return;
-    var it = items.find(function (x) { return x.id === Number(btn.dataset.id); });
-    if (!it) return;
-    it.qty += Number(btn.dataset.d);
-    if (it.qty <= 0) items = items.filter(function (x) { return x !== it; });
-    pushLog(Number(btn.dataset.d) > 0 ? "in" : "out", (Number(btn.dataset.d) > 0 ? "手动 +1：" : "手动 -1：") + it.name);
-    renderAll();
-  });
-
-  /* ---------- 容器 Tabs ---------- */
-  el.tabs.addEventListener("click", function (e) {
-    var btn = e.target.closest(".tab");
-    if (!btn) return;
-    currentTab = btn.dataset.c;
-    el.tabs.querySelectorAll(".tab").forEach(function (b) { b.classList.toggle("active", b === btn); });
-    renderInventory();
-  });
-
-  /* ---------- 菜谱 ---------- */
-  function hasStock(name) {
-    return items.some(function (it) {
-      return it.name.indexOf(name) >= 0 && it.qty > 0 && status(it) !== "expired";
-    });
-  }
-  function renderRecipes() {
-    var ok = [], miss = [];
-    recipes.forEach(function (r) {
-      var missing = r.need.filter(function (ing) { return !hasStock(ing); });
-      if (missing.length === 0) ok.push(r.name);
-      else miss.push(r.name + "（缺：" + missing.join("、") + "）");
-    });
-    el.recipeOk.innerHTML = ok.length ? ok.map(function (n) { return "✔ " + n; }).join("<br>") : '<span style="color:var(--muted)">暂无完全可做的菜</span>';
-    el.recipeMiss.innerHTML = miss.length ? miss.map(function (n) { return "○ " + n; }).join("<br>") : "";
-  }
-
-  /* ---------- 月度统计 ---------- */
-  function renderMonth() {
-    var counts = CONTAINERS.map(function (c) {
-      return { c: c, n: items.filter(function (it) { return it.container === c; }).reduce(function (s, it) { return s + it.qty; }, 0) };
-    });
-    var max = Math.max(1, Math.max.apply(null, counts.map(function (x) { return x.n; })));
-    el.monthChart.innerHTML = counts.map(function (x) {
-      return '<div class="bar-row"><span style="width:3.2rem">' + x.c + '</span>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:' + Math.round(x.n / max * 100) + '%"></div></div>' +
-        '<span class="bar-val">' + x.n + '</span></div>';
-    }).join("");
-  }
-
   /* ---------- 操作记录 ---------- */
   function renderLog() {
-    el.logList.innerHTML = log.slice(0, 20).map(function (l) {
-      return '<div class="' + l.type + '">' + l.time + " · " + l.text + "</div>";
-    }).join("") || '<span style="color:var(--muted)">暂无操作记录</span>';
     el.deviceLog.innerHTML = log.slice(0, 6).map(function (l) {
       return (l.type === "in" ? "▲ " : l.type === "out" ? "▼ " : "◎ ") + l.time + " " + l.text;
     }).join("<br>");
@@ -576,15 +387,10 @@ canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     pushLog("push", "下班前推送：剩余食材 + 补货清单");
     renderLog();
   }
-  el.btnPush.addEventListener("click", showPush);
   el.pushClose.addEventListener("click", function () { el.pushToast.classList.add("hidden"); });
 
-  /* ---------- 汇总 ---------- */
+  /* ---------- 汇总刷新 ---------- */
   function renderAll() {
-    renderStats();
-    renderInventory();
-    renderRecipes();
-    renderMonth();
     renderLog();
     updateDeviceIdle();
   }

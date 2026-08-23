@@ -4,7 +4,7 @@
 
 ```text
 frontend/
-├── demos/       # 对外演示页（H5 手机端 / 大屏 / 硬件交互 Demo）
+├── demos/       # 对外演示页（H5 手机端 / 硬件交互 Demo）
 └── tablet-ui/   # 外置平板（T5-E1）v1 界面参考（给烧录 AI）+ previews 截图
 ```
 
@@ -13,8 +13,9 @@ frontend/
 | 文件 | 说明 |
 |---|---|
 | [食刻-H5手机端.html](demos/食刻-H5手机端.html) | 手机端 H5：首页 / 扫描 / 库存 / 菜谱 / 我的 |
-| [食刻-WebDemo.html](demos/食刻-WebDemo.html) | 大屏版：库存排行 / 临期提醒 / 周度菜谱 / 月度统计 |
 | [食刻-硬件交互Demo.html](demos/食刻-硬件交互Demo.html) | 硬件交互模拟（HW-v1 门外交互屏流程） |
+
+> 网页端仅 H5 一个界面（无独立大屏版）；旧「食刻-WebDemo.html」已归档至 [archive/](../archive/食刻-WebDemo.html)（仅本地）。
 
 ## tablet-ui/（设备界面参考）
 
