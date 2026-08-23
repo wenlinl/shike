@@ -25,8 +25,8 @@ h1{font-size:24px;margin-bottom:4px}
 <h1>食刻 · 硬件界面参考总览</h1>
 <div class="sub">目标板 T5-E1 · ST7789 240×320 触控彩屏 · 每个文件均为独立界面（240×320），文件内附实现说明。</div>
 <div class="flow">
-  <b>状态机：</b>BOOT（启动页）→ IDLE（待机）→ SCAN（拍照倒计时）→ RECOGNIZING（识别中）→ RESULT in/out（识别结果）→ 回 IDLE<br>
-  兜底：LOW_CONF（没看清重拍）｜NET_FAIL（网络错误重试）｜OFFLINE（断网本地模式）
+  <b>状态机（v1）：</b>BOOT（启动页）→ STANDBY（待机：放入/取出 + 临期提醒）→ WAIT_SCAN（等待扫码，内模组完成识别）→ RESULT in/out（结果同步展示）→ 回 STANDBY<br>
+  辅助：STOCK（库存列表）｜SUMMARY（汇总待确认）｜OFFLINE（断网本地模式）
 </div>
 <div class="grid" id="grid"></div>
 <div class="note">
@@ -36,19 +36,18 @@ h1{font-size:24px;margin-bottom:4px}
 <script>
 const IMG = "../../../media/软件示意图/硬件设备界面/";
 const screens = [
-  ["01-待机页.html","IDLE 待机页","放入/取出 + 临期提醒"],
-  ["02-拍照倒计时.html","SCAN 倒计时","3→2→1 半透明大数字"],
-  ["03-识别中.html","RECOGNIZING","正在识别… 15s 超时"],
-  ["04-识别结果-放入.html","RESULT 放入","品名/保质期/容器确认"],
-  ["05-识别结果-取出.html","RESULT 取出","出库确认 库存 −1"],
-  ["06-识别失败-重拍.html","LOW_CONF","没看清，重新扫描"],
-  ["07-网络错误.html","NET_FAIL","网络不好，重试"],
-  ["08-断网离线.html","OFFLINE","本地库存 + 重连"],
-  ["09-启动页.html","BOOT 启动页","品牌 + 连接云端"]
+  ["01-待机页.html","STANDBY 待机页","放入/取出 + 临期提醒"],
+  ["02-等待扫码.html","WAIT_SCAN 等待扫码","已通知内模组，轮询结果"],
+  ["03-识别结果-放入.html","RESULT 放入","内模组扫码结果同步"],
+  ["04-识别结果-取出.html","RESULT 取出","内模组扫码结果同步"],
+  ["05-库存页.html","STOCK 库存页","临期/过期置顶列表"],
+  ["06-汇总待确认.html","SUMMARY 汇总","放入/取出/未识别 + 确认"],
+  ["07-断网离线.html","OFFLINE 断网","本地库存 + 重连"],
+  ["08-启动页.html","BOOT 启动页","品牌 + 连接云端"]
 ];
 document.getElementById("grid").innerHTML = screens.map(s => `
   <a class="cell" href="${s[0]}">
-    <img src="${IMG}${s[0].replace('.html','.png')}" alt="${s[1]}">
+    <img src="${IMG}${s[0].replace('.html','.png')}" alt="${s[1]}" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div style=width:120px;height:160px;border:1px dashed #d8c8b5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#a08c7c;font-size:10px>PNG 待更新</div>')">
     <div class="n">${s[1]}</div>
     <div class="d">${s[2]}</div>
   </a>`).join("");

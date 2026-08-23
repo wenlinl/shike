@@ -42,22 +42,23 @@ body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"
     <button class="btn in">＋ 放入食材</button>
     <button class="btn out">－ 取出食材</button>
   </div>
-  <div class="mini"><span>冰箱 <b>12</b> 种</span><span>临期 <b>3</b></span><span>成员 <b>4</b></span><span>本月省 <b>¥42</b></span></div>
+  <div class="mini"><span>冰箱 <b>12</b> 种</span><span>临期 <b>3</b></span><span>成员 <b>4</b></span></div>
   <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
 </div>
 <div class="spec" id="spec">
   <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
   <h2>实现说明（给烧录 AI）</h2>
-  固件状态：<b>IDLE</b>（开机或任意流程结束后回到本页）。数据来自 <code>GET /reminders</code> 与 <code>GET /items</code>。
+  固件状态：<b>STANDBY</b>（开机或任意流程结束后回到本页）。数据来自 <code>GET /api/reminders</code> 与 <code>GET /api/items</code>。
   <table>
     <tr><th>元素</th><th>规格</th></tr>
     <tr><td>状态条</td><td>高 24px；左侧当前时间，右侧日期；● 在线/离线指示</td></tr>
     <tr><td>临期提醒</td><td>圆角 14px，浅橙底 #fdf0cd；显示临期/过期数量与置顶 2–3 项</td></tr>
     <tr><td>【放入】按钮</td><td>86px 高、圆角 20px、红色渐变；触控目标整块</td></tr>
     <tr><td>【取出】按钮</td><td>86px 高、白底红描边 2px；与放入按钮间距 12px</td></tr>
-    <tr><td>底部统计</td><td>9px 次要文字，一行四列</td></tr>
+    <tr><td>底部统计</td><td>9px 次要文字，一行三列（冰箱种数 / 临期 / 成员）；"本月省 ¥"暂不展示（无数据源）</td></tr>
   </table>
-  动作：点【放入】→ action=in → 进 SCAN；点【取出】→ action=out → 进 SCAN。
+  动作：点【放入】→ <code>POST /api/device/task {"deviceId":"shike-xiao-001","action":"in"}</code>（带 <code>X-Device-Token</code>）→ 进 WAIT_SCAN；
+  点【取出】→ action=out → 进 WAIT_SCAN。扫码识别由内模组完成，平板不再拍照。
 </div>
 </body>
 </html>
