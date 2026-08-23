@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 04 识别结果-取出 (240×320)</title>
+<style>
+:root{--bg:#f8f1e9;--card:#fffdf9;--ink:#50382b;--ink2:#a08c7c;--line:#efe3d5;--red:#e23c2b;--blue-soft:#deeefc;--blue:#3f76ad}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.stat{height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:10px;color:var(--ink2)}
+.ok{margin:6px 12px 0;background:var(--blue-soft);border-radius:12px;padding:6px 10px;font-size:10.5px;color:var(--blue);font-weight:700;display:flex;align-items:center;gap:5px}
+.name{padding:6px 12px 2px;font-size:22px;font-weight:800;color:var(--ink);display:flex;align-items:baseline;gap:6px}
+.name small{font-size:9.5px;color:var(--blue);font-weight:600}
+.card{background:var(--card);border-radius:16px;margin:2px 12px;padding:7px 10px;box-shadow:0 2px 8px rgba(126,86,57,.07)}
+.row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;color:var(--ink2)}
+.row b{color:var(--ink);font-weight:600}
+.row .red{color:var(--red);font-weight:700}
+.btns{padding:8px 12px 5px;display:flex;flex-direction:column;gap:7px;margin-top:auto}
+.btn{height:46px;border-radius:16px;font-size:15px;font-weight:800;border:0;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.out{background:var(--ink);color:#fff;box-shadow:0 6px 12px rgba(80,56,43,.22)}
+.btn.ghost{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+.note{font-size:8.5px;color:var(--ink2);text-align:center;padding-bottom:4px}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:var(--ink);margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="stat"><span>08:30</span><span>●</span><span>08-16 周六</span></div>
+  <div class="ok">✓ 内模组识别成功 · 取出</div>
+  <div class="name">光明鲜牛奶 <small>已出库</small></div>
+  <div class="card">
+    <div class="row"><span>当前时间</span><b>2026-08-16 08:30</b></div>
+    <div class="row"><span>原库存</span><b>2 瓶</b></div>
+    <div class="row"><span>取出后</span><b>1 瓶</b></div>
+    <div class="row"><span>到期日</span><b>08-17 · <span class="red">剩 2 天</span></b></div>
+  </div>
+  <div class="btns">
+    <button class="btn out">✓ 完成，回待机</button>
+  </div>
+  <div class="note">库存 −1 · 已自动入账 · 由内模组扫码识别</div>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>RESULT(out)</b>。数据来自 <code>GET /api/scan/latest</code>（内模组扫码事件，action=out）；入账由内模组扫码时自动完成，本页仅同步展示。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>模式标签</td><td>浅蓝底蓝字：内模组识别成功 · 取出（与放入的绿色区分）</td></tr>
+    <tr><td>信息卡</td><td>当前时间 / 原库存 / 取出后 / 到期日（字段随 scan/latest 契约确认）</td></tr>
+    <tr><td>完成</td><td>深棕底主按钮 → 回 STANDBY；库存 −1 已由内模组扫码完成</td></tr>
+  </table>
+</div>
+</body>
+</html>

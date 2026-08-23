@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 01 待机页 (240×320)</title>
+<style>
+:root{--bg:#f8f1e9;--card:#fffdf9;--ink:#50382b;--ink2:#a08c7c;--red:#e23c2b;--red-d:#c93122;--amber-soft:#fdf0cd}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.stat{height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:10px;color:var(--ink2)}
+.stat .conn{color:#4d9a62;font-size:8px}
+.brand{display:flex;align-items:baseline;gap:6px;padding:4px 12px 6px}
+.brand .logo{font-size:22px;font-weight:800;color:var(--red);letter-spacing:1px}
+.brand .tag{font-size:9px;color:var(--ink2)}
+.remind{background:var(--amber-soft);border-radius:14px;margin:0 10px;padding:7px 10px}
+.remind b{font-size:11.5px;color:var(--ink);display:block}
+.remind span{font-size:9.5px;color:#a06b1c;display:block;margin-top:3px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btns{padding:12px 12px 4px;display:flex;flex-direction:column;gap:10px;flex:1}
+.btn{height:76px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:19px;font-weight:800;border:0}
+.btn.in{background:linear-gradient(135deg,#ef5a41,#c93122);color:#fff;box-shadow:0 8px 16px rgba(201,49,34,.28)}
+.btn.out{background:var(--card);color:var(--red);border:2px solid var(--red)}
+.mini{display:flex;justify-content:space-around;padding:4px 8px 8px;font-size:9px;color:var(--ink2)}
+.mini b{color:var(--ink)}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:var(--ink);margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="stat"><span>08:30</span><span class="conn">● 在线</span><span>08-16 周六</span></div>
+  <div class="brand"><span class="logo">食刻</span><span class="tag">让每一餐都新鲜安心</span></div>
+  <div class="remind"><b>3 种食材即将过期</b><span>西兰花剩1天 · 牛肉今天到期 · 点击查看</span></div>
+  <div class="btns">
+    <button class="btn in">＋ 放入食材</button>
+    <button class="btn out">－ 取出食材</button>
+  </div>
+  <div class="mini"><span>冰箱 <b>12</b> 种</span><span>临期 <b>3</b></span><span>成员 <b>4</b></span></div>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>STANDBY</b>（开机或任意流程结束后回到本页）。数据来自 <code>GET /api/reminders</code> 与 <code>GET /api/items</code>。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>状态条</td><td>高 24px；左侧当前时间，右侧日期；● 在线/离线指示</td></tr>
+    <tr><td>临期提醒</td><td>圆角 14px，浅橙底 #fdf0cd；显示临期/过期数量与置顶 2–3 项</td></tr>
+    <tr><td>【放入】按钮</td><td>86px 高、圆角 20px、红色渐变；触控目标整块</td></tr>
+    <tr><td>【取出】按钮</td><td>86px 高、白底红描边 2px；与放入按钮间距 12px</td></tr>
+    <tr><td>底部统计</td><td>9px 次要文字，一行三列（冰箱种数 / 临期 / 成员）；"本月省 ¥"暂不展示（无数据源）</td></tr>
+  </table>
+  动作：点【放入】→ <code>POST /api/device/task {"deviceId":"shike-xiao-001","action":"in"}</code>（带 <code>X-Device-Token</code>）→ 进 WAIT_SCAN；
+  点【取出】→ action=out → 进 WAIT_SCAN。扫码识别由内模组完成，平板不再拍照。
+</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 06 汇总待确认 (240×320)</title>
+<style>
+:root{--bg:#f8f1e9;--card:#fffdf9;--ink:#50382b;--ink2:#a08c7c;--line:#efe3d5;--red:#e23c2b;--red-d:#c93122;--amber-soft:#fdf0cd;--amber:#a06b1c;--green2:#3d7f50}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.stat{height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:10px;color:var(--ink2)}
+.head{padding:2px 12px 4px;font-size:15px;font-weight:800;color:var(--ink)}
+.counts{display:flex;gap:5px;padding:0 12px 6px}
+.cnt{flex:1;background:var(--card);border-radius:10px;padding:5px 2px;text-align:center;box-shadow:0 2px 6px rgba(126,86,57,.06)}
+.cnt .v{font-size:15px;font-weight:800;color:var(--ink)}
+.cnt .k{font-size:8px;color:var(--ink2);margin-top:1px}
+.cnt.warn .v{color:var(--red)}
+.warnbar{background:var(--amber-soft);border-radius:12px;margin:0 12px 6px;padding:6px 10px;font-size:10px;color:var(--amber)}
+.issues{flex:1;margin:0 12px 8px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.issue{background:var(--card);border-radius:12px;padding:8px 10px;box-shadow:0 2px 6px rgba(126,86,57,.06)}
+.issue .row{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--ink)}
+.issue .tag{font-size:8.5px;background:#f6ede2;color:var(--ink2);border-radius:999px;padding:2px 7px}
+.issue .ops{display:flex;gap:6px;margin-top:6px}
+.issue .op{flex:1;text-align:center;font-size:10px;padding:5px 0;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink2)}
+.issue .op.ok{background:var(--green2);border-color:var(--green2);color:#fff}
+.issue .op.no{color:var(--red);border-color:var(--red)}
+.btns{padding:2px 12px 10px}
+.btn{height:44px;border-radius:15px;font-size:14px;font-weight:800;border:0;width:100%;background:linear-gradient(135deg,#ef5a41,#c93122);color:#fff;box-shadow:0 6px 12px rgba(201,49,34,.25)}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:var(--ink);margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="stat"><span>12:05</span><span>● 在线</span><span>08-16 周六</span></div>
+  <div class="head">关门结算</div>
+  <div class="counts">
+    <div class="cnt"><div class="v">3</div><div class="k">放入</div></div>
+    <div class="cnt"><div class="v">1</div><div class="k">取出</div></div>
+    <div class="cnt"><div class="v">1</div><div class="k">中途取出</div></div>
+    <div class="cnt warn"><div class="v">2</div><div class="k">未识别</div></div>
+  </div>
+  <div class="warnbar">⚠ 有 3 项需要确认，其余已自动入账</div>
+  <div class="issues">
+    <div class="issue">
+      <div class="row"><span>未识别 × 2</span><span class="tag">抓拍</span></div>
+      <div class="ops"><span class="op no">取出了什么？</span><span class="op ok">✓ 确认</span></div>
+    </div>
+    <div class="issue">
+      <div class="row"><span>光明鲜牛奶 · 疑似重复</span><span class="tag">扫码</span></div>
+      <div class="ops"><span class="op no">× 忽略</span><span class="op ok">✓ 确认</span></div>
+    </div>
+  </div>
+  <div class="btns"><button class="btn">✓ 全部确认</button></div>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>SUMMARY</b>。关门结算后云端生成批次；全高置信 → 静默入账不进本页；有可疑项才进入（设计基线 §3.4 触发分级）。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>顶部统计</td><td>放入 / 取出 / 中途取出 / 未识别 四格；未识别 >0 红色强调</td></tr>
+    <tr><td>可疑项</td><td>每项含来源标签（扫码/抓拍）与操作：确认 / 忽略 / "取出了什么？"修正</td></tr>
+    <tr><td>数据接口</td><td><code>GET /api/summary/pending</code>（待补）；确认提交 <code>POST /api/summary/confirm</code>（待补，逐条 + 全部）</td></tr>
+    <tr><td>全部确认</td><td>红色渐变主按钮 → 提交后回 STANDBY；失败保留本页可重试</td></tr>
+    <tr><td>离线</td><td>断网显示"稍后确认"，批次在云端保留，下次联网仍可见</td></tr>
+  </table>
+</div>
+</body>
+</html>

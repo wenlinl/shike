@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>食刻 · 硬件界面 02 等待扫码 (240×320)</title>
+<style>
+:root{--bg:#f8f1e9;--card:#fffdf9;--ink:#50382b;--ink2:#a08c7c;--line:#efe3d5;--red:#e23c2b;--red-d:#c93122;--amber-soft:#fdf0cd;--amber:#a06b1c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:240px;height:320px;overflow:hidden;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.stat{height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:10px;color:var(--ink2)}
+.stat .conn{color:#4d9a62;font-size:8px}
+.action{margin:8px 12px 0;border-radius:16px;padding:8px 10px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
+.action.in{background:linear-gradient(135deg,#ef5a41,#c93122);color:#fff;box-shadow:0 6px 12px rgba(201,49,34,.25)}
+.action.out{background:#fff;color:var(--red);border:2px solid var(--red)}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0 18px}
+.pulse{width:58px;height:58px;border-radius:50%;background:var(--red);opacity:.12;position:relative}
+.pulse::after{content:"";position:absolute;inset:12px;border-radius:50%;background:linear-gradient(135deg,#ef5a41,#c93122)}
+.hint{font-size:14px;font-weight:700;color:var(--ink);text-align:center;line-height:1.5}
+.sub{font-size:10px;color:var(--ink2);text-align:center;line-height:1.6}
+.offline{background:var(--amber-soft);border-radius:12px;margin:0 14px;padding:6px 10px;font-size:9.5px;color:var(--amber);text-align:center}
+.cancel{margin:8px 12px 12px;height:40px;border-radius:14px;background:#fff;color:var(--ink2);border:1px solid var(--line);font-size:12px;font-weight:700}
+.spec-btn{position:absolute;top:4px;right:4px;z-index:30;width:18px;height:18px;border-radius:50%;border:0;background:rgba(80,56,43,.5);color:#fff;font-size:11px;font-weight:700;line-height:18px;cursor:pointer}
+.spec{display:none;position:absolute;inset:0;z-index:40;background:rgba(248,241,233,.985);padding:20px 12px 28px;font-size:11.5px;color:#5f4f42;line-height:1.65;overflow:auto}
+.spec.open{display:block}
+.spec h2{font-size:13px;color:var(--ink);margin-bottom:4px}
+.spec table{border-collapse:collapse;width:100%;margin-top:6px}
+.spec td,.spec th{border:1px solid #e2d5c5;padding:4px 6px;text-align:left;font-size:10.5px;vertical-align:top}
+.spec th{background:#f6ede2}
+.spec code{background:#f6ede2;padding:0 3px;border-radius:4px}
+.spec-close{position:absolute;top:8px;right:10px;border:0;background:#f6ede2;width:22px;height:22px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="stat"><span>08:30</span><span class="conn">● 在线</span><span>08-16 周六</span></div>
+  <div class="action in">＋ 正在放入</div>
+  <div class="stage">
+    <div class="pulse"></div>
+    <div class="hint">已通知内模组<br>请把食材条码对准镜头</div>
+    <div class="sub">识别结果将语音播报并在本屏显示<br>可连续扫描多件，无需逐件确认</div>
+  </div>
+  <div class="offline">内模组离线 · 扫码不可用（以本地库存为准）</div>
+  <button class="cancel">取消，回待机</button>
+  <button class="spec-btn" onclick="document.getElementById('spec').classList.toggle('open')">i</button>
+</div>
+<div class="spec" id="spec">
+  <button class="spec-close" onclick="document.getElementById('spec').classList.remove('open')">×</button>
+  <h2>实现说明（给烧录 AI）</h2>
+  固件状态：<b>WAIT_SCAN</b>。用户在待机页点【放入】/【取出】→ <code>POST /api/device/task</code> 成功后进入本页；扫码由内模组完成（条码优先 + 语音）。
+  <table>
+    <tr><th>元素</th><th>规格</th></tr>
+    <tr><td>动作徽标</td><td>放入=红渐变实心；取出=白底红描边（与待机页按钮同色系）</td></tr>
+    <tr><td>等待动画</td><td>静态红点即可（参考页示意呼吸动画）；内模组语音为主反馈</td></tr>
+    <tr><td>结果同步</td><td>每 2–3s 轮询 <code>GET /api/scan/latest?deviceId=xzd-t5e1-001</code>；有结果 → RESULT(in/out)；15s 无结果 → 提示后回 STANDBY</td></tr>
+    <tr><td>内模组离线</td><td>浅橙条提示；离线时显示本地最近库存，扫描入口禁用（与 OFFLINE 页一致）</td></tr>
+    <tr><td>取消</td><td>白底灰字 → 回 STANDBY（动作保留在云端，下次点按钮覆盖）</td></tr>
+  </table>
+</div>
+</body>
+</html>

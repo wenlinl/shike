@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>食刻 · 硬件交互 Demo</title>
+<style>
+:root{
+  --bg:#f8f1e9; --panel:#fffdf9; --ink:#50382b; --muted:#a08c7c;
+  --line:#efe3d5; --brand:#e23c2b; --brand2:#c93122;
+  --soon:#e8913c; --expired:#c93122; --ok:#4d9a62;
+  --chip-bg:#f3e7da; --shadow:0 10px 28px rgba(126,86,57,.12);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:0 0 2rem}
+.topbar{display:flex;align-items:baseline;gap:.8rem;flex-wrap:wrap;padding:.9rem 1.2rem;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff}
+.topbar h1{font-size:1.25rem;margin:0}
+.topbar span{font-size:.8rem;opacity:.85}
+.stage{display:flex;flex-direction:column;align-items:center;gap:1.1rem;padding:1.1rem 1.2rem;max-width:1280px;margin:0 auto}
+.stage .panel{width:100%;max-width:420px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem;box-shadow:var(--shadow)}
+.panel h2{font-size:.95rem;margin:0 0 .7rem;color:var(--ink)}
+
+/* ---- 设备模拟 ---- */
+.device-wrap{display:flex;flex-direction:column;align-items:center;gap:.8rem}
+.device{width:272px;height:363px;border-radius:26px;background:#2a2018;padding:14px;box-shadow:inset 0 0 0 2px #4a3b2d, 0 16px 34px rgba(70,45,25,.35)}
+.screen{position:relative;width:100%;height:100%;border-radius:12px;overflow:hidden;background:#f8f1e9}
+.dev-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.65rem;padding:1rem;text-align:center;color:#50382b}
+.hidden{display:none !important}
+.dev-logo{font-size:1.05rem;font-weight:600;letter-spacing:.35em;color:#e23c2b;margin-top:.5rem}
+.dev-sub{font-size:.68rem;color:#a08c7c}
+.dev-btns{display:flex;gap:.7rem;margin-top:.6rem}
+.dev-btn{border:0;border-radius:12px;padding:.85rem 1.25rem;font-size:1.05rem;font-weight:600;color:#fff;cursor:pointer;min-width:96px}
+.dev-btn.in{background:linear-gradient(180deg,#ef5a41,#c93122)}
+.dev-btn.out{background:#fffdf9;border:2px solid var(--brand);color:var(--brand)}
+.dev-btn:active{transform:scale(.97)}
+.dev-mini{margin-top:.5rem;font-size:.68rem;color:#a86a17;background:rgba(232,145,60,.18);padding:.25rem .6rem;border-radius:999px}
+.dev-remind{font-size:.66rem;color:#a08c7c;max-width:210px}
+canvas#camCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cam-tip{position:absolute;top:.65rem;left:50%;transform:translateX(-50%);font-size:.66rem;color:#50382b;background:rgba(80,56,43,.08);padding:.25rem .6rem;border-radius:999px;white-space:nowrap}
+.count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:200px;font-weight:700;color:#fff;opacity:.36;text-shadow:0 4px 18px rgba(0,0,0,.5);pointer-events:none}
+.cam-actions{position:absolute;bottom:.7rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem}
+.ghost-btn{border:1px solid var(--brand);background:rgba(226,60,43,.06);color:var(--brand);border-radius:10px;padding:.45rem .8rem;font-size:.72rem;cursor:pointer}
+.upload-box{display:flex;flex-direction:column;align-items:center;gap:.8rem}
+.ring{width:52px;height:52px;border-radius:50%;border:5px solid rgba(226,60,43,.25);border-top-color:#e23c2b;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.res-card{width:100%;background:#fffdf9;border:1px solid #efe3d5;border-radius:12px;padding:.8rem .9rem;text-align:left}
+.res-name{font-size:1rem;font-weight:600;color:#50382b;margin-bottom:.35rem}
+.res-row{font-size:.72rem;color:#a08c7c;line-height:1.7}
+.res-row b{color:#c93122;font-weight:600}
+.res-exp{font-size:.78rem;color:#a86a17;margin-top:.3rem}
+.res-actions{display:flex;gap:.5rem;margin-top:.7rem}
+.dev-btn.ok{background:linear-gradient(180deg,#4d9a62,#3d7f50);min-width:96px}
+.status-line{font-size:.68rem;color:#a08c7c;text-align:center;min-height:1em}
+.device-log{width:100%;max-height:120px;overflow:auto;font-size:.68rem;color:#a08c7c;line-height:1.6;border-top:1px dashed var(--line);padding-top:.5rem}
+
+/* ---- 推送弹窗 ---- */
+.push-toast{position:fixed;top:1rem;right:1rem;width:300px;background:#fffdf9;border:1px solid var(--line);border-left:5px solid var(--soon);border-radius:12px;box-shadow:var(--shadow);padding:.8rem .95rem;z-index:50;animation:slideIn .35s ease}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+.push-toast h3{font-size:.82rem;margin:0 0 .3rem;color:var(--ink)}
+.push-toast p{font-size:.74rem;margin:.15rem 0;color:#a08c7c}
+.push-close{position:absolute;top:.45rem;right:.6rem;border:0;background:none;font-size:1rem;cursor:pointer;color:var(--muted)}
+.foot-note{max-width:1280px;margin:.4rem auto 0;padding:0 1.2rem;font-size:.72rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="topbar"><h1>食刻</h1><span>食刻在场 · 不浪费每一份食材 ｜ 硬件交互 Demo · 外置平板门外交互 · 内模组扫码识别（条码优先 + 语音播报）· 关门结算</span></header>
+
+<main class="stage">
+  <!-- 硬件设备模拟 -->
+  <section class="panel">
+    <h2>硬件屏幕（T5-E1 模拟）</h2>
+    <div class="device-wrap">
+      <div class="device">
+        <div class="screen" id="deviceScreen">
+          <div id="devIdle" class="dev-state">
+            <div class="dev-logo">食刻</div>
+            <div class="dev-sub">冰箱 · 零食柜 · 药盒 · 调料柜 · 主食柜</div>
+            <div class="dev-btns">
+              <button class="dev-btn in" id="btnIn" type="button">放入</button>
+              <button class="dev-btn out" id="btnOut" type="button">取出</button>
+            </div>
+            <div class="dev-mini" id="devMini"></div>
+            <div class="dev-mini" id="devSession" style="background:rgba(226,60,43,.12);color:#c93122">本次会话：暂无</div>
+            <div class="dev-remind" id="devRemind">待机：常显临期 / 过期提醒</div>
+            <button class="ghost-btn" id="btnSettle" type="button" style="margin-top:.5rem">模拟关门结算</button>
+          </div>
+
+          <div id="devCam" class="dev-state hidden">
+            <div class="ring"></div>
+            <div class="status-line" style="color:#50382b" id="camTip">已通知内模组 · 请将食材对准门内镜头</div>
+            <div class="cam-actions" id="camActions">
+              <button class="ghost-btn" id="btnCancel" type="button">取消</button>
+            </div>
+          </div>
+
+          <div id="devResult" class="dev-state hidden">
+            <div class="res-card">
+              <div class="res-name" id="resName"></div>
+              <div class="res-row" id="resMeta"></div>
+              <div class="res-exp" id="resExp"></div>
+            </div>
+            <div class="res-actions">
+              <button class="dev-btn ok" id="btnConfirm" type="button">完成</button>
+              <button class="ghost-btn" id="btnReshoot" type="button">再扫一次</button>
+            </div>
+          </div>
+
+          <div id="devSummary" class="dev-state hidden">
+            <div class="res-card">
+              <div class="res-name">关门结算 · 汇总确认</div>
+              <div class="res-row">放入 <b id="sumIn">0</b> 件 · 取出 <b id="sumOut">0</b> 件 · 未识别 <b id="sumUnknown">0</b> 件</div>
+              <div class="res-exp" id="sumHint">连续扫码已入会话，一键确认即入账</div>
+            </div>
+            <div class="res-actions">
+              <button class="dev-btn ok" id="btnSettleOk" type="button">一键确认</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="device-log" id="deviceLog"></div>
+    </div>
+  </section>
+
+</main>
+
+<div id="pushToast" class="push-toast hidden">
+  <button class="push-close" id="pushClose" type="button" aria-label="关闭">×</button>
+  <h3>下班前提醒</h3>
+  <p id="pushBody"></p>
+</div>
+
+<div class="foot-note">说明：本页为 HW-v1 门外交互屏模拟——外置平板只做动作下发 / 结果显示，识别由内模组完成（条码优先 + 视觉兜底 + 语音"叮"声），关门结算一次确认；识别结果由演示数据生成。</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- 数据 ---------- */
+  var nextId = 100;
+  var log = [];
+  var action = "in";            // in | out
+  var scanCount = 0;
+  var timers = [];
+  var session = { in: [], out: [] };   // 本次会话：关门结算时统一入账
+
+  function daysFromNow(n) {
+    var d = new Date();
+    d.setDate(d.getDate() + n);
+    return d;
+  }
+  function fmtDate(d) {
+    var p = function (x) { return (x < 10 ? "0" : "") + x; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  function fmtDateTime(d) {
+    var p = function (x) { return (x < 10 ? "0" : "") + x; };
+    return fmtDate(d) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  function daysLeft(item) {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var exp = new Date(item.expiry); exp.setHours(0, 0, 0, 0);
+    return Math.round((exp - today) / 86400000);
+  }
+  function status(item) {
+    var dl = daysLeft(item);
+    return dl < 0 ? "expired" : (dl <= 3 ? "soon" : "normal");
+  }
+
+  var items = [
+    { id: 1, name: "光明鲜牛奶", cat: "乳制品", container: "冰箱", qty: 1, expiry: daysFromNow(2), suggested: "冰箱" },
+    { id: 2, name: "老酸奶", cat: "乳制品", container: "冰箱", qty: 2, expiry: daysFromNow(4), suggested: "冰箱" },
+    { id: 3, name: "内酯豆腐", cat: "豆制品", container: "冰箱", qty: 1, expiry: daysFromNow(1), suggested: "冰箱" },
+    { id: 4, name: "剩菜（青椒肉丝）", cat: "熟食", container: "冰箱", qty: 1, expiry: daysFromNow(-1), suggested: "冰箱" },
+    { id: 5, name: "鸡蛋", cat: "蛋类", container: "冰箱", qty: 6, expiry: daysFromNow(6), suggested: "冰箱" },
+    { id: 6, name: "薯片", cat: "零食", container: "零食柜", qty: 1, expiry: daysFromNow(18), suggested: "零食柜" },
+    { id: 7, name: "坚果混合装", cat: "零食", container: "零食柜", qty: 1, expiry: daysFromNow(45), suggested: "零食柜" },
+    { id: 8, name: "感冒灵颗粒", cat: "药品", container: "药盒", qty: 1, expiry: daysFromNow(120), suggested: "药盒" },
+    { id: 9, name: "酱油", cat: "调味品", container: "调料柜", qty: 1, expiry: daysFromNow(90), suggested: "调料柜" },
+    { id: 10, name: "大米", cat: "主食", container: "主食柜", qty: 1, expiry: daysFromNow(200), suggested: "主食柜" },
+    { id: 11, name: "苹果", cat: "水果", container: "冰箱", qty: 3, expiry: daysFromNow(5), suggested: "冰箱" }
+  ];
+
+  var templates = [
+    { name: "光明鲜牛奶", cat: "乳制品", shelf: 5, container: "冰箱" },
+    { name: "老酸奶", cat: "乳制品", shelf: 7, container: "冰箱" },
+    { name: "内酯豆腐", cat: "豆制品", shelf: 2, container: "冰箱" },
+    { name: "苹果", cat: "水果", shelf: 7, container: "冰箱" },
+    { name: "薯片", cat: "零食", shelf: 30, container: "零食柜" },
+    { name: "感冒灵颗粒", cat: "药品", shelf: 120, container: "药盒" },
+    { name: "酱油", cat: "调味品", shelf: 90, container: "调料柜" },
+    { name: "大米", cat: "主食", shelf: 180, container: "主食柜" }
+  ];
+
+  /* ---------- DOM ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  var el = {
+    devIdle: $("devIdle"), devCam: $("devCam"), devResult: $("devResult"), devSummary: $("devSummary"),
+    camTip: $("camTip"), camActions: $("camActions"),
+    resName: $("resName"), resMeta: $("resMeta"), resExp: $("resExp"),
+    btnConfirm: $("btnConfirm"), btnReshoot: $("btnReshoot"), btnCancel: $("btnCancel"),
+    btnIn: $("btnIn"), btnOut: $("btnOut"),
+    devMini: $("devMini"), devSession: $("devSession"), devRemind: $("devRemind"), deviceLog: $("deviceLog"),
+    btnSettle: $("btnSettle"), btnSettleOk: $("btnSettleOk"),
+    sumIn: $("sumIn"), sumOut: $("sumOut"), sumUnknown: $("sumUnknown"), sumHint: $("sumHint"),
+    pushToast: $("pushToast"), pushBody: $("pushBody"), pushClose: $("pushClose")
+  };
+
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  function showState(name) {
+    ["devIdle", "devCam", "devResult", "devSummary"].forEach(function (k) {
+      el[k].classList.toggle("hidden", k !== name);
+    });
+  }
+
+  /* ---------- 声音：叮（内模组语音播报提示） ---------- */
+  function beepDing() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      var ctx = new AC();
+      var t0 = ctx.currentTime;
+      var gain = ctx.createGain(); gain.gain.value = 0.25;
+      gain.connect(ctx.destination);
+      [[880, 0, 0.09], [1320, 0.1, 0.12]].forEach(function (f) {
+        var o = ctx.createOscillator();
+        o.type = "sine";
+        o.frequency.value = f[0];
+        o.connect(gain);
+        o.start(t0 + f[1]);
+        o.stop(t0 + f[1] + f[2]);
+      });
+      setTimeout(function () { ctx.close(); }, 600);
+    } catch (e) { /* 无音频环境忽略 */ }
+  }
+
+  /* ---------- 扫描流程（v1：平板下发动作，内模组识别） ---------- */
+  function startScan(act) {
+    clearTimers();
+    action = act;
+    el.camTip.textContent = act === "in"
+      ? "已通知内模组 · 请将食材对准门内镜头（条码优先）"
+      : "已通知内模组 · 请将食材对准门内镜头（条码优先）";
+    showState("devCam");
+    later(beepDing, 1600);   // 内模组"叮"声（本地条码解码成功）
+    later(finishWait, 2400); // 条码本地解码 + 云端查库
+  }
+
+  function finishWait() {
+    var tpl = templates[Math.floor(Math.random() * templates.length)];
+    showResult(tpl);
+  }
+
+  function showResult(tpl) {
+    var now = new Date();
+    var exp = new Date(now); exp.setDate(exp.getDate() + tpl.shelf);
+    var result = {
+      name: tpl.name, cat: tpl.cat, expiry: exp, suggested: tpl.container, scannedAt: now
+    };
+    el.resName.textContent = result.name;
+    el.resMeta.innerHTML = "扫描时间 <b>" + fmtDateTime(result.scannedAt) + "</b><br>识别 <b>内模组条码优先 + 云端查库</b> · 建议容器 <b>" + result.suggested + "</b>";
+    el.resExp.textContent = "保质期至 " + fmtDate(result.expiry) + "（剩 " + Math.max(0, tpl.shelf) + " 天）";
+    el.btnConfirm.textContent = "完成";
+    showState("devResult");
+  }
+
+  el.btnIn.addEventListener("click", function () { startScan("in"); });
+  el.btnOut.addEventListener("click", function () { startScan("out"); });
+  el.btnCancel.addEventListener("click", function () { cancelScan(); });
+  el.btnReshoot.addEventListener("click", function () { clearTimers(); startScan(action); });
+
+  function cancelScan() {
+    clearTimers(); showState("devIdle"); updateDeviceIdle();
+  }
+
+  el.btnConfirm.addEventListener("click", function () {
+    var tpl = lastResult();
+    if (!tpl) return;
+    session[action].push(tpl);   // 记入本次会话，关门结算时统一入账
+    pushLog(action, (action === "in" ? "扫码放入 " : "扫码取出 ") + tpl.name + "（待结算）");
+    showState("devIdle");
+    updateDeviceIdle();
+  });
+
+  var last = null;
+  function lastResult() { return last; }
+  // showResult 时记录模板
+  var _origShow = showResult;
+  showResult = function (tpl) { last = tpl; _origShow(tpl); };
+
+  /* ---------- 关门结算（v1 汇总确认） ---------- */
+  el.btnSettle.addEventListener("click", function () {
+    if (session.in.length + session.out.length === 0) {
+      pushLog("push", "本次会话无扫码，无需结算");
+      renderLog();
+      return;
+    }
+    el.sumIn.textContent = session.in.length;
+    el.sumOut.textContent = session.out.length;
+    el.sumUnknown.textContent = 0;
+    el.sumHint.textContent = "连续扫码已入会话，一键确认即入账";
+    showState("devSummary");
+  });
+
+  el.btnSettleOk.addEventListener("click", function () {
+    session.in.forEach(addItem);
+    session.out.forEach(removeItem);
+    pushLog("push", "关门结算：放入 " + session.in.length + " / 取出 " + session.out.length + "，已确认");
+    session = { in: [], out: [] };
+    showState("devIdle");
+    updateDeviceIdle();
+    scanCount++;
+    if (scanCount === 1) later(showPush, 600); // 首次结算后模拟下班前推送
+  });
+
+  function addItem(tpl) {
+    var found = null;
+    items.forEach(function (it) {
+      if (it.name === tpl.name && it.container === tpl.container && status(it) !== "expired") found = it;
+    });
+    if (found) {
+      found.qty++;
+      found.expiry = tpl.expiry;
+    } else {
+      items.push({ id: nextId++, name: tpl.name, cat: tpl.cat, container: tpl.suggested, qty: 1, expiry: tpl.expiry, suggested: tpl.suggested });
+    }
+    pushLog("in", "放入 " + tpl.name + "（建议容器：" + tpl.suggested + "）");
+    renderAll();
+  }
+
+  function removeItem(tpl) {
+    var found = null;
+    items.forEach(function (it) {
+      if (it.name === tpl.name && it.qty > 0) found = it;
+    });
+    if (found) {
+      found.qty--;
+      if (found.qty <= 0) items = items.filter(function (it) { return it !== found; });
+      pushLog("out", "取出 " + tpl.name);
+    } else {
+      pushLog("out", "取出失败：库存中没有 " + tpl.name);
+    }
+    renderAll();
+  }
+
+  function pushLog(type, text) {
+    var t = new Date();
+    log.unshift({ type: type, text: text, time: fmtDateTime(t) });
+    if (log.length > 60) log.pop();
+  }
+
+  /* ---------- 设备待机 ---------- */
+  function updateDeviceIdle() {
+    var soon = items.filter(function (it) { return status(it) === "soon"; });
+    var exp = items.filter(function (it) { return status(it) === "expired"; });
+    var mini = soon[0] ? soon[0].name + " · 还剩 " + daysLeft(soon[0]) + " 天" : "暂无临期";
+    el.devMini.textContent = mini;
+    el.devSession.textContent = (session.in.length + session.out.length)
+      ? "本次会话：放入 " + session.in.length + " · 取出 " + session.out.length
+      : "本次会话：暂无";
+    var parts = [];
+    if (exp.length) parts.push(exp.length + " 件已过期");
+    if (soon.length) parts.push(soon.length + " 件临期");
+    el.devRemind.textContent = parts.length ? "待机提醒：" + parts.join("，") : "待机：无临期 / 过期物品";
+  }
+
+  /* ---------- 操作记录 ---------- */
+  function renderLog() {
+    el.deviceLog.innerHTML = log.slice(0, 6).map(function (l) {
+      return (l.type === "in" ? "▲ " : l.type === "out" ? "▼ " : "◎ ") + l.time + " " + l.text;
+    }).join("<br>");
+  }
+
+  /* ---------- 下班前推送 ---------- */
+  function showPush() {
+    var soon = items.filter(function (it) { return status(it) === "soon"; }).slice(0, 3);
+    var exp = items.filter(function (it) { return status(it) === "expired"; });
+    var lines = [];
+    if (exp.length) lines.push("已过期：" + exp.map(function (x) { return x.name; }).join("、") + "，建议尽快处理");
+    if (soon.length) lines.push("今日临期：" + soon.map(function (x) { return x.name; }).join("、"));
+    lines.push("建议补货：酸奶、鸡蛋、番茄");
+    el.pushBody.innerHTML = lines.map(function (l) { return "· " + l; }).join("<br>");
+    el.pushToast.classList.remove("hidden");
+    pushLog("push", "下班前推送：剩余食材 + 补货清单");
+    renderLog();
+  }
+  el.pushClose.addEventListener("click", function () { el.pushToast.classList.add("hidden"); });
+
+  /* ---------- 汇总刷新 ---------- */
+  function renderAll() {
+    renderLog();
+    updateDeviceIdle();
+  }
+
+  pushLog("in", "演示数据初始化（11 件库存）");
+  renderAll();
+})();
+</script>
+</body>
+</html>
