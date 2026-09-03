@@ -37,11 +37,13 @@ def onnx_simplify(path, img_size):
     return path
 
 
-def random_calib(shape, count):
+def random_calib(shape, count, is_float=False):
+    if is_float:
+        return [[np.random.uniform(0.0, 1.0, shape).astype(np.float32)] for _ in range(count)]
     return [[np.random.randint(0, 256, shape).astype(np.uint8)] for _ in range(count)]
 
 
-def real_calib(shape, count, calib_dir):
+def real_calib(shape, count, calib_dir, is_float=False):
     files = sorted(glob.glob(os.path.join(calib_dir, "*.jpg")) +
                    glob.glob(os.path.join(calib_dir, "*.png")) +
                    glob.glob(os.path.join(calib_dir, "*.jpeg")))
@@ -50,7 +52,11 @@ def real_calib(shape, count, calib_dir):
     for i in range(count):
         p = files[i % len(files)]
         img = Image.open(p).convert("RGB").resize((w, h), Image.BILINEAR)
-        arr = np.asarray(img, dtype=np.uint8).transpose(2, 0, 1)
+        arr = np.asarray(img, dtype=np.float32).transpose(2, 0, 1)
+        if is_float:
+            arr /= 255.0
+        else:
+            arr = arr.astype(np.uint8)
         data.append([arr[np.newaxis, ...]])
     return data
 
