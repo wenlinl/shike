@@ -1,0 +1,30 @@
+name: k230-yolo11n-cls-convert
+
+on:
+  push:
+    branches: [codex/k230-convert]
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install nncase toolchain
+        run: pip install -q nncase==2.11.0 nncase-kpu==2.11.0 onnx onnxsim pillow numpy
+      - name: Compile yolo11n-cls kmodel
+        run: |
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 7.0 --runtime dotnet --install-dir "$HOME/.dotnet7"
+          export DOTNET_ROOT="$HOME/.dotnet7"
+          export PATH="$HOME/.dotnet7:$PATH"
+          python k230-convert/onnx2kmodel_k230.py \
+            k230-convert/yolo11n-cls.onnx \
+            yolo11n_cls_224.kmodel \
+            --no-preprocess --random-calib 100
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kmodel
+          path: yolo11n_cls_224.kmodel
