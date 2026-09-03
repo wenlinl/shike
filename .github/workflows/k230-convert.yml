@@ -23,7 +23,7 @@ jobs:
           python k230-convert/onnx2kmodel_k230.py \
             k230-convert/yolo11n-cls.onnx \
             yolo11n_cls_224.kmodel \
-            --no-preprocess --random-calib 100
+            --random-calib 100
       - uses: actions/upload-artifact@v4
         with:
           name: kmodel
