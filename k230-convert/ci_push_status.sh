@@ -2,6 +2,11 @@
 # 把 CI 进度/失败日志追加到 codex/rawfood-out 分支（单文件历史），主 agent 可直接 git 拉取查看。
 set -e
 
+export GIT_AUTHOR_NAME="codex-ci"
+export GIT_AUTHOR_EMAIL="codex-ci@users.noreply.github.com"
+export GIT_COMMITTER_NAME="codex-ci"
+export GIT_COMMITTER_EMAIL="codex-ci@users.noreply.github.com"
+
 STAGE="$1"
 LOG="${2:-}"
 

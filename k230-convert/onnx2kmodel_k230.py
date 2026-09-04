@@ -27,6 +27,12 @@ def onnx_simplify(path, img_size):
     import onnxsim
 
     model = onnx.load(path)
+    # nncase 2.11 不支持 Reshape 的 allowzero 属性（新版 torch 导出会带），清零（语义不变）
+    for node in model.graph.node:
+        if node.op_type == "Reshape":
+            for attr in node.attribute:
+                if attr.name == "allowzero":
+                    attr.i = 0
     model = onnx.shape_inference.infer_shapes(model)
     model, check = onnxsim.simplify(
         model,
