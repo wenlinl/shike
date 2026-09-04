@@ -30,8 +30,8 @@ jobs:
           set +e
           pip install -q --retries 10 --timeout 60 torch torchvision --index-url https://download.pytorch.org/whl/cpu > ci_step.log 2>&1 \
             || pip install -q --retries 10 --timeout 60 torch torchvision --index-url https://download.pytorch.org/whl/cpu >> ci_step.log 2>&1
-          pip install -q --retries 10 --timeout 60 "numpy<2" "onnx==1.16.2" "onnxscript==0.1.0" onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1 \
-            || pip install -q --retries 10 --timeout 60 "numpy<2" "onnx==1.16.2" "onnxscript==0.1.0" onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1
+          pip install -q --retries 10 --timeout 60 "numpy<2" "onnx==1.16.2" onnxscript onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1 \
+            || pip install -q --retries 10 --timeout 60 "numpy<2" "onnx==1.16.2" onnxscript onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1
           rc=$?
           set -e
           if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_INSTALL ci_step.log || true; exit $rc; fi
