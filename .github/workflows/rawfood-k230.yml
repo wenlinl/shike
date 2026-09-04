@@ -28,7 +28,7 @@ jobs:
         name: Install toolchain (torch CPU + nncase 2.11.0)
         run: |
           pip install -q torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          pip install -q onnx onnxsim pillow numpy nncase==2.11.0 nncase-kpu==2.11.0
+          pip install -q onnx onnxscript onnxsim pillow numpy nncase==2.11.0 nncase-kpu==2.11.0
 
       - if: steps.check.outputs.EXISTS != '1'
         name: Download raw-food ResNet-50 weights
