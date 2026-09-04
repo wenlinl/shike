@@ -25,13 +25,14 @@ jobs:
       - name: Report start
         run: bash k230-convert/ci_push_status.sh START || true
 
-      - name: Install toolchain (torch CPU + nncase 2.11.0)
+      - name: Install export env (torch CPU + recent onnx)
         run: |
           set +e
-          pip install -q --retries 10 --timeout 60 torch torchvision --index-url https://download.pytorch.org/whl/cpu > ci_step.log 2>&1 \
-            || pip install -q --retries 10 --timeout 60 torch torchvision --index-url https://download.pytorch.org/whl/cpu >> ci_step.log 2>&1
-          pip install -q --retries 10 --timeout 60 "numpy<2" onnx onnxscript onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1 \
-            || pip install -q --retries 10 --timeout 60 "numpy<2" onnx onnxscript onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1
+          python -m venv env-exp > ci_step.log 2>&1
+          env-exp/bin/pip install -q --retries 10 --timeout 60 torch torchvision --index-url https://download.pytorch.org/whl/cpu >> ci_step.log 2>&1 \
+            || env-exp/bin/pip install -q --retries 10 --timeout 60 torch torchvision --index-url https://download.pytorch.org/whl/cpu >> ci_step.log 2>&1
+          env-exp/bin/pip install -q --retries 10 --timeout 60 onnx onnxscript >> ci_step.log 2>&1 \
+            || env-exp/bin/pip install -q --retries 10 --timeout 60 onnx onnxscript >> ci_step.log 2>&1
           rc=$?
           set -e
           if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_INSTALL ci_step.log || true; exit $rc; fi
@@ -55,12 +56,23 @@ jobs:
       - name: Export ONNX (ResNet-50, 90 classes, 224x224)
         run: |
           set +e
-          python k230-convert/export_rawfood_resnet50_onnx.py \
+          env-exp/bin/python k230-convert/export_rawfood_resnet50_onnx.py \
             resnet50_pytorch_model.bin rawfood_resnet50_224.onnx > ci_step.log 2>&1
           rc=$?
           set -e
           if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_EXPORT ci_step.log || true; exit $rc; fi
           bash k230-convert/ci_push_status.sh OK_EXPORT || true
+
+      - name: Install compile env (nncase 2.11.0, old onnx/onnxsim, numpy<2)
+        run: |
+          set +e
+          python -m venv env-cmp > ci_step.log 2>&1
+          env-cmp/bin/pip install -q --retries 10 --timeout 60 "numpy<2" "onnx==1.16.2" onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1 \
+            || env-cmp/bin/pip install -q --retries 10 --timeout 60 "numpy<2" "onnx==1.16.2" onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1
+          rc=$?
+          set -e
+          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_COMPILE_ENV ci_step.log || true; exit $rc; fi
+          bash k230-convert/ci_push_status.sh OK_COMPILE_ENV || true
 
       - name: Compile kmodel (nncase 2.11.0, INT8 PTQ, ImageNet mean/std baked in)
         run: |
@@ -68,7 +80,7 @@ jobs:
           curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 7.0 --runtime dotnet --install-dir "$HOME/.dotnet7" > ci_step.log 2>&1
           export DOTNET_ROOT="$HOME/.dotnet7"
           export PATH="$HOME/.dotnet7:$PATH"
-          python k230-convert/onnx2kmodel_k230.py \
+          env-cmp/bin/python k230-convert/onnx2kmodel_k230.py \
             rawfood_resnet50_224.onnx rawfood_resnet50_224.kmodel \
             --random-calib 100 \
             --input-range 0,1 \
@@ -101,5 +113,6 @@ jobs:
           name: rawfood-resnet50-224
           path: |
             rawfood_resnet50_224.kmodel
+            ci_step.log
             ci_status.txt
           if-no-files-found: warn
