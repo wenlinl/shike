@@ -23,7 +23,7 @@ jobs:
         run: git fetch origin codex/rawfood-out || true
 
       - name: Report start
-        run: bash k230-convert/ci_push_status.sh START
+        run: bash k230-convert/ci_push_status.sh START || true
 
       - name: Install toolchain (torch CPU + nncase 2.11.0)
         run: |
@@ -34,8 +34,8 @@ jobs:
             || pip install -q --retries 10 --timeout 60 "numpy<2" "onnx==1.16.2" "onnxscript==0.1.0" onnxsim pillow "nncase==2.11.0" "nncase-kpu==2.11.0" >> ci_step.log 2>&1
           rc=$?
           set -e
-          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_INSTALL ci_step.log; exit $rc; fi
-          bash k230-convert/ci_push_status.sh OK_INSTALL
+          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_INSTALL ci_step.log || true; exit $rc; fi
+          bash k230-convert/ci_push_status.sh OK_INSTALL || true
 
       - name: Download raw-food ResNet-50 weights
         run: |
@@ -49,8 +49,8 @@ jobs:
           ls -l resnet50_pytorch_model.bin >> ci_step.log 2>&1
           rc=$?
           set -e
-          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_DOWNLOAD ci_step.log; exit $rc; fi
-          bash k230-convert/ci_push_status.sh OK_DOWNLOAD
+          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_DOWNLOAD ci_step.log || true; exit $rc; fi
+          bash k230-convert/ci_push_status.sh OK_DOWNLOAD || true
 
       - name: Export ONNX (ResNet-50, 90 classes, 224x224)
         run: |
@@ -59,8 +59,8 @@ jobs:
             resnet50_pytorch_model.bin rawfood_resnet50_224.onnx > ci_step.log 2>&1
           rc=$?
           set -e
-          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_EXPORT ci_step.log; exit $rc; fi
-          bash k230-convert/ci_push_status.sh OK_EXPORT
+          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_EXPORT ci_step.log || true; exit $rc; fi
+          bash k230-convert/ci_push_status.sh OK_EXPORT || true
 
       - name: Compile kmodel (nncase 2.11.0, INT8 PTQ, ImageNet mean/std baked in)
         run: |
@@ -76,12 +76,12 @@ jobs:
             --std 0.229,0.224,0.225 >> ci_step.log 2>&1
           rc=$?
           set -e
-          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_COMPILE ci_step.log; exit $rc; fi
-          bash k230-convert/ci_push_status.sh OK_COMPILE
+          if [ $rc -ne 0 ]; then bash k230-convert/ci_push_status.sh FAIL_COMPILE ci_step.log || true; exit $rc; fi
+          bash k230-convert/ci_push_status.sh OK_COMPILE || true
 
-      - name: Publish kmodel to output branch
+      - name: Publish kmodel to output branch (best effort)
         run: |
-          bash k230-convert/ci_push_status.sh DONE
+          bash k230-convert/ci_push_status.sh DONE || true
           blob1=$(git hash-object -w ci_status.txt)
           blob2=$(git hash-object -w rawfood_resnet50_224.kmodel)
           blob3=$(git hash-object -w rawfood_resnet50_224.onnx)
@@ -91,5 +91,15 @@ jobs:
           else
             commit=$(git commit-tree "$tree" -m "ci: kmodel ready")
           fi
-          git push origin "$commit":refs/heads/codex/rawfood-out
+          git push origin "$commit":refs/heads/codex/rawfood-out || echo PUSH_BACK_FAILED
           echo PUBLISHED "$commit"
+
+      - name: Upload kmodel artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rawfood-resnet50-224
+          path: |
+            rawfood_resnet50_224.kmodel
+            ci_status.txt
+          if-no-files-found: warn
