@@ -1,0 +1,70 @@
+name: k230-rawfood-resnet50-convert
+
+on:
+  push:
+    branches: [codex/rawfood-k230]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Skip if kmodel already committed
+        id: check
+        run: |
+          if [ -f rawfood_resnet50_224.kmodel ]; then
+            echo "EXISTS=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.check.outputs.EXISTS != '1'
+        name: Install toolchain (torch CPU + nncase 2.11.0)
+        run: |
+          pip install -q torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install -q onnx onnxsim pillow numpy nncase==2.11.0 nncase-kpu==2.11.0
+
+      - if: steps.check.outputs.EXISTS != '1'
+        name: Download raw-food ResNet-50 weights
+        run: |
+          for u in \
+            "https://hf-mirror.com/ibrahimdaud/raw-food-recognition-models/resolve/main/resnet50_pytorch_model.bin" \
+            "https://huggingface.co/ibrahimdaud/raw-food-recognition-models/resolve/main/resnet50_pytorch_model.bin" ; do
+            echo "try $u"
+            curl -fsSL --retry 5 --retry-delay 5 -C - -o resnet50_pytorch_model.bin "$u" && break
+          done
+          ls -l resnet50_pytorch_model.bin
+
+      - if: steps.check.outputs.EXISTS != '1'
+        name: Export ONNX (ResNet-50, 90 classes, 224x224)
+        run: |
+          python k230-convert/export_rawfood_resnet50_onnx.py \
+            resnet50_pytorch_model.bin rawfood_resnet50_224.onnx
+
+      - if: steps.check.outputs.EXISTS != '1'
+        name: Compile kmodel (nncase 2.11.0, INT8 PTQ, ImageNet mean/std baked in)
+        run: |
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 7.0 --runtime dotnet --install-dir "$HOME/.dotnet7"
+          export DOTNET_ROOT="$HOME/.dotnet7"
+          export PATH="$HOME/.dotnet7:$PATH"
+          python k230-convert/onnx2kmodel_k230.py \
+            rawfood_resnet50_224.onnx rawfood_resnet50_224.kmodel \
+            --random-calib 100 \
+            --input-range 0,1 \
+            --mean 0.485,0.456,0.406 \
+            --std 0.229,0.224,0.225
+
+      - if: steps.check.outputs.EXISTS != '1'
+        name: Commit kmodel back to branch
+        run: |
+          git config user.name "codex-ci"
+          git config user.email "codex-ci@users.noreply.github.com"
+          git add rawfood_resnet50_224.kmodel
+          git commit -m "ci(k230): rawfood resnet50 90cls kmodel (int8 ptq)"
+          git push
